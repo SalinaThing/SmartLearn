@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #f4f7f6; padding: 20px 0 40px 0; }
+        .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; font-family: sans-serif; color: #333333; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .header { background-color: #1e293b; padding: 35px; text-align: center; color: #ffffff; }
+        .content { padding: 30px; }
+        
+        /* Table Styling */
+        .order-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .order-table th { text-align: left; padding: 12px; border-bottom: 2px solid #edf2f7; color: #718096; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .order-table td { padding: 15px 12px; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+        
+        .calculation-row td { padding: 8px 12px; border: none; font-size: 13px; color: #4a5568; }
+        .total-row { font-weight: bold; font-size: 16px !important; color: #1e293b; border-top: 2px solid #edf2f7 !important; }
+        
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #a0aec0; }
+        .button { display: inline-block; background-color: #4F46E5; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <table class="main">
+            <tr>
+                <td class="header">
+                    <h1 style="margin: 0; font-size: 22px;">Payment Confirmation</h1>
+                </td>
+            </tr>
+            <tr>
+                <td class="content">
+                    <p>Hello,</p>
+                    <p>Your payment was successful! Here are your order details:</p>
+                    
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th style="text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong><%= order.name %></strong><br>
+                                    <span style="font-size: 12px; color: #718096;">ID: #<%= order._id %></span>
+                                </td>
+                                <td style="text-align: right; vertical-align: top;">
+                                    $<%= order.price %>
+                                </td>
+                            </tr>
+                            <tr class="calculation-row">
+                                <td style="text-align: right; padding-top: 20px;">Subtotal:</td>
+                                <td style="text-align: right; padding-top: 20px;">$<%= order.price %></td>
+                            </tr>
+                            <tr class="calculation-row">
+                                <td style="text-align: right;">Tax:</td>
+                                <td style="text-align: right;">$0.00</td>
+                            </tr>
+                            <tr class="calculation-row total-row">
+                                <td style="text-align: right;">Total Paid:</td>
+                                <td style="text-align: right;">$<%= order.price %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="font-size: 13px; color: #718096;"><strong>Date:</strong> <%= order.date %></p>
+
+                    <div style="text-align: center;">
+                        <a href="<%= process.env.CLIENT_URL %>/course-access/<%= order.courseId %>" class="button">Access Course</a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="footer">
+                    <p>&copy; 2026 Your LMS Brand. All rights reserved.</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
