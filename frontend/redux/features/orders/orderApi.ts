@@ -1,5 +1,3 @@
-"use-cleint"
-
 import { apiSlice } from "../api/apiSlice";
 
 export const orderApi = apiSlice.injectEndpoints({

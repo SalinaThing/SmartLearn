@@ -1,5 +1,6 @@
 "use client";
 
+import axios from 'axios';
 import React, { FC, useEffect, useState } from 'react'
 
 type Props = {
@@ -25,6 +26,7 @@ const CoursePlayer: FC <Props> = ({videoUrl, title}) => {
 
   return (
     <div style= {{ paddingTop: "41%", position: "relative"}} >
+        <h2 className="text-white text-lg mb-2">{title}</h2>
         {
             videoData.otp && videoData.playbackInfo !== "" && (
                 <iframe 

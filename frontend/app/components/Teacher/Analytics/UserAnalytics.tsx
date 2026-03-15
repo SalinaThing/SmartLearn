@@ -1,4 +1,4 @@
-'use-client'
+"use client"
 import { useGetUsersAnaltyicsQuery } from '@/redux/features/analytics/analyticsApi';
 import React from 'react'
 import {

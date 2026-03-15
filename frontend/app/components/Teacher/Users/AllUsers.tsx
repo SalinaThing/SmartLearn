@@ -19,7 +19,6 @@ const AllUsers: FC<Props> = ({isTeam}) => {
 
     const {theme, setTheme} = useTheme();
     const [active, setActive] = useState(false);
-    const [email, setEmail] = useState("");
     const [role, setRole] = useState("teacher");
     const [open, setOpen] = useState(false);
     const [userId, setUserId] = useState("");
@@ -150,11 +149,23 @@ const AllUsers: FC<Props> = ({isTeam}) => {
     }
 
     const handleSubmit = async () => {
-        await updateUserRole({email, role});
+        if (!userId) {
+            toast.error("Please select or enter a user ID to update");
+            return;
+        }
+        await updateUserRole({id: userId, role});
     }
 
     const handleDelete = async () => {
-        console.log('fff');
+        if (!userId) {
+            toast.error("No user selected to delete");
+            return;
+        }
+        try {
+            await deleteUser(userId).unwrap();
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to delete user");
+        }
     }
 
 
@@ -246,9 +257,42 @@ const AllUsers: FC<Props> = ({isTeam}) => {
                     />
                 </Box>
 
-                {
-                    active && (
+                {active && (
+                    <div className="mt-6 p-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900">
+                        <h3 className={`${styles.title} mb-3`}>Update Team Member Role</h3>
 
+                        <input
+                            type="text"
+                            placeholder="User ID"
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
+                            className={`${styles.input} mb-2`}
+                        />
+
+                        <select
+                            className={`${styles.input} mb-2`}
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                        >
+                            <option value="teacher">Teacher</option>
+                            <option value="student">Student</option>
+                        </select>
+
+                        <div className="flex gap-2">
+                            <button
+                                className={`${styles.button} !w-[120px] !h-[35px]`}
+                                onClick={handleSubmit}
+                            >
+                                Save
+                            </button>
+                            <button
+                                className={`${styles.button} !w-[120px] !h-[35px] bg-gray-500`}
+                                onClick={() => setActive(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 )}
 
                 {open && (

@@ -8,13 +8,14 @@ import CourseContent from './CourseContent';
 import CoursePreview from './CoursePreview';
 import { useEditCourseMutation, useGetAllCoursesQuery } from '@/redux/features/courses/coursesApi';
 import toast from 'react-hot-toast';
-import { redirect } from 'next/dist/server/api-utils';
+import { useRouter } from 'next/navigation';
 
 type Props = {
     id: string;
 }
 
 const EditCourse:FC <Props> = ({id}) => {
+    const router = useRouter();
     // console.log(id); All coppied from CreateCOurse 
     const [editCourse, {isSuccess, error}] = useEditCourseMutation(); 
 
@@ -28,7 +29,7 @@ const EditCourse:FC <Props> = ({id}) => {
     useEffect(() => {
         if(isSuccess){
             toast.success("Course updated successfully");
-            redirect("/teacher/courses");
+            router.push("/teacher/courses");
         }
         if(error){
             if("data" in error){

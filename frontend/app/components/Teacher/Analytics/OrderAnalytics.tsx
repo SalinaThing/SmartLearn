@@ -1,4 +1,4 @@
-'use-client'
+"use client"
 import { useGetOrdersAnaltyicsQuery } from '../../../../redux/features/analytics/analyticsApi';
 import React from 'react'
 import {

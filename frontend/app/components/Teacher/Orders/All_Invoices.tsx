@@ -230,10 +230,10 @@ const All_Invoices = ({isDashboard}: Props) => {
               }}
           >
             <DataGrid
-                checkboxSelection={isDashboard ? false : true}
+                checkboxSelection={!isDashboard}
                 rows={rows}
                 columns={columns}
-                components={isDashboard ? {} : { Toolbar: GridToolbar }}
+                slots={isDashboard ? {} : { toolbar: GridToolbar }}
               />
           </Box>
         </Box>

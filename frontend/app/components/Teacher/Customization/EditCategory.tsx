@@ -32,7 +32,7 @@ const EditCategory = (props: Props) => {
         }
     }, [data, isSuccess, error])
 
-    const handleCategoriesAdd = (id, value) => {
+    const handleCategoriesAdd = (id: string, value: string) => {
         setCategories((prevCategory:any) =>
             prevCategory.map((i:any) => 
                 (i._id === id

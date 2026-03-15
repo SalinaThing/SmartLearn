@@ -15,7 +15,7 @@ const EditFAQ = (props: Props) => {
         {refetchOnMountOrArgChange: true}
     );
 
-    const [questions, setQuestions] = useState<[]>([]);
+    const [questions, setQuestions] = useState<any[]>([]);
     const [editLayout, {isSuccess, error}]= useEditLayoutMutation();
 
     useEffect(() =>{

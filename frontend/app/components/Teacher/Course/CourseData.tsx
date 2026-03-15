@@ -1,4 +1,4 @@
-"use-client"
+"use client"
 
 import { styles } from '@/app/styles/style';
 import React, { FC } from 'react'
