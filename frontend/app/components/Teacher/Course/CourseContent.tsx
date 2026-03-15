@@ -1,7 +1,7 @@
 "use client";
 
 import { styles } from '@/app/styles/style';
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
 import { AiOutlineDelete, AiOutlinePlusCircle } from 'react-icons/ai';
 import { BsLink45Deg, BsPencil } from 'react-icons/bs';
@@ -26,13 +26,23 @@ const CourseContent : FC <Props> = ({
   const [isCollapsed, setIsCollapsed] = useState (Array(courseContentData.length).fill(false));
   const [activeSection, setActiveSection] = useState(1);
 
+  useEffect(() => {
+    setIsCollapsed((prev) => {
+      const updated = [...prev];
+      if (courseContentData.length > updated.length) {
+        return [...updated, ...Array(courseContentData.length - updated.length).fill(false)];
+      }
+      return updated.slice(0, courseContentData.length);
+    });
+  }, [courseContentData.length]);
+
   const handleSubmit = (e:any) => {
     e.preventDefault();
   }
 
   const handleCollapseToggle = (index:number) => {
-        const updatedCollapsed = [ ...isCollapsed];
-        updatedCollapsed[index].title = !updatedCollapsed[index];
+        const updatedCollapsed = [...isCollapsed];
+        updatedCollapsed[index] = !updatedCollapsed[index];
         setIsCollapsed(updatedCollapsed);
   }
 
@@ -100,7 +110,7 @@ const CourseContent : FC <Props> = ({
       setActive(active -1);
     }
 
-  const handleOptions = () => {
+  const handleOptions = async () => {
     if(
       courseContentData[courseContentData.length - 1].title === "" ||
       courseContentData[courseContentData.length - 1].description === "" ||
@@ -112,8 +122,8 @@ const CourseContent : FC <Props> = ({
       toast.error("Section can't be empty!!")
     } 
     else {
+      await handleCourseSubmit();
       setActive(active + 1);
-      handleCourseSubmit();
     }
   }
   return (
@@ -126,7 +136,7 @@ const CourseContent : FC <Props> = ({
             item.videoSection !== courseContentData[index - 1].videoSection;
 
           return (
-            <>
+            <React.Fragment key={`${index}-${item.videoSection}`}> 
               <div
                 className={`w-full bg-[#cdc8c817] p-4 ${
                   showSectionInput ? "mt-10" : "mb-0"
@@ -290,7 +300,7 @@ const CourseContent : FC <Props> = ({
                             type="text"
                             placeholder="Source code...(Link title)"
                             className={`${styles.input}`}
-                            value={item.title}
+                            value={link.title}
                             onChange={(e) =>{
                               const updatedData = [ ...courseContentData];
                               updatedData[index].links[linkIndex].title = e.target.value;
@@ -340,7 +350,7 @@ const CourseContent : FC <Props> = ({
                 )
               }
               </div>
-            </>
+            </React.Fragment>
           )
         })} 
         <br/>

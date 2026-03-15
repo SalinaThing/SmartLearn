@@ -29,8 +29,8 @@ const CoursePreview: FC <Props> = ({
         setActive(active - 1);
     }
 
-    const createCourse = () => {
-        handleCourseCreate();
+    const createCourse = async () => {
+        await handleCourseCreate();
     }
 
 

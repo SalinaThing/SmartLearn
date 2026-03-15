@@ -44,6 +44,7 @@ const EditCourse:FC <Props> = ({id}) => {
     const [courseInfo, setCourseInfo] = useState({
         name: "", 
         description: "",
+        categories: "",
         price:"",
         estimatedPrice: "",
         tags: "",
@@ -75,6 +76,7 @@ const EditCourse:FC <Props> = ({id}) => {
             setCourseInfo({
                 name: editCourseData.name,
                 description: editCourseData.description,
+                categories: editCourseData.categories,
                 price: editCourseData.price,
                 estimatedPrice: editCourseData?.estimatedPrice,
                 tags: editCourseData.tags,
@@ -90,14 +92,10 @@ const EditCourse:FC <Props> = ({id}) => {
 
     const [courseData, setCourseData] = useState({});
 
-    const handleSubmit = async () => {
-        //format benefit array
-        const formattedBenefits = benefits.map((benefit) =>({ title: benefit.title }));
-
-        //format prerequisites array
+    const prepareCoursePayload = () => {
+        const formattedBenefits = benefits.map((benefit) => ({ title: benefit.title }));
         const formattedPrerequisites = prerequisites.map((prerequisite) => ({ title: prerequisite.title }));
 
-        //format course content data array
         const formattedCourseContentData = courseContentData.map((courseContent) => ({
             videoUrl: courseContent.videoUrl,
             title: courseContent.title,
@@ -110,30 +108,36 @@ const EditCourse:FC <Props> = ({id}) => {
             suggestion: courseContent.suggestion,
         }));
 
-        //Prepare our data obj
-        const data = {
+        return {
             name: courseInfo.name,
             description: courseInfo.description,
-            price: courseInfo.price,
-            estimatedPrice: courseInfo.estimatedPrice,
+            categories: courseInfo.categories,
+            price: Number(courseInfo.price),
+            estimatedPrice: Number(courseInfo.estimatedPrice),
             tags: courseInfo.tags,
             level: courseInfo.level,
             demoUrl: courseInfo.demoUrl,
             thumbnail: courseInfo.thumbnail,
             benefits: formattedBenefits,
             prerequisites: formattedPrerequisites,
-            courseData:  formattedCourseContentData,
+            courseData: formattedCourseContentData,
             totalVideos: formattedCourseContentData.length,
         };
+    };
+
+    const handleSubmit = async () => {
+        const data = prepareCoursePayload();
         setCourseData(data);
-    }
+        return data;
+    };
+
     console.log(courseData);
 
-    const handleCourseCreate = async (e:any) => {
-        const data = courseData;
-        await editCourse({id: editCourseData?._id, data});
-
-    }
+    const handleCourseCreate = async () => {
+        const data = prepareCoursePayload();
+        setCourseData(data);
+        await editCourse({ id: editCourseData?._id, data });
+    };
 
   return (
     <div className="w-full flex min-h-screen">

@@ -267,7 +267,7 @@ return(
                         {/* Teacher Hero */}
                         <Item
                             title="Hero"
-                            to="/teacher/hero"
+                            to="/teacher/hero-layout"
                             icon={<WebIcon/>}
                             selected={selected}
                             setSelected={setSelected} 
@@ -275,7 +275,7 @@ return(
 
                         <Item
                             title="FAQ"
-                            to="/faq"
+                            to="/teacher/faq"
                             icon={<QuizIcon/>}
                             selected={selected}
                             setSelected={setSelected}                        

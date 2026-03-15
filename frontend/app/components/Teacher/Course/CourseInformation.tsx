@@ -170,9 +170,9 @@ const CourseInformation : FC <Props> = ({courseInfo, setCourseInfo, active, setA
                         name="" 
                         id="" 
                         className={`${styles.input}`}
-                        value={courseInfo.category}
+                        value={courseInfo.categories}
                         onChange={(e: any) =>
-                            setCourseInfo({ ...courseInfo, category: e.target.value })
+                            setCourseInfo({ ...courseInfo, categories: e.target.value })
                         }
                     >
                         <option value="">Select Category</option>

@@ -93,7 +93,7 @@ const EditFAQ = (props: Props) => {
         ) {
             await editLayout({
                 type:"FAQ",
-                faq:questions,
+                faqs:questions,
             })
         }
     }

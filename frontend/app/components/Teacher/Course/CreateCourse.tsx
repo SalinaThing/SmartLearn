@@ -64,14 +64,10 @@ const CreateCourse = (props: Props) => {
 
     const [courseData, setCourseData] = useState({});
 
-    const handleSubmit = async () => {
-        //format benefit array
-        const formattedBenefits = benefits.map((benefit) =>({ title: benefit.title }));
-
-        //format prerequisites array
+    const prepareCoursePayload = () => {
+        const formattedBenefits = benefits.map((benefit) => ({ title: benefit.title }));
         const formattedPrerequisites = prerequisites.map((prerequisite) => ({ title: prerequisite.title }));
 
-        //format course content data array
         const formattedCourseContentData = courseContentData.map((courseContent) => ({
             videoUrl: courseContent.videoUrl,
             title: courseContent.title,
@@ -85,32 +81,49 @@ const CreateCourse = (props: Props) => {
             suggestion: courseContent.suggestion,
         }));
 
-        //Prepare our data obj
-        const data = {
+        return {
             name: courseInfo.name,
             description: courseInfo.description,
-            price: courseInfo.price,
-            estimatedPrice: courseInfo.estimatedPrice,
+            categories: courseInfo.categories,
+            price: Number(courseInfo.price),
+            estimatedPrice: Number(courseInfo.estimatedPrice),
             tags: courseInfo.tags,
             level: courseInfo.level,
             demoUrl: courseInfo.demoUrl,
             thumbnail: courseInfo.thumbnail,
             benefits: formattedBenefits,
             prerequisites: formattedPrerequisites,
-            courseData:  formattedCourseContentData,
+            courseData: formattedCourseContentData,
             totalVideos: formattedCourseContentData.length,
         };
+    };
+
+    const handleSubmit = async () => {
+        const data = prepareCoursePayload();
         setCourseData(data);
-    }
+        return data;
+    };
+
     console.log(courseData);
 
-    const handleCourseCreate = async (e:any) => {
-        const data = courseData;
+    const handleCourseCreate = async () => {
+        const data = prepareCoursePayload();
+        setCourseData(data);
 
-        if(!isLoading){
-            await createCourse(data); //id isLoading is false then only create course
+        if (!data.name || !data.description || !data.categories || !data.price || !data.tags || !data.level || !data.demoUrl || !data.thumbnail) {
+            toast.error('Please fill all required course fields before creating.');
+            return;
         }
-    }
+
+        if (!isLoading) {
+            try {
+                await createCourse(data).unwrap();
+            } catch (apiError: any) {
+                const message = apiError?.data?.message || apiError?.error || 'Course creation failed';
+                toast.error(message);
+            }
+        }
+    };
 
   return (
     <div className="w-full flex min-h-screen">
