@@ -7,7 +7,6 @@ import Hero from "./components/Route/Hero";
 import Courses from "./components/Route/Courses";
 import Reviews from "./components/Route/Reviews";
 import Faq from "./components/FAQ/Faq";
-import Footer from "./components/Footer";
 
 export default function HomePage() {
   const [open, setOpen] = useState(false);
@@ -34,7 +33,7 @@ export default function HomePage() {
       <Courses/>
       <Reviews/>
       <Faq/>
-      <Footer />
+      <Footer/>
 
     </div>
   );
