@@ -18,14 +18,16 @@ const Hero: FC<Props> = () => {
     refetchOnMountOrArgChange:true
   })
 
+  const heroImage = data?.layout?.banner?.image?.url || avatar;
+
   return (
     <div className="w-full min-h-screen flex items-center justify-between px-6 1000px:px-12 relative overflow-hidden">
 
       {/* Left Section - Smaller Banner */}
       <div className="w-[40%] flex items-center justify-center relative">
         <Image
-          src={data?.layout?.banner?.image?.url}
-          alt=""
+          src={heroImage}
+          alt={data?.layout?.banner?.title || "Banner"}
           width={380}
           height={380}
           priority
