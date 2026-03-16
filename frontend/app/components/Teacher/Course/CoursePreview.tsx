@@ -77,10 +77,10 @@ const CoursePreview: FC <Props> = ({
                 </div>
             </div>
 
-            <p className="pb-1"> Source code included</p>
-            <p className="pb-1"> Full lifetime access</p>
-            <p className="pb-1"> Access on mobile and TV</p>
-            <p className="pb-1"> Premium Support</p>
+            <p className="pb-1"> · Source code included</p>
+            <p className="pb-1"> · Full lifetime access</p>
+            <p className="pb-1"> · Access on mobile and TV</p>
+            <p className="pb-1"> · Premium Support</p>
         </div>
 
         <div className="w-full">
