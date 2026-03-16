@@ -1,12 +1,12 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import React, { FC, useEffect, useState } from 'react'
-import {DataGrid} from '@mui/x-data-grid';
-import {Box, Button, Modal} from '@mui/material';
-import {AiOutlineDelete, AiOutlineMail} from 'react-icons/ai';
+import React, { FC, useMemo, useState } from 'react'
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Box, Button, Modal } from '@mui/material';
+import { AiOutlineDelete, AiOutlineMail } from 'react-icons/ai';
 import Loader from '../../Loader/Loader';
-import {format} from "timeago.js";
+import { format } from "timeago.js";
 import { useDeleteUserMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } from '@/redux/features/user/userApi';
 import { styles } from '@/app/styles/style';
 import { toast } from 'react-hot-toast';
@@ -15,146 +15,123 @@ type Props = {
     isTeam?: boolean;
 }
 
+type User = {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+    courses: Array<unknown>;
+    createdAt: string;
+};
+
+type UserRow = {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    courses: number;
+    created_at: string;
+};
+
 const AllUsers: FC<Props> = ({isTeam}) => {
 
-    const {theme, setTheme} = useTheme();
+    const {theme} = useTheme();
     const [active, setActive] = useState(false);
     const [role, setRole] = useState("teacher");
     const [open, setOpen] = useState(false);
     const [userId, setUserId] = useState("");
 
-    const [updateUserRole, { error: updateError, isSuccess }] =
-        useUpdateUserRoleMutation();
+    const [updateUserRole] = useUpdateUserRoleMutation();
 
     const { isLoading, data, refetch } = useGetAllUsersQuery({}, {
         refetchOnMountOrArgChange: true,
     });
 
-    const [deleteUser, { isSuccess: deleteSuccess, error: deleteError }] =
-        useDeleteUserMutation();
-
-    useEffect(() => {
-        if (updateError) {
-            if ("data" in updateError) {
-                const errorMessage = updateError as any;
-                toast.error(errorMessage.data.message);
-            }
-        }
-
-        if (isSuccess) {
-            refetch();
-            toast.success("User role updated successfully");
-            setActive(false);
-        }
-
-        if (deleteSuccess) {
-            refetch();
-            toast.success("Delete user successfully!");
-            setOpen(false);
-        }
-
-        if (deleteError) {
-            if ("data" in deleteError) {
-                const errorMessage = deleteError as any;
-                toast.error(errorMessage.data.message);
-            }
-        }
-    }, [updateError, isSuccess, deleteSuccess, deleteError]);
+    const [deleteUser] = useDeleteUserMutation();
 
 
-    const columns = [
+    const columns: GridColDef<UserRow>[] = [
         { field: 'id', headerName: 'ID', flex: 0.3 },
-        {field:'name', headerName:'User Name', flex:0.5},
-        {field:'email', headerName:'Email', flex:0.5},
-        {field:'role', headerName:'Role', flex:0.5},
-        {field:'courses', headerName:'Purchased Courses', flex:0.5},
-        {field:'created_at', headerName:"Created At", flex:0.5},
+        { field: 'name', headerName: 'User Name', flex: 0.5 },
+        { field: 'email', headerName: 'Email', flex: 0.5 },
+        { field: 'role', headerName: 'Role', flex: 0.5 },
+        { field: 'courses', headerName: 'Purchased Courses', flex: 0.5 },
+        { field: 'created_at', headerName: "Joined At", flex: 0.5 },
 
-        {field:' ', headerName:"Delete", flex:0.2, 
-            renderCell: (params:any) =>{
-                return(
-                    <>
-                        <Button
-                            onClick={() => {
-                                setUserId(params.row.id);
-                                setOpen(true);
-                            }}
-                        >
-                            <AiOutlineDelete
-                                className="dark:text-white text-black"
-                                size={20}
-                            />
-                        </Button>
-                    </>
-                )
-            }
+        {
+            field: 'action-delete',
+            headerName: "Delete",
+            flex: 0.2,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams<UserRow>) => (
+                <Button
+                    onClick={() => {
+                        setUserId(params.row.id);
+                        setOpen(true);
+                    }}
+                >
+                    <AiOutlineDelete
+                        className="dark:text-white text-black"
+                        size={20}
+                    />
+                </Button>
+            ),
         },
 
-        {field:'  ', headerName:"Email", flex:0.2, 
-            renderCell: (params:any) =>{
-                return(
-                    <>
-                        <a href={`mailto:${params.row.email}`}>
-                            <AiOutlineMail
-                                className="dark:text-white text-black"
-                                size={20}
-                            />
-                        </a >
-                    </>
-                )
-            }
+        {
+            field: 'action-email',
+            headerName: "Email",
+            flex: 0.2,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams<UserRow>) => (
+                <a href={`mailto:${params.row.email}`}>
+                    <AiOutlineMail
+                        className="dark:text-white text-black"
+                        size={20}
+                    />
+                </a>
+            ),
+        },
+    ];
+
+    const rows = useMemo<UserRow[]>(() => {
+        if (!data || !Array.isArray(data.users)) {
+            return [];
         }
-    ]
 
-    // const rows = [
-    //     {  
-    //         id:1, 
-    //         title:"React Course", 
-    //         ratings:4.5, 
-    //         purchased:1000, 
-    //         created_at:"2023-01-01"
-    //     },
-    // ]
+        const filteredUsers = isTeam
+            ? data.users.filter((user: User) => user.role === "teacher")
+            : data.users;
 
-    const rows:any = [];
-
-    if(isTeam){
-        const newData = data && data.users.filter((item:any) => item.role === "teacher");
-        newData && 
-            newData.forEach((item:any) => {
-                rows.push({
-                    id:item._id,
-                    name:item.name,
-                    email:item.email,
-                    role:item.role,
-                    courses:item.courses.length,
-                    created_at:format(item.createdAt),
-                })
-            }
-        );
-
-    } else {
-         data && 
-            data.users.forEach((item:any) => {
-                rows.push({
-                    id:item._id,
-                    name:item.name,
-                    email:item.email,
-                    role:item.role,
-                    courses:item.courses.length,
-                    created_at:format(item.createdAt),
-                })
-            }
-        );
-    }
-
+        return filteredUsers.map((user: User) => ({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            courses: Array.isArray(user.courses) ? user.courses.length : 0,
+            created_at: format(user.createdAt),
+        }));
+    }, [data, isTeam]);
     const handleSubmit = async () => {
         if (!userId) {
             toast.error("Please select or enter a user ID to update");
             return;
         }
-        await updateUserRole({id: userId, role});
-    }
+
+        try {
+            await updateUserRole({ id: userId, role }).unwrap();
+            toast.success("User role updated successfully");
+            setActive(false);
+            await refetch();
+        } catch (error: unknown) {
+            if (typeof error === "object" && error !== null && "data" in error) {
+                const e = error as { data?: { message?: string } };
+                toast.error(e.data?.message || "Failed to update user role");
+            } else {
+                toast.error("Failed to update user role");
+            }
+        }
+    };
 
     const handleDelete = async () => {
         if (!userId) {
@@ -163,10 +140,18 @@ const AllUsers: FC<Props> = ({isTeam}) => {
         }
         try {
             await deleteUser(userId).unwrap();
-        } catch (err: any) {
-            toast.error(err?.data?.message || "Failed to delete user");
+            toast.success("Delete user successfully!");
+            setOpen(false);
+            await refetch();
+        } catch (error: unknown) {
+            if (typeof error === "object" && error !== null && "data" in error) {
+                const e = error as { data?: { message?: string } };
+                toast.error(e.data?.message || "Failed to delete user");
+            } else {
+                toast.error("Failed to delete user");
+            }
         }
-    }
+    };
 
 
  return (
