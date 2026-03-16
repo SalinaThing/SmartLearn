@@ -160,7 +160,9 @@ export const updateAccessToken = catchAsyncErrors(async (req, res, next) => {
         const refreshTokenFromCookie = req.cookies?.refreshToken;
 
         if (!refreshTokenFromCookie) {
-            return next(new ErrorHandler(400, "Refresh token not found"));
+            // No refresh token means unauthenticated user. proceed without throwing.
+            req.user = null;
+            return next();
         }
 
         const decoded = jwt.verify(refreshTokenFromCookie, process.env.REFRESH_TOKEN);
@@ -208,7 +210,11 @@ export const getUserInfo = catchAsyncErrors(async (req, res, next) => {
         const userId = req.user?._id;
 
         if (!userId) {
-            return next(new ErrorHandler(400, "User not found"));
+            return res.status(200).json({
+                success: false,
+                message: "User not authenticated",
+                user: null,
+            });
         }
 
         const user = await userModel.findById(userId);
