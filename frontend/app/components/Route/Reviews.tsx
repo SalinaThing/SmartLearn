@@ -45,8 +45,8 @@ const Reviews = (props: Props) => {
           <Image
             src={Hero}
             alt="business"
-            width={700}
-            height={700}
+            width={400}
+            height={300}
           />
         </div>
 
