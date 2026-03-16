@@ -9,18 +9,23 @@ import avatar from "../../../public/assets/Hero.jpg";
 import heroIcon1 from "../../../public/assets/heroicon1.jpg";
 import heroIcon2 from "../../../public/assets/heroicon2.jpg";
 import heroIcon3 from "../../../public/assets/heroicon3.jpg";
+import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 
 type Props = {};
 
 const Hero: FC<Props> = () => {
+  const {data, refetch} = useGetHeroDataQuery("Banner", {
+    refetchOnMountOrArgChange:true
+  })
+
   return (
     <div className="w-full min-h-screen flex items-center justify-between px-6 1000px:px-12 relative overflow-hidden">
 
       {/* Left Section - Smaller Banner */}
       <div className="w-[40%] flex items-center justify-center relative">
         <Image
-          src={avatar}
-          alt="Banner Image"
+          src={data?.layout?.banner?.image?.url}
+          alt=""
           width={380}
           height={380}
           priority
@@ -35,14 +40,13 @@ const Hero: FC<Props> = () => {
         <h2 className="dark:text-white text-gray-800 
           text-[32px] 1100px:text-[50px] 
           font-[600] font-Josefin leading-tight">
-          Improve Your Online Learning Experience Better Instantly
+          {data?.layout?.banner?.title}
         </h2>
 
         <p className="dark:text-gray-300 text-gray-600 
           font-Josefin font-[600] 
           text-[18px] mt-6">
-          We have 40k+ Online courses & 500k+ Online registered students.
-          Find your desired courses from them.
+          {data?.layout?.banner?.subTitle}
         </p>
 
       {/* Search Box */}

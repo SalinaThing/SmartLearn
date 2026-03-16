@@ -4,6 +4,7 @@ import Heading from '../utils/Heading'
 import TeacherSidebar from '../components/Teacher/Sidebar/TeacherSidebar'
 import TeacherProtected from '../hooks/teacherProtected'
 import DashboardHero from '../components/Teacher/DashboardHero'
+import EditHero from '../components/Teacher/Customization/EditHero'
 
 type Props = {}
 
@@ -24,8 +25,8 @@ const page = (props: Props) => {
 
                 <div className="w-[85%]">
                     <DashboardHero isDashboard={true}/>
+                    <EditHero/>
                 </div>
-
             </div>
         </TeacherProtected>
     </div>

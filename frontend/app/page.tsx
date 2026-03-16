@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Heading from "./utils/Heading";
 import Header from "./components/Header";
 import Hero from "./components/Route/Hero";
+import Courses from "./components/Route/Courses";
+import Reviews from "./components/Route/Reviews";
 
 export default function HomePage() {
   const [open, setOpen] = useState(false);
@@ -27,7 +29,8 @@ export default function HomePage() {
       />
 
       <Hero/>
-      {/* <Courses/> */}
+      <Courses/>
+      <Reviews/>
 
     </div>
   );
