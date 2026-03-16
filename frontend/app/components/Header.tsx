@@ -93,6 +93,7 @@ const Header: FC<Props> = ({
   };
 
   //console.log(user) getting user data in browser
+  const profileImage = user?.avatar?.url && user.avatar.url.trim() !== "" ? user.avatar.url : avatar;
 
   return (
     <div className="w-full relative">
@@ -135,8 +136,8 @@ const Header: FC<Props> = ({
                 user ? (
                   <Link href={"/profile"}>
                     <Image
-                      src={user.avatar ? user.avatar.url : avatar}
-                      alt=""
+                      src={profileImage}
+                      alt="Profile"
                       width={30}
                       height={30}
                       className="w-[30px] h-[30px] rounded-full cursor-pointer border-2"
@@ -179,8 +180,8 @@ const Header: FC<Props> = ({
             {user ? (
               <Link href={"/profile"} onClick={() => setOpenSidebar(false)}>
                 <Image
-                  src={user.avatar ? user.avatar.url : avatar}
-                  alt=""
+                  src={profileImage}
+                  alt="Profile"
                   width={30}
                   height={30}
                   className="w-[30px] h-[30px] rounded-full ml-5 my-2 cursor-pointer border-2"
