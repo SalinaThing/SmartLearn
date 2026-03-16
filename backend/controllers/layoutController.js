@@ -18,7 +18,7 @@ export const createLayout = catchAsyncErrors(async (req, res, next) => {
             });
 
             const bannerData = {
-                tyype: "Banner",
+                type: "Banner",
                 banner: {
                     image: {
                         public_id: myCloud.public_id,
