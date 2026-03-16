@@ -217,7 +217,7 @@ return(
                         {/* Invoices */}
                         <Item
                             title="Users"
-                            to="/teacher/users"
+                            to="/teacher/all-users"
                             icon={<GroupsIcon/>}
                             selected={selected}
                             setSelected={setSelected} 
