@@ -6,6 +6,7 @@ import { format } from 'path';
 import React from 'react'
 import { IoCheckmarkDoneCircleOutline } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
+import CourseContentList from './CourseContentList';
 
 type Props = {
     data:any;
@@ -86,8 +87,10 @@ const CourseDetails = ({data}: Props) => {
                             Course Overview
                         </h1>
 
-                        <CourseContentList />   
-                        
+                        <CourseContentList
+                            data = {data?.courseData}
+                        />   
+
                     </div>
                     <br/>
                     <br/>
