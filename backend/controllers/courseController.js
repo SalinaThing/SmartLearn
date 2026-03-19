@@ -11,6 +11,7 @@ import sendEmail from "../utils/sendMail.js";
 import { fileURLToPath } from "url";
 import NotificationModel from "../models/notificationModel.js";
 import { getAllCoursesService } from "../services/courseService.js";
+import axios from "axios";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

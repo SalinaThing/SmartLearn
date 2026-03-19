@@ -23,27 +23,30 @@ const CourseContentList = (props: Props) => {
 
     const toggleSection =(section: string) => {
         const newVisibleSections = new Set(visibleSections);
-        if(newVisibleSections.has(section){
+        if(newVisibleSections.has(section)){
             newVisibleSections.delete(section);
         }else{
             newVisibleSections.add(section);
-        } setVisibleSections(newVisibleSections))
+        } setVisibleSections(newVisibleSections);
     };
   return (
-    <div className={`mt-[15px] w-full ${!props.isDemo && `ml-[-30px] min-h-screen sticky top-24 left-0 z-30`}`}>
+    <div className={`mt-[15px] w-full ${
+            !props.isDemo && "ml-[-30px] sticky top-24 left-0 z-30"
+        }`}
+    > 
         {
             videoSections.map((section:string, sectionIndex:number) =>{
                 const isSectionVisible = visibleSections.has(section);
 
                 // Filter videos by section
                 const sectionVideos: any[] = props.data.filter(
-                (item: any) => item.videoSection === section
+                    (item: any) => item.videoSection === section
                 );
 
                 const sectionVideoCount: number = sectionVideos.length; // Number of videos in the current section
 
                 const sectionVideoLength: number = sectionVideos.reduce(
-                (totalLength: number, item: any) => totalLength + item.videoLength,
+                    (totalLength: number, item: any) => totalLength + item.videoLength,
                 0
                 );
 
@@ -116,7 +119,7 @@ const CourseContentList = (props: Props) => {
                                         </div>
 
                                         <h5 className="pl-8 text-black dark:text-white">
-                                            {item.videoLenth>60 ? contentLength.toFixed(2):item.videoLengt}{""}
+                                            {item.videoLenth>60 ? contentLength.toFixed(2):item.videoLength}{""}
                                             {item.videoLenth>60 ? "hours":"minutes"}
                                         </h5>
                                     </div>

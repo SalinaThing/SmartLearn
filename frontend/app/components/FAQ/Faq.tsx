@@ -55,16 +55,13 @@ const Faq = (props: Props) => {
                     </span>
                   </button>
                 </dt>
-                  {
-                    activeQuestion === q._id && (
-                      <dd className="mt-2 pr-12">
-                        <p className="text-base font-Poppins text-black dark:text-white">
-                          {q.answer}
-                        </p>
-                      </dd>
-                    )
-                  }
-
+                  {activeQuestion === q._id && (
+                    <dd className="mt-2 pr-12">
+                      <p className="text-base font-Poppins text-black dark:text-white">
+                        {q.answer}
+                      </p>
+                    </dd>
+                  )}
               </div>
             ))}
           </dl>

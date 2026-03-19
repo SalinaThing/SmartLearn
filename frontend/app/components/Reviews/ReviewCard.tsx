@@ -8,49 +8,31 @@ type Props = {
 
 const ReviewCard = (props: Props) => {
   return (
-    <div className="w-full h-max pb-4 dark:bg-slate-500 dark:bg-opacity-[0,20] border border-[#00000028] dark:border-[#ffffff1d] backdrop-blur shadow-[bg-slate-700] rounded-lg p-3 shadow-inner">
-      <div className="flex w-full">
-        <Image 
-          src={props.item.avatar}
-          alt=''
-          width={50}
-          height={50}
-          className="w-[50px] h-[50px] rounded-full object-cover"
-        />
-
-        <div className="800px:flex justify-between w-full hidden">
-          <div className="pl-4">
-            <h5 className="text-[20px] text-black dark:text-white">
-              {props.item.name}
-            </h5>
-
-            <h6 className="text-[16px] text-[#000] dark:text-[#ffffffab]">
-              {props.item.profession}
-            </h6>
-          </div>
-
-          <Ratings rating={props.item.ratings}/>  
+    <div className="w-full h-max pb-4 bg-[#111c43] dark:bg-slate-500 dark:bg-opacity-[0.20] border border-[#ffffff1d] backdrop-blur rounded-lg p-5 shadow-inner">
+      <div className="flex w-full items-start justify-between">
+        <div className="flex items-center">
+            <Image 
+                src={props.item.avatar}
+                alt=''
+                width={50}
+                height={50}
+                className="w-[50px] h-[50px] rounded-full object-cover"
+            />
+            <div className="pl-4">
+                <h5 className="text-[20px] text-white">
+                    {props.item.name}
+                </h5>
+                <h6 className="text-[16px] text-[#ffffffab]">
+                    {props.item.profession}
+                </h6>
+            </div>
         </div>
-
-        {/* For mobile */}
-        <div className="800px:hidden justify-between w-full flex flex-col">
-          <div className="pl-4">
-            <h5 className="text-[20px] text-black dark:text-white">
-              {props.item.name}
-            </h5>
-
-            <h6 className="text-[16px] text-[#000] dark:text-[#ffffffab]">
-              {props.item.profession}
-            </h6> 
-
-            <Ratings rating={props.item.ratings}/>   
-          </div>
-        </div>
-
-        <p className="pt-2 px-2 font-Poppins text-black dark:text-white">
-          {props.item.comment}
-        </p>
+        <Ratings rating={props.item.ratings}/>  
       </div>
+
+      <p className="pt-4 font-Poppins text-white">
+        {props.item.comment}
+      </p>
     </div>
   )
 }

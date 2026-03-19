@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(__filename);
 
 // --- REGISTER USER ---
-export const registrationUser = catchAsyncErrors(async (req, res) => {
+export const registrationUser = catchAsyncErrors(async (req, res, next) => {
     const { name, email, password, avatar, role } = req.body;
 
     // Check if fields exist
@@ -70,7 +70,7 @@ export const createdActivationToken = (user) => {
 };
 
 // --- ACTIVATE USER ---
-export const activateUser = catchAsyncErrors(async (req, res) => {
+export const activateUser = catchAsyncErrors(async (req, res, next) => {
     const { activation_token, activation_code } = req.body;
 
     // Verify token
@@ -109,7 +109,7 @@ export const activateUser = catchAsyncErrors(async (req, res) => {
 });
 
 // LOGIN USER
-export const loginUser = catchAsyncErrors(async (req, res) => {
+export const loginUser = catchAsyncErrors(async (req, res, next) => {
   try{
     const { email, password } = req.body;
 
@@ -135,7 +135,7 @@ export const loginUser = catchAsyncErrors(async (req, res) => {
 });
 
 //LOGOUT USER
-export const logoutUser = catchAsyncErrors(async (req, res) => {
+export const logoutUser = catchAsyncErrors(async (req, res, next) => {
     try{
         res.cookie("accessToken", "", {maxAge: 1});
         res.cookie("refreshToken", "", {maxAge: 1});

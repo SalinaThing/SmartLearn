@@ -1,6 +1,7 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import layoutModel from "../models/layoutModel.js";
+import cloudinary from "cloudinary";
 
 export const createLayout = catchAsyncErrors(async (req, res, next) => {
     try{
@@ -83,7 +84,6 @@ export const editLayout = catchAsyncErrors(async (req, res, next) => {
                 });
 
             const banner = {
-                type: "Banner",
                 image: {
                     public_id: image.startsWith("https")
                         ? bannerData.banner.image.public_id
