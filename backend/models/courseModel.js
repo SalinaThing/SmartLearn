@@ -43,7 +43,7 @@ const commentSchema = new mongoose.Schema({
     type: [Object], // Fixed from [object] to [Object]
     default: [],
   },
-});
+}, {timestamps: true});
 
 // Course Data Schema
 const courseDataSchema = new mongoose.Schema({
