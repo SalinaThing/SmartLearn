@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { AiFillStar, AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineStar } from 'react-icons/ai';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { useAddNewQuestionMutation } from '@/redux/features/courses/coursesApi';
+import { useAddAnswerToQuestionMutation, useAddNewQuestionMutation } from '@/redux/features/courses/coursesApi';
 import { format } from 'timeago.js';
 import { BiMessage } from 'react-icons/bi';
 type Props = {
@@ -27,7 +27,9 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
     const [rating, setRating] = useState(1);
     const [review, setReview] = useState("");
     const [answer, setAnswer] = useState("");
-    const [answerId, setAnswerId] = useState("");
+    const [questionId, setQuestionId] = useState("");
+
+    const [addAnswerToQuestion, {isSuccess:answerSuccess, error: answerError, isLoading:answerCreationLoading}]=useAddAnswerToQuestionMutation();
 
     const handleQuestionSubmit = () => {
         if (question.length === 0){
@@ -38,7 +40,7 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
     }
 
     const handleAnswerSubmit = () => {
-
+        addAnswerToQuestion({answer, courseId: id, contentId: data[activeVideo]._id , questionId:questionId})
     }
 
     useEffect (() => {
@@ -46,15 +48,26 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
             setQuestion("");
             refetch();
             toast.success("Question added successfully");
+        }
+        if(answerSuccess){
+            setAnswer("");
+            refetch();
+            toast.success("Answer added successfully");
+        }
 
-            if(error){
-                if("data" in error){
-                    const errorMesage= error as any;
-                    toast.error(errorMesage.data.message); 
-                }
+        if(error){
+            if("data" in error){
+                const errorMesage= error as any;
+                toast.error(errorMesage.data.message); 
             }
         }
-    },[])
+        if(answerError){
+            if("data" in answerError){
+                const errorMesage= answerError as any;
+                toast.error(errorMesage.data.message); 
+            }
+        }
+    },[isSuccess, error, answerSuccess, answerError]);
 
   return ( 
     <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
@@ -188,7 +201,8 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
                             setAnswer={setAnswer}
                             handleAnswerSubmit={handleAnswerSubmit}
                             user={user}
-                            setAnswerId={setAnswerId}
+                            setQuestionId={setQuestionId}
+                            answerCreationLoading= {answerCreationLoading}
                         />
                         </div>
 
@@ -275,18 +289,19 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
 
 const CommentReply = ({
     data, 
-    activeVideo, 
+    activeVideo,  
     answer, 
     setAnswer, 
     handleAnswerSubmit,
     user,
-    setAnswerId,
+    setQuestionId,
+    answerCreationLoading,
 }:any) => {
     return (
         <>
             <div className="w-full my-3">
                 {
-                    data[activeVideo].questions.map((item:any, index) => (
+                    data[activeVideo].questions.map((item:any, index:any) => (
                         <CommentItem
                             key={index}
                             data={data}
@@ -295,7 +310,9 @@ const CommentReply = ({
                             index={index}
                             answer={answer}
                             setAnswer={setAnswer}
+                            setQuestionId={setQuestionId}
                             handleAnswerSubmit={handleAnswerSubmit}  
+                            answerCreationLoading={answerCreationLoading}
                         />
                     ))
                 }
@@ -309,8 +326,10 @@ const CommentItem = ({
     activeVideo, 
     item,
     answer, 
-    setAnswer, 
+    setQuestionId, 
     handleAnswerSubmit,
+    setAnswer,
+    answerCreationLoading,
 }:any) => {
 
     const [replyActive, setReplyActive] = useState(false);
@@ -352,7 +371,11 @@ const CommentItem = ({
                 <div className="w-full flex">
                     <span
                         className="800px:pl-16 text-[#000000b8] dark:text-[#ffffff83] cursor-pointer mr-2"
-                        onClick={() => setReplyActive(!replyActive)}
+                        onClick={() => 
+                            {setReplyActive(!replyActive), 
+                             setQuestionId(item._id)
+                            }
+                        }
                     >
                         {!replyActive ? item.questionReplies.length !== 0 ? "All Replies" : "Add Reply" : "Hide Replies"}
                     </span>
@@ -386,7 +409,7 @@ const CommentItem = ({
 
                                 <div className="pl-2">
                                     <h5 className="text-[20px]">{item.user.name}</h5>
-                                    <p>{item.comment}</p>
+                                    <p>{item.answer}</p>
                                     <small className="text-[#ffffff83]">
                                         {format(item.createdAt)} -
                                     </small>
@@ -401,14 +424,15 @@ const CommentItem = ({
                                     placeholder="Enter your answer..."
                                     value={answer}
                                     onChange={(e) => setAnswer(e.target.value)}
-                                    className="block 800px:ml-12 mt-2 outline-none bg-transparent border-[#00000027] dark:border-[#fff] dark:text-white text-black p-[5px] w-[95%]"
+                                    className={`block 800px:ml-12 mt-2 outline-none bg-transparent border-[#00000027] dark:border-[#fff] dark:text-white text-black p-[5px] w-[95%]
+                                        ${answer==="" || answerCreationLoading && "cursor-not-allowed"} ` }
                                 />
 
                                 <button
-                                    type="submit"
+                                    type= "submit"
                                     className="absolute right-0 bottom-1"
                                     onClick={handleAnswerSubmit }
-                                    disabled={answer === ""}
+                                    disabled={answer === "" || answerCreationLoading}
                                 >
                                     Submit
                                 </button>
