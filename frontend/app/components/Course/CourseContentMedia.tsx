@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { AiFillStar, AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineStar } from 'react-icons/ai';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { useAddAnswerToQuestionMutation, useAddNewQuestionMutation } from '@/redux/features/courses/coursesApi';
+import { useAddAnswerToQuestionMutation, useAddNewQuestionMutation, useAddReviewInCourseMutation } from '@/redux/features/courses/coursesApi';
 import { format } from 'timeago.js';
 import { BiMessage } from 'react-icons/bi';
 import { VscVerifiedFilled } from 'react-icons/vsc';
@@ -31,6 +31,7 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
     const [questionId, setQuestionId] = useState("");
 
     const [addAnswerToQuestion, {isSuccess:answerSuccess, error: answerError, isLoading:answerCreationLoading}]=useAddAnswerToQuestionMutation();
+    const [addReviewInCourse, {isSuccess:reviewSuccess, error: reviewError, isLoading:reviewCreationLoading}]= useAddReviewInCourseMutation();
 
     const handleQuestionSubmit = () => {
         if (question.length === 0){
@@ -44,6 +45,17 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
         addAnswerToQuestion({answer, courseId: id, contentId: data[activeVideo]._id , questionId:questionId})
     }
 
+    const handleReviewSubmit = async () =>{
+        if(review.length === 0)
+        {
+            toast.error("Review can't be empty");
+        }
+        else{
+            addReviewInCourse({review, rating, courseId:id});
+
+        }
+    }
+
     useEffect (() => {
         if(isSuccess){
             setQuestion("");
@@ -55,6 +67,12 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
             refetch();
             toast.success("Answer added successfully");
         }
+        if(reviewSuccess){
+            setReview("");
+            setRating(1);
+            refetch();
+            toast.success("Review added successfully");
+        }
 
         if(error){
             if("data" in error){
@@ -64,11 +82,18 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
         }
         if(answerError){
             if("data" in answerError){
-                const errorMesage= answerError as any;
+                const errorMesage= error as any;
                 toast.error(errorMesage.data.message); 
             }
         }
-    },[isSuccess, error, answerSuccess, answerError]);
+
+        if(reviewError){
+            if("data" in reviewError){
+                const errorMesage= error as any;
+                toast.error(errorMesage.data.message); 
+            }
+        }
+    },[isSuccess, error, answerSuccess, answerError, reviewError, reviewSuccess]);
 
   return ( 
     <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
@@ -268,9 +293,8 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
 
                                     <div className='w-full flex justify-end'>
                                         <div 
-                                            // className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2 ${isLoading && "cursor-no-drop"}`}
-                                            // onClick={isLoading ? null : handleReviewSubmit}
-                                            className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2 `}
+                                            className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2 ${reviewCreationLoading && "cursor-no-drop"}`}
+                                            onClick={reviewCreationLoading ? () => {}: handleReviewSubmit}
                                         > 
                                             Submit
                                         </div>
@@ -421,7 +445,7 @@ const CommentItem = ({
                                     </div>
 
                                     <p>{item.answer}</p>
-                                    
+
                                     <small className="text-[#ffffff83]">
                                         {format(item.createdAt)} -
                                     </small>
