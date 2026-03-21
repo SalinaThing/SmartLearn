@@ -16,6 +16,20 @@ const __dirname = path.dirname(__filename);
 export const createOrder = catchAsyncErrors(async (req, res, next) => {
     try{
         const { courseId, payment_info } = req.body || {};
+
+        if(payment_info){
+            if("id" in payment_info){
+                const paymentIntentId = payment_info.id;
+                const paymentIntent = await khalti.paymentIntents.retrieve(
+                  paymentIntentId  
+                );
+
+                if(paymentIntent.status === "suceeded"){
+                    return next(new ErrorHandler("Payment not authorized!, 400"));
+                }
+            }
+        }
+
         const user = await UserModel.findById(req.user?._id);
 
         const courseExistInUser = user?.courses?.some(
@@ -68,6 +82,9 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
         }
 
         user?.courses.push(course._id);
+
+        await redis.set(req.user?._id, JSON.stringify(user));
+
         await user?.save();
 
         await NotificationModel.create({
@@ -96,3 +113,33 @@ export const getAllOrders = catchAsyncErrors(async (req, res, next) => {
     }
 });
  
+//send khalti key
+export const sendStripePublishableKey = catchAsyncErrors(async (req, res) => {
+    res.status(200).json({
+        key: process.env.STRIPE_PUBLISHABLE_KEY,
+    })
+});
+
+//New payment
+export const newPayment = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const myPayment = await stripe.paymentIntents.create({
+            amount: req.body.amount,
+            currency: "Rs.",
+            metadata: {
+                company: "SmartLearn",
+            },
+            automatic_payment_methods: {
+                enabled:true,
+            }
+
+        });
+
+        res.status(201).json({
+            success:true,
+            client_secret:myPayment.client_secret,
+        })
+    } catch (error: any){
+        return next(new ErrorHandler(error.message, 500))
+    }
+})

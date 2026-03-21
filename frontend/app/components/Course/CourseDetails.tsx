@@ -10,9 +10,11 @@ import CourseContentList from './CourseContentList';
 
 type Props = {
     data:any;
+    clientSecret:string;
+    stripePromise:any;
 }
 
-const CourseDetails = ({data}: Props) => {
+const CourseDetails = ({data, stripePromise, clientSecret}: Props) => {
     const {user} = useSelector((state:any) => state.auth);
     const [open, setOpen] = useState(false);
 
@@ -218,7 +220,7 @@ const CourseDetails = ({data}: Props) => {
             </div>    
         </div>
 
-        {/* Dialog after Buy Button */}
+        {/* Dialog after Buy Button click */}
         <>
             {open && (
                 <div className="w-full h-screen bg-[#00000036] fixed top-0 left-0 flex items-center justify-center">
