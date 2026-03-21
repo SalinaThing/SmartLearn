@@ -265,6 +265,8 @@ export const addAnswer = catchAsyncErrors(async (req, res, next) => {
         const newAnswer = {
             user: req.user,
             answer,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
 
         //add this answer to our question
@@ -334,6 +336,8 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
             user: req.user,
             rating,
             comment: review,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
 
         course?.reviews.push(reviewData);
