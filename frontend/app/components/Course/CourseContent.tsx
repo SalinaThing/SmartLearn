@@ -1,8 +1,10 @@
 import React from 'react'
 
-type Props = {}
+type Props = {
+    id:string;
+}
 
-const CourseContent = (props: Props) => {
+const CourseContent = ({id}: Props) => {
   return (
     <div>CourseContent</div>
   )
