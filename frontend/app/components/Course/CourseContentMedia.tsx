@@ -1,8 +1,10 @@
 import { styles } from '@/app/styles/style';
 import CoursePlayer from '@/app/utils/CoursePlayer';
-import React, { useState } from 'react'
-import { AiOutlineArrowLeft, AiOutlineArrowRight } from 'react-icons/ai';
+import React, { useState, useEffect } from 'react'
+import { AiFillStar, AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineStar } from 'react-icons/ai';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { useAddNewQuestionMutation } from '@/redux/features/courses/coursesApi';
 type Props = {
     data:any;
     id:string;
@@ -15,7 +17,26 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props)
 
     const [activeBar, setActiveBar] = useState(0);
     const [question, setQuestion] = useState("");
-  return (
+    const [addNewQuestion, {isLoading:questionCreationLoading, isSuccess, error}] = useAddNewQuestionMutation();
+    const isReviewExists = data?.reviews?.find(
+        (item:any) => item.user._id === user._id
+    );
+    const [rating, setRating] = useState(1);
+    const [review, setReview] = useState("");
+
+    const handleQuestionSubmit = () => {
+        if (question.length === 0){
+            toast.error("Question can't be empty");
+        }else {
+            addNewQuestion({question, courseId:id, contentId: data._id})
+        }
+    }
+
+    useEffect (() => {
+
+    },[])
+
+  return ( 
     <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
         <CoursePlayer
             title={data[activeVideo]?.title}
@@ -99,7 +120,7 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props)
             }
 
             {
-                activeBar === 2 && (
+                activeBar === 2 && ( 
                     <>
                        <div className="flex w-full">
                             <Image 
@@ -118,16 +139,16 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props)
                                 cols={40}
                                 rows={5}
                                 placeholder="Write your question..."
-                                className="outline-none bg-transparent m;-3 border-[#ffffff57] 800px:w-full p-2 rounded w-[90%] 800px:text-[18px] font-Poppins"
+                                className="outline-none bg-transparent ml-3 border border-[#ffffff57] 800px:w-full p-2 rounded w-[90%] 800px:text-[18px] font-Poppins"
                             />
                         </div>
 
                         <div className='w-full flex justify-end'>
-                            <div className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5`}>
-                            {/* //    isLoading && "cursor-no-drop" 
-                            // }`}
-                            // onClick={isLoading ? null : handleCommentSubmit}
-                            // > */}
+                            <div 
+                                className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 ${
+                                    questionCreationLoading && "cursor-not-allow"}`}
+                                onClick={questionCreationLoading ? () => {}: handleQuestionSubmit}
+                            >
                                 Submit
                             </div>
                         </div>
@@ -142,6 +163,78 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props)
                         {/* Question Reply */}
                         </div>
 
+                    </>
+                )
+            }
+
+            {
+                activeBar === 3 && (
+                    <>
+                        {
+                            !isReviewExists && (
+                                <>
+                                    <div className="flex w-full">
+                                        <Image 
+                                            src={user.avatar ? user.avatar.url : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                                            alt=" "
+                                            width={50}
+                                            height={50}
+                                            className="w-[50px] h-[50px] rounded-full object-cover"
+                                        />
+
+                                        <div className="w-full">
+                                            <h5 className="pl-3 text-[20px] font-[500] dark:text-white text-black">
+                                                Give a Rating <span className="text-red-500">*</span>
+                                            </h5>
+
+                                            <div className="flex w-full ml-2 pb-3">
+                                                {[1,2,3,4,5].map((i) =>
+                                                    rating >= i ? (
+                                                        <AiFillStar
+                                                            key={i}
+                                                            className="mr-1 cursor-pointer"
+                                                            color="rgb(246, 186, 0)"
+                                                            size={25}
+                                                            onClick={() => setRating(i)}
+                                                        />
+                                                    ): (
+                                                        <AiOutlineStar
+                                                            key={i}
+                                                            className="mr-1 cursor-pointer"
+                                                            color="rgb(246, 186, 0)"
+                                                            size={25}
+                                                            onClick={() => setRating(i)}
+                                                        /> 
+                                                    )
+                                                )}
+                                            </div>
+                                            
+                                            <textarea
+                                                name=""
+                                                value={review}
+                                                onChange={(e) => setReview(e.target.value)}
+                                                id=""
+                                                cols={40}
+                                                rows={5}
+                                                placeholder="Write your comment..."
+                                                className="outline-none bg-transparent ml-3 border border-[#ffffff57] 800px:w-full p-2 rounded w-[95%] text-[18px] font-Poppins"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className='w-full flex justify-end'>
+                                        <div 
+                                            // className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2 ${isLoading && "cursor-no-drop"}`}
+                                            // onClick={isLoading ? null : handleReviewSubmit}
+                                            className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 800px:mr-0 mr-2 `}
+                                        > 
+                                            Submit
+                                        </div>
+                                    </div>
+                                </>
+
+                            )
+                        }
                     </>
                 )
             }
