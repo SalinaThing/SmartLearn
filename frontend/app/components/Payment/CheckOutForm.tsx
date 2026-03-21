@@ -1,7 +1,7 @@
 import { styles } from '@/app/styles/style';
 import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { useCreateOrderMutation } from '@/redux/features/orders/orderApi';
-import { redirect } from 'next/dist/server/api-utils';
+import { redirect } from 'next/navigation';
 import React, { FC, useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
 
