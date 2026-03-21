@@ -2,17 +2,19 @@ import { styles } from '@/app/styles/style';
 import CoursePlayer from '@/app/utils/CoursePlayer';
 import React, { useState } from 'react'
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from 'react-icons/ai';
-
+import Image from 'next/image';
 type Props = {
     data:any;
     id:string;
     activeVideo:number;
     setActiveVideo:(activeVideo:number)=> void;
+    user:any;
 }
 
-const CourseContentMedia = ({data, id, activeVideo,setActiveVideo}: Props) => {
+const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props) => {
 
     const [activeBar, setActiveBar] = useState(0);
+    const [question, setQuestion] = useState("");
   return (
     <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
         <CoursePlayer
@@ -93,6 +95,54 @@ const CourseContentMedia = ({data, id, activeVideo,setActiveVideo}: Props) => {
                             </div>
                         ))}
                     </div>
+                )
+            }
+
+            {
+                activeBar === 2 && (
+                    <>
+                       <div className="flex w-full">
+                            <Image 
+                                src={user.avatar ? user.avatar.url : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                                alt=" "
+                                width={50}
+                                height={50}
+                                className="w-[50px] h-[50px] rounded-full object-cover"
+                            />
+
+                            <textarea
+                                name=""
+                                value={question}
+                                onChange={(e) => setQuestion(e.target.value)}
+                                id=""
+                                cols={40}
+                                rows={5}
+                                placeholder="Write your question..."
+                                className="outline-none bg-transparent m;-3 border-[#ffffff57] 800px:w-full p-2 rounded w-[90%] 800px:text-[18px] font-Poppins"
+                            />
+                        </div>
+
+                        <div className='w-full flex justify-end'>
+                            <div className= {`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5`}>
+                            {/* //    isLoading && "cursor-no-drop" 
+                            // }`}
+                            // onClick={isLoading ? null : handleCommentSubmit}
+                            // > */}
+                                Submit
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+
+                        <div className='w-full h-[1px] bg-[#ffffff3b]'>
+
+                        </div>
+
+                        <div>
+                        {/* Question Reply */}
+                        </div>
+
+                    </>
                 )
             }
         </div>

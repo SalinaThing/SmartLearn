@@ -9,3 +9,5 @@ const Page = ({params}: any) => {
         </div>
     )
 }
+
+export default Page; 
