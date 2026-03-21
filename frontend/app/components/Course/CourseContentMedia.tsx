@@ -5,6 +5,7 @@ import { AiFillStar, AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineStar } fr
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { useAddNewQuestionMutation } from '@/redux/features/courses/coursesApi';
+import { format } from 'timeago.js';
 type Props = {
     data:any;
     id:string;
@@ -24,6 +25,8 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
     );
     const [rating, setRating] = useState(1);
     const [review, setReview] = useState("");
+    const [answer, setAnswer] = useState("");
+    const [answerId, setAnswerId] = useState("");
 
     const handleQuestionSubmit = () => {
         if (question.length === 0){
@@ -31,6 +34,10 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
         }else {
             addNewQuestion({question, courseId:id, contentId: data[activeVideo]._id})
         }
+    }
+
+    const handleAnswerSubmit = () => {
+
     }
 
     useEffect (() => {
@@ -173,6 +180,15 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
 
                         <div>
                         {/* Question Reply */}
+                        <CommentReply
+                            data={data}
+                            activeVideo={activeVideo}
+                            answer={answer}
+                            setAnswer={setAnswer}
+                            handleAnswerSubmit={handleAnswerSubmit}
+                            user={user}
+                            setAnswerId={setAnswerId}
+                        />
                         </div>
 
                     </>
@@ -254,6 +270,69 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
 
     </div>
   )
+}
+
+const CommentReply = ({
+    data, 
+    activeVideo, 
+    answer, 
+    setAnswer, 
+    handleAnswerSubmit,
+    user,
+    setAnswerId,
+}:any) => {
+    return (
+        <>
+            <div className="w-full my-3">
+                {
+                    data[activeVideo].questions.map((item:any, index) => (
+                        <CommentItem
+                            key={index}
+                            data={data}
+                            activeVideo={activeVideo}
+                            item={item}
+                            index={index}
+                            answer={answer}
+                            setAnswer={setAnswer}
+                            handleAnswerSubmit={handleAnswerSubmit}  
+                        />
+                    ))
+                }
+            </div>
+        </>
+    )
+}
+
+const CommentItem = ({
+    data, 
+    activeVideo, 
+    item,
+    answer, 
+    setAnswer, 
+    handleAnswerSubmit,
+}:any) => {
+    return (
+        <>
+            <div className="my-4">
+                <div className="flex mb-2">
+                    <div className="w-[50px] h-[50px]">
+                        <div className="w-[50px] bg-slate-600 rounded-[50px] flex items-center justify-center cursor-pointer">
+                            <h1 className="uppercase text-[18px]">
+                                {item?.user.name.slice(0,2)}
+                            </h1>
+                        </div>
+                    </div>
+
+                    <div className="pl-3">
+                        <h1 className="text-[20px]">{item?.user.name}</h1>
+                        <p>{item?.question}</p>
+                        <small className="txt-[#ffffff83]">{!item.createdAt ? "" : format(item?.createdAt)} -</small>
+                    </div>
+                </div>
+              
+            </div>
+        </>
+    )
 }
 
 export default CourseContentMedia
