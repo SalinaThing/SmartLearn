@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { useAddAnswerToQuestionMutation, useAddNewQuestionMutation } from '@/redux/features/courses/coursesApi';
 import { format } from 'timeago.js';
 import { BiMessage } from 'react-icons/bi';
+import { VscVerifiedFilled } from 'react-icons/vsc';
 type Props = {
     data:any;
     id:string;
@@ -407,8 +408,13 @@ const CommentItem = ({
                                     />
                                 </div>
 
-                                <div className="pl-2">
-                                    <h5 className="text-[20px]">{item.user.name}</h5>
+                                <div className="pl-3">
+                                    <div className="flex items-center">
+                                        <h5 className="text-[20px]">{item.user.name}</h5>
+                                        <VscVerifiedFilled 
+                                            className="text-[#50c750] ml-2 text-[20px]"
+                                        />
+                                    </div> 
                                     <p>{item.answer}</p>
                                     <small className="text-[#ffffff83]">
                                         {format(item.createdAt)} -
