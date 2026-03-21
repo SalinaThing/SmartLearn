@@ -7,6 +7,9 @@ import React, { useState } from 'react'
 import { IoCheckmarkDoneCircleOutline, IoCloseOutline } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import CourseContentList from './CourseContentList';
+import {Elements} from "@stripe/react-stripe-js";
+import CheckOutForm from "../app/components/Payment/CheckOutForm";
+import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
 
 type Props = {
     data:any;
@@ -15,7 +18,9 @@ type Props = {
 }
 
 const CourseDetails = ({data, stripePromise, clientSecret}: Props) => {
-    const {user} = useSelector((state:any) => state.auth);
+    const {data: userData} = useLoadUserQuery(undefined, {});
+    const user=userData?.user;
+
     const [open, setOpen] = useState(false);
 
     const discountPercentage =
@@ -24,7 +29,7 @@ const CourseDetails = ({data, stripePromise, clientSecret}: Props) => {
     const discountPercentagePrice = discountPercentage.toFixed(0);
 
     const isPurchased =
-    user && user?.courses?.find((item: any) => item._id === data._id);
+    user && user?.courses?.find((item: any) =>  item._id === data._id);
 
     const handleOrder = (e: any) => {
         setOpen(true);
@@ -231,6 +236,20 @@ const CourseDetails = ({data, stripePromise, clientSecret}: Props) => {
                                 className="text-black cursor-pointer"
                                 onClick={() => setOpen(false)}
                             />
+                        </div>
+
+                        <div className= "w-full">
+                            {
+                                stripePromise && clientSecret && (
+                                    <Elements stripe={stripePromise} options={{clientSecret}}>
+                                        <CheckOutForm
+                                            setOpen={setOpen}
+                                            data={data}
+                                        />
+                                    </Elements>
+                                )
+                            }
+
                         </div>
                     </div>
                 </div>
