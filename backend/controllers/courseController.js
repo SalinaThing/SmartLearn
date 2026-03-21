@@ -351,12 +351,12 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
         }
         await course?.save();
 
-        const notification = {
+        //create notification for course instructor
+        await NotificationModel.create({
+            user: req.user?._id,
             title: "New Review Received",
             message: `${req.user.name} has given a review in "${course?.name}" course`,
-        };
-
-        //create notification for course instructor
+        });
 
         res.status(200).json({
             success: true,
