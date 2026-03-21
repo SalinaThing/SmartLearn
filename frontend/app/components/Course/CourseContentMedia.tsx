@@ -325,12 +325,12 @@ const CommentItem = ({
                             />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="pl-3 dark:text-white text-black">
                         <h1 className="text-[20px]">{item?.user.name}</h1>
                         <p>{item?.question}</p>
                         <small className="txt-[#ffffff83]">{!item.createdAt ? "" : format(item?.createdAt)} -</small>
                     </div>
-                    
+
                     {/* <div className="w-[50px] h-[50px]">
                         <div className="w-[50px] bg-slate-600 rounded-[50px] flex items-center justify-center cursor-pointer">
                             <h1 className="uppercase text-[18px]">
