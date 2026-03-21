@@ -315,7 +315,23 @@ const CommentItem = ({
         <>
             <div className="my-4">
                 <div className="flex mb-2">
-                    <div className="w-[50px] h-[50px]">
+                    <div>
+                         <Image 
+                                src={item.user.avatar ? item.user.avatar.url : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                                alt=" "
+                                width={50}
+                                height={50}
+                                className="w-[50px] h-[50px] rounded-full object-cover"
+                            />
+                    </div>
+
+                    <div className="pl-3">
+                        <h1 className="text-[20px]">{item?.user.name}</h1>
+                        <p>{item?.question}</p>
+                        <small className="txt-[#ffffff83]">{!item.createdAt ? "" : format(item?.createdAt)} -</small>
+                    </div>
+                    
+                    {/* <div className="w-[50px] h-[50px]">
                         <div className="w-[50px] bg-slate-600 rounded-[50px] flex items-center justify-center cursor-pointer">
                             <h1 className="uppercase text-[18px]">
                                 {item?.user.name.slice(0,2)}
@@ -327,7 +343,7 @@ const CommentItem = ({
                         <h1 className="text-[20px]">{item?.user.name}</h1>
                         <p>{item?.question}</p>
                         <small className="txt-[#ffffff83]">{!item.createdAt ? "" : format(item?.createdAt)} -</small>
-                    </div>
+                    </div> */}
                 </div>
               
             </div>
