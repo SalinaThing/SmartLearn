@@ -11,9 +11,10 @@ type Props = {
     activeVideo:number;
     setActiveVideo:(activeVideo:number)=> void;
     user:any;
+    refetch:any;
 }
 
-const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props) => {
+const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch}: Props) => {
 
     const [activeBar, setActiveBar] = useState(0);
     const [question, setQuestion] = useState("");
@@ -28,12 +29,23 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo}: Props)
         if (question.length === 0){
             toast.error("Question can't be empty");
         }else {
-            addNewQuestion({question, courseId:id, contentId: data._id})
+            addNewQuestion({question, courseId:id, contentId: data[activeVideo]._id})
         }
     }
 
     useEffect (() => {
+        if(isSuccess){
+            setQuestion("");
+            refetch();
+            toast.success("Question added successfully");
 
+            if(error){
+                if("data" in error){
+                    const errorMesage= error as any;
+                    toast.error(errorMesage.data.message); 
+                }
+            }
+        }
     },[])
 
   return ( 
