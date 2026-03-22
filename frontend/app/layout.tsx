@@ -1,16 +1,18 @@
 "use client"
 
 import './globals.css'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { ThemeProvider } from './utils/ThemeProvider'
 import { Toaster } from 'react-hot-toast'
 import Providers from './Provider'
 import {SessionProvider} from 'next-auth/react'
 import Loader from './components/Loader/Loader'
 import { useSelector } from "react-redux";
+import socketIO from "socket.io-client";
+import { apiSlice, useLoadUserQuery } from '@/redux/features/api/apiSlice'
 
-import { apiSlice } from '@/redux/features/api/apiSlice'
-
+import ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
+const socketId = socketIO(ENDPOINT, {transports: ["websocket"]});
 export default function RootLayout({
   children,
 }: {
@@ -37,13 +39,10 @@ export default function RootLayout({
 }
 
 const Custom: React.FC <{children: React.ReactNode}> = ({children}) => {
-  const selectLoadUser = useMemo(
-    () => apiSlice.endpoints.loadUser.select(undefined),
-    []
-  );
-  const loadUserState = useSelector(selectLoadUser);
-  const isLoading = Boolean(loadUserState?.isLoading);
-
+  const {isLoading} = useLoadUserQuery({});
+  useEffect(() => {
+    socketId.on("connection", () => {});
+  }, [])
   return(
     <>
       {
