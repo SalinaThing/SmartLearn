@@ -9,15 +9,10 @@ type Props = {
   activeItem: any;
   component: any;
   setRoute?: (route: string) => void;
+  refetch?:any;
 };
 
-const CustomModal: FC<Props> = ({
-  open,
-  setOpen,
-  activeItem,
-  component,
-  setRoute,
-}) => {
+const CustomModal: FC<Props> = ({ open, setOpen, setRoute, component: Component, refetch }) => {
   return (
     <Modal
       open={open}
@@ -25,27 +20,8 @@ const CustomModal: FC<Props> = ({
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "420px",
-          bgcolor: "background.paper",
-          borderRadius: "16px",
-          boxShadow: 24,
-          p: 4,
-          outline: "none",
-          "@media (prefers-color-scheme: dark)": {
-            bgcolor: "#1e293b",
-          },
-        }}
-      >
-        {React.createElement(component, {
-          setOpen,
-          setRoute,
-        })}
+      <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[450px] bg-white dark:bg-slate-900 rounded-[8px] shadow p-4 outline-none">
+        <Component setOpen={setOpen} setRoute={setRoute} refetch={refetch} />
       </Box>
     </Modal>
   );
