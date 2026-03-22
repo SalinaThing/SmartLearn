@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import Image from "next/image";
 import { BiSearch } from "react-icons/bi";
 import Link from "next/link";
@@ -11,13 +11,23 @@ import heroIcon2 from "../../../public/assets/heroicon2.jpg";
 import heroIcon3 from "../../../public/assets/heroicon3.jpg";
 import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import Loader from "../Loader/Loader";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const Hero: FC<Props> = () => {
   const {data, isLoading} = useGetHeroDataQuery("Banner")
+  const [search, setSearch] = useState("");
+  const router = useRouter();
 
-  const heroImage = data?.layout?.banner?.image?.url || avatar;
+  const handleSearch = () => {
+    if(search === ""){
+      return
+    }else{
+      router.push(`/courses?title=${search}`);
+    }
+
+  }
 
   return (
     <>
@@ -61,6 +71,8 @@ const Hero: FC<Props> = () => {
                 <input
                   type="search"
                   placeholder="Search Courses..."
+                  value={search}
+                  onChange={(e)=> setSearch(e.target.value)}
                   className="bg-transparent 
                       border dark:border-none 
                       dark:bg-[#575757] 
@@ -73,7 +85,9 @@ const Hero: FC<Props> = () => {
                 />
 
                 {/* Search Button inside the box */}
-                <div className="absolute flex items-center justify-center w-[50px] cursor-pointer h-[50px] top-0 right-0 bg-[#39c1f3] rounded-r-[5px]">
+                <div className="absolute flex items-center justify-center w-[50px] cursor-pointer h-[50px] top-0 right-0 bg-[#39c1f3] rounded-r-[5px]"
+                  onClick={handleSearch}
+                >
                   <BiSearch 
                     className="text-white"
                     size={30} 
