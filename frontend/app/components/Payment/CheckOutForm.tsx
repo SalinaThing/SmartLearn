@@ -44,7 +44,7 @@ const CheckOutForm: FC <Props> = ({setOpen, data, user}: Props) => {
         if(error) {
             setMessage(error.message);
             settIsLoading(false);
-        }else(paymentIntent && paymentIntent.status === "succeed"){
+        }else if (paymentIntent && paymentIntent.status === "succeed"){
             setIsLoading(false);
             createOrder({courseId:data._id, payment_info: paymentIntent})
         }
