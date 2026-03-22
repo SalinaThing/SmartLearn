@@ -351,6 +351,8 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
         }
         await course?.save();
 
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800); //7days
+
         //create notification for course instructor
         await NotificationModel.create({
             user: req.user?._id,
@@ -387,6 +389,8 @@ export const addReplyToReview = catchAsyncErrors(async (req, res, next) => {
         const replyData = {
             user: req.user,
             comment,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
 
         if(!review.commentReplies) {
@@ -394,7 +398,10 @@ export const addReplyToReview = catchAsyncErrors(async (req, res, next) => {
         }
 
         review.commentReplies?.push(replyData);
+        
         await course?.save();
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800); //7days
+
 
         res.status(200).json({
             success: true,
