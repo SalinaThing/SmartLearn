@@ -14,12 +14,12 @@ import Image from "next/image";
 import avatar from "../../public/assets/heroicon3.jpg";
 import { useSession } from "next-auth/react";
 import { useLogoutUserQuery, useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   activeItem: number;
-  setActiveItem?: (activeItem: number) => void;
   route: string;
   setRoute: (route: string) => void;
 };
@@ -34,7 +34,7 @@ const Header: FC<Props> = ({
 }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
-  const { user } = useSelector((state: any) => state.auth);
+  const { data: userData, isLoading, refetch } = useLoadUserQuery(undefined,{refetchOnMountOrArgChange:true});
   const { data } = useSession();
   const [logoutUser, setLogoutUser] = useState(false);
 
@@ -44,14 +44,27 @@ const Header: FC<Props> = ({
   })
 
   useEffect(() => {
-    if (data && !user) {
-      socialAuth({
-        email: data.user?.email,
-        name: data.user?.name,
-        avatar: data.user?.image,
-      });
+    if(!isLoading){
+      if (!userData) {
+        if(data){
+          socialAuth({
+            email: data.user?.email,
+            name: data.user?.name,
+            avatar: data.user?.image,
+          });
+          refetch();
+        }
+      } 
+      if (data === null){
+        if(isSuccess){
+          toast.success("Login Successfully");
+        }
+      }
+      if(data === null && !isLoading && !userData){
+        setLogoutUser(true);
+      }
     }
-  }, [data, user, socialAuth]);
+  }, [data, userData, socialAuth, isLoading]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -133,11 +146,11 @@ const Header: FC<Props> = ({
 
               {/* Desktop User Icon */}
               {
-                user ? (
+                userData ? (
                   <Link href={"/profile"}>
                     <Image
-                      src={profileImage}
-                      alt="Profile"
+                      src={userData?.user.avatar  ? userData.user.avatar.url : avatar}
+                      alt=" "
                       width={30}
                       height={30}
                       className="w-[30px] h-[30px] rounded-full cursor-pointer border-2"
@@ -152,7 +165,6 @@ const Header: FC<Props> = ({
                     size={25}
                     className="hidden 800px:block cursor-pointer dark:text-white text-black ml-4"
                     onClick={() => {
-                      setRoute("Login");   // ✅ IMPORTANT FIX
                       setOpen(true);
                     }}
                   />
@@ -161,108 +173,85 @@ const Header: FC<Props> = ({
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Sidebar */}
-      {openSidebar && (
-        <div
-          className="fixed w-full h-screen top-0 left-0 z-[99999] bg-[#00000024]"
-          onClick={handleCloseSidebar}
-          id="screen"
-        >
-          <div className="w-[70%] fixed z-[999999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
-            <NavItems
-              activeItem={activeItem}
-              isMobile={true}
-              onNavClick={() => setOpenSidebar(false)}
-            />
+        {/* mobile sidebar */}
+          {openSidebar && (
+            <div
+              className="fixed w-full h-screen top-0 left-0 z-[99999] dark:bg-[unset] bg-[#00000024]"
+              onClick={handleCloseSidebar}
+              id="screen"
+            >
+              <div className="w-[70%] fixed z-[99999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
+                <NavItems activeItem={activeItem} isMobile={true} />
 
-            {user ? (
-              <Link href={"/profile"} onClick={() => setOpenSidebar(false)}>
-                <Image
-                  src={profileImage}
-                  alt="Profile"
-                  width={30}
-                  height={30}
-                  className="w-[30px] h-[30px] rounded-full ml-5 my-2 cursor-pointer border-2"
-                  style={{
-                    borderColor: activeItem === 5 ? "#ffc107" : "transparent",
-                  }}
+                <HiOutlineUserCircle
+                  size={25}
+                  className="cursor-pointer ml-5 my-2 text-black dark:text-white"
+                  onClick={() => setOpen(true)}
                 />
-              </Link>
-            ) : (
-              <HiOutlineUserCircle
-                size={25}
-                className="cursor-pointer ml-5 my-2 dark:text-white text-black"
-                onClick={() => {
-                  setRoute("Login");   // ✅ IMPORTANT FIX
-                  setOpen(true);
-                  setOpenSidebar(false);
-                }}
-              />
-            )}
 
-            <br />
-            <br />
-            <br />
+                <br />
+                <br />
 
-            <p className="text-[16px] px-2 pl-5 text-black dark:text-white">
-              Copyright @2026 Elearning. All rights reserved.
-            </p>
-          </div>
+                <p className="text-[16px] px-2 pl-5 text-black dark:text-white">
+                  Copyright © 2023 ELearning
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Login Modal */}
-      {route === "Login" && (
-        <>
-          {
-            open && (
-              <CustomModal
-                open={open}
-                setOpen={setOpen}
-                activeItem={activeItem}
-                component={Login}
-                setRoute={setRoute}
-              />
-            )
-          }
-        </>
-      )}
+        {/* Login Modal */}
+        {route === "Login" && (
+          <>
+            {
+              open && (
+                <CustomModal
+                  open={open}
+                  setOpen={setOpen}
+                  activeItem={activeItem}
+                  component={Login}
+                  setRoute={setRoute}
+                  refetch={refetch}
+                />
+              )
+            }
+          </>
+        )}
 
-      {/* SignUp Modal */}
-      {route === "SignUp" && (
-        <>
-          {
-            open && (
-              <CustomModal
-                open={open}
-                setOpen={setOpen}
-                activeItem={activeItem}
-                component={SignUp}
-                setRoute={setRoute}
-              />
-            )
-          }
-        </>
-      )}
+        {/* SignUp Modal */}
+        {route === "SignUp" && (
+          <>
+            {
+              open && (
+                <CustomModal
+                  open={open}
+                  setOpen={setOpen}
+                  activeItem={activeItem}
+                  component={SignUp}
+                  setRoute={setRoute}
+                />
+              )
+            }
+          </>
+        )}
 
-      {/* Verification Modal */}
-      {route === "Verification" && (
-        <>
-          {
-            open && (
-              <CustomModal
-                open={open}
-                setOpen={setOpen}
-                activeItem={activeItem}
-                component={Verification}
-                setRoute={setRoute}
-              />
-            )
-          }
-        </>
-      )}
+        {/* Verification Modal */}
+        {route === "Verification" && (
+          <>
+            {
+              open && (
+                <CustomModal
+                  open={open}
+                  setOpen={setOpen}
+                  activeItem={activeItem}
+                  component={Verification}
+                  setRoute={setRoute}
+                />
+              )
+            }
+          </>
+        )}
 
     </div>
   );
