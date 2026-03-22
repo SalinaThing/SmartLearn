@@ -11,7 +11,10 @@ import orderRouter from './routes/orderRoute.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import analyticsRouter from './routes/analyticsRoutes.js';
 import layoutRouter from './routes/layoutRoutes.js';
+import http from "http";
+import { initSocketServer } from './socketServer.js';
 
+const server = HttpStatusCode.createServer(app);
 const app = express ();
 
 //middlewares
@@ -22,9 +25,6 @@ app.use(cors({
     credentials: true,
 }));
 app.use(express.urlencoded({extended:true}));
-
-//db
-connectDB();
 
 //routes
 app.use('/api/v1', userRouter);
@@ -49,7 +49,11 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUD_API_SECRET
 });
 
+initSocketServer(server);
 //server start
-app.listen(process.env.PORT, ()=>{
+server.listen(process.env.PORT, ()=>{
     console.log(`Server Started on http://localhost:${process.env.PORT}`);
+    
+    //db
+    connectDB();
 });
