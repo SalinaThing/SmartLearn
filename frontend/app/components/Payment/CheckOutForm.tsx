@@ -61,7 +61,7 @@ const CheckOutForm: FC <Props> = ({setOpen, data, user}: Props) => {
             redirect(`/course-access/${data._id}`);
         }
 
-        if(error){
+        if(error){ 
             if("data" in error){
                 const errorMessage = error as any;
                 toast.error(errorMessage.data.message);
