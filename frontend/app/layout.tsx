@@ -8,11 +8,16 @@ import Providers from './Provider'
 import {SessionProvider} from 'next-auth/react'
 import Loader from './components/Loader/Loader'
 import { useSelector } from "react-redux";
-import socketIO from "socket.io-client";
 import { apiSlice, useLoadUserQuery } from '@/redux/features/api/apiSlice'
 
-import ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
-const socketId = socketIO(ENDPOINT, {transports: ["websocket"]});
+import { io } from "socket.io-client";
+
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
+
+const socketId = io(ENDPOINT, {
+  transports: ["websocket"],
+});
+
 export default function RootLayout({
   children,
 }: {
