@@ -294,6 +294,7 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
                                         <CheckOutForm
                                             setOpen={setOpen}
                                             data={data}
+                                            user={user}
                                         />
                                     </Elements>
                                 )
