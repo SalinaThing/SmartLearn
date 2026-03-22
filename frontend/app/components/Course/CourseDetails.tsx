@@ -3,7 +3,7 @@ import CoursePlayer from '@/app/utils/CoursePlayer';
 import Ratings from '@/app/utils/Ratings';
 import Link from 'next/link';
 import { format } from 'path';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoCheckmarkDoneCircleOutline, IoCloseOutline } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import CourseContentList from './CourseContentList';
@@ -17,12 +17,14 @@ type Props = {
     data:any;
     clientSecret:string;
     stripePromise:any;
+    setRoute:any;
+    setOpen:any;
 }
 
-const CourseDetails = ({data, stripePromise, clientSecret}: Props) => {
+const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:openAuthModal}: Props) => {
     const {data: userData} = useLoadUserQuery(undefined, {});
-    const user=userData?.user;
-
+    // const user=userData?.user;
+    const[user, setUser] = useState<any>();
     const [open, setOpen] = useState(false);
 
     const discountPercentage =
@@ -31,10 +33,19 @@ const CourseDetails = ({data, stripePromise, clientSecret}: Props) => {
     const discountPercentagePrice = discountPercentage.toFixed(0);
 
     const isPurchased =
-    user && user?.courses?.find((item: any) =>  item._id === data._id);
+        user && user?.courses?.find((item: any) =>  item._id === data._id);
+
+    useEffect(() => {
+        setUser(userData?.user)
+    }, [userData])
 
     const handleOrder = (e: any) => {
-        setOpen(true);
+        if(user){
+            setOpen(true);
+        }else{
+            setRoute("Login");
+            openAuthModal(true);
+        }
     };
 
     return (
