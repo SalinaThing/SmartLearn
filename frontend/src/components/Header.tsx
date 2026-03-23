@@ -173,6 +173,7 @@ const Header: FC<Props> = ({
                     className="hidden 800px:block cursor-pointer dark:text-white text-black ml-4"
                     onClick={() => {
                       setOpen(true);
+                      setRoute("Login");
                     }}
                   />
                 )
@@ -194,7 +195,10 @@ const Header: FC<Props> = ({
                 <HiOutlineUserCircle
                   size={25}
                   className="cursor-pointer ml-5 my-2 text-black dark:text-white"
-                  onClick={() => setOpen(true)}
+                  onClick={() => {
+                    setOpen(true);
+                    setRoute("Login");
+                  }}
                 />
 
                 <br />

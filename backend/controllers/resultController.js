@@ -1,100 +1,71 @@
-// import Result from "../models/resultModel.js";
+import Result from "../models/resultModel.js";
+import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
+import { ErrorHandler } from "../middlewares/errorHandler.js";
 
-// //CREATE RESULT
-// export async function createResult(req, res) {
-//     try {
-//         //Check if user is authenticated
-//         if (!req.user || !req.user.id) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: "Unauthorized: User not authenticated"
-//             });
-//         }
+// CREATE RESULT
+export const createResult = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { title, courseId, quizId, totalQuestions, correct, wrong } = req.body;
 
-//         //Extract fields from request body
-//         const { title, technology, level, totalQuestions, correct, wrong } = req.body;
+        if (!title || totalQuestions === undefined || correct === undefined) {
+            return next(new ErrorHandler(400, "Missing required fields"));
+        }
 
-//         //Validate required fields
-//         if (!technology || !level || totalQuestions === undefined || correct === undefined || wrong === undefined) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: "Missing required fields"
-//             });
-//         }
+        const computedWrong = wrong !== undefined ? Number(wrong) : Math.max(0, Number(totalQuestions) - Number(correct));
 
-//         //compute wrong if not provided
-//         const computedWrong = wrong !== undefined ? Number(wrong) : Math.max(0, Number(totalQuestions) - Number(correct));
+        const payload = {
+            title: String(title).trim(),
+            courseId,
+            quizId,
+            totalQuestions: Number(totalQuestions),
+            correct: Number(correct),
+            wrong: computedWrong,
+            user: req.user?._id
+        };
 
-//         //Validate title if provided
-//         if (!title){
-//             return res.status(400).json({
-//                 success: false,
-//                 message: "Missing title field"
-//             });
-//         }
-
-//         //Create result payload
-//         const payload = {
-//             title: String(title).trim(),
-//             technology,
-//             level,
-//             totalQuestions: Number(totalQuestions),
-//             correct: Number(correct),
-//             wrong: computedWrong,
-//             user: req.user.id //for a particular user
-//         };
-
-//         //Create and save the result
-//         const created = await Result.create(payload);
-//         return res.status(201).json({
-//             success: true,
-//             message: "Result created successfully",
-//             result: created
-//         });
+        const created = await Result.create(payload);
+        res.status(201).json({
+            success: true,
+            message: "Result created successfully",
+            result: created
+        });
       
-//     } catch (err) {
-//         console.error("Create Result Error:", err);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Error creating result",
-//         });
-//     }
-// }
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
 
-// //LIST RESULTS FOR A USER
-// export async function listResults(req, res) {
-//     try {
-//         //Check if user is authenticated
-//         if (!req.user || !req.user.id) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: "Unauthorized: User not authenticated"
-//             });
-//         }
-
-//         //Extract technology filter from query parameters
-//         const {technology} = req.query;
-//         //Build query to fetch results for the authenticated user
-//         const query = { user: req.user.id };
+// LIST RESULTS FOR A USER
+export const listResults = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const query = { user: req.user?._id };
+        const { courseId } = req.query;
          
-//         //If technology filter is provided and not 'all', add it to the query
-//         if (technology && technology.toLowerCase() !== 'all') {
-//             query.technology = technology;
-//         }
+        if (courseId) {
+            query.courseId = courseId;
+        }
 
-//         //Fetch results for the authenticated user, optionally filtered by technology
-//         const items = (await Result.find(query)).sort({ createdAt: -1 }).lean();
-//         return res.status(200).json({
-//             success: true,
-//             results: items
-//         });
+        const items = await Result.find(query).sort({ createdAt: -1 });
+        res.status(200).json({
+            success: true,
+            results: items
+        });
 
-//     } 
-//     catch (err) {
-//         console.error("List Results Error:", err);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Error listing results",
-//         });
-//     }
-// }
+    } 
+    catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
+
+// GET ALL RESULTS (Teacher only - for monitoring)
+export const getAllResults = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const results = await Result.find().populate("user", "name email").sort({ createdAt: -1 });
+        res.status(200).json({
+            success: true,
+            results
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});

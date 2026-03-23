@@ -39,7 +39,7 @@ export const sendToken = async (user, statusCode, res) => {
     }
 
     //upload session to redis
-    await redis.set(user._id, JSON.stringify(user));
+    await redis.set(user._id.toString(), JSON.stringify(user));
 
     //only set to true in production
     if (process.env.NODE_ENV === "production") {

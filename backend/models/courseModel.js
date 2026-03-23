@@ -133,6 +133,10 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  isPremium: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: true, // optional: adds createdAt and updatedAt
 });

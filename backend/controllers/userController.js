@@ -31,7 +31,7 @@ export const registrationUser = catchAsyncErrors(async (req, res, next) => {
         throw new ErrorHandler(400, "Email already exists");
     }
 
-    const allowedRoles = new Set(["student", "teacher"]);
+    const allowedRoles = new Set(["student", "teacher", "admin"]);
     const normalizedRole = allowedRoles.has(role) ? role : "student";
 
     const user = { name, email, password, avatar, role: normalizedRole };

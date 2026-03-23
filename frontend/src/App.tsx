@@ -20,6 +20,15 @@ import Faq from "./pages/teacher/Faq";
 import Team from "./pages/teacher/Team";
 import AllUsers from "./pages/teacher/AllUsers";
 import AllCourses from "./pages/teacher/AllCourses";
+import Quizzes from "./pages/teacher/Quizzes";
+import Feedback from "./pages/teacher/Feedback";
+import QuizPage from "./pages/QuizPage";
+import FeedbackPage from "./pages/FeedbackPage";
+import Announcements from "./pages/teacher/Announcements";
+import AboutPage from "./pages/About";
+import FAQPage from "./pages/FAQ";
+import ContactPage from "./pages/Contact";
+
 
 export default function App() {
   return (
@@ -50,6 +59,14 @@ export default function App() {
         <Route path="/teacher/team" element={<Team />} />
         <Route path="/teacher/all-users" element={<AllUsers />} />
         <Route path="/teacher/allcourses" element={<AllCourses />} />
+        <Route path="/teacher/quizzes" element={<Quizzes />} /> 
+        <Route path="/teacher/feedback" element={<Feedback />} /> 
+        <Route path="/teacher/announcements" element={<Announcements />} />
+        <Route path="/quiz" element={<QuizPage />} /> 
+        <Route path="/feedback" element={<FeedbackPage />} /> 
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Route>
     </Routes>
   );

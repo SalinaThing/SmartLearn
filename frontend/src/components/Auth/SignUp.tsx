@@ -57,11 +57,12 @@ const SignUp: FC<Props> = ({ setRoute }) => {
             name: "",
             email: "",
             password: "",
+            role: "student",
         },
         validationSchema: schema,
-        onSubmit: async ({ name, email, password }) => {
+        onSubmit: async ({ name, email, password, role }) => {
             const data = {
-                name, email, password
+                name, email, password, role
             }
             await registerUser(data);
         },
@@ -181,6 +182,28 @@ const SignUp: FC<Props> = ({ setRoute }) => {
                             {errors.password}
                         </span>
                     )}
+                </div>
+                <br />
+
+                {/* Role */}
+                <div className="mb-3">
+                    <label
+                        className={`${styles.label}`}
+                        htmlFor="role"
+                    >
+                        Select your role
+                    </label>
+                    <select
+                        name="role"
+                        id="role"
+                        value={values.role}
+                        onChange={handleChange}
+                        className={`${styles.input}`}
+                    >
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
                 <br />
 

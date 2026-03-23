@@ -9,6 +9,9 @@ import { format } from 'timeago.js';
 import { BiMessage } from 'react-icons/bi';
 import { VscVerifiedFilled } from 'react-icons/vsc';
 import Ratings from '@/utils/Ratings';
+import QuizListStudent from './QuizListStudent';
+import FeedbackForm from './FeedbackForm';
+import StudentAnnouncements from './StudentAnnouncements';
 
 import { io } from "socket.io-client";
 
@@ -209,7 +212,7 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
         <br/>
 
         <div className="w-full p-4 flex items-center justify-between bg-slate-500 bg-opacity-20 backdrop-blur shadow-[bg-slate-700] rounded shadow-inner">
-            {["Overview", "Resources", "Q&A", "Reviews"].map((text, index) =>(
+            {["Overview", "Resources", "Q&A", "Reviews", "Quiz", "Feedback", "Announcements"].map((text, index) =>(
                 <h5
                     key={index}
                     className={`800px:text-[20px] cursor-pointer ${
@@ -476,6 +479,31 @@ const CourseContentMedia = ({data, user, id, activeVideo,setActiveVideo, refetch
                             ))}
                         </div>
                     </>
+                )
+            }
+
+            {
+                activeBar === 4 && (
+                    <QuizListStudent 
+                        courseId={id}
+                        user={user}
+                    />
+                )
+            }
+
+            {
+                activeBar === 5 && (
+                    <FeedbackForm 
+                        courseId={id}
+                    />
+                )
+            }
+
+            {
+                activeBar === 6 && (
+                    <StudentAnnouncements 
+                        courseId={id}
+                    />
                 )
             }
         </div>

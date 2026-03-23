@@ -55,7 +55,7 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
         const user = await UserModel.findById(req.user?._id);
 
         const courseExistInUser = user?.courses?.some(
-            course => course._id.toString() === courseId);
+            course => course.courseId === courseId);
 
         if (courseExistInUser) {
             return next(new ErrorHandler(400, "Course already purchased"));
@@ -103,7 +103,7 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(500, err.message));
         }
 
-        user?.courses.push(course?._id);
+        user?.courses.push({ courseId: course?._id });
 
         await redis.set(req.user?._id.toString(), JSON.stringify(user));
 
