@@ -99,7 +99,8 @@ export const activateUser = catchAsyncErrors(async (req, res, next) => {
         email,
         password,
         avatar,
-        role: role || "student"
+        role: role || "student",
+        isVerified: true,
     });
 
     res.status(201).json({

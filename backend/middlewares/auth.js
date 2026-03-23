@@ -1,5 +1,5 @@
-import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
-import { ErrorHandler } from "../middlewares/errorHandler.js";
+import { catchAsyncErrors } from "./catchAsyncErrors.js";
+import { ErrorHandler } from "./errorHandler.js";
 import jwt from "jsonwebtoken";
 import { redis } from "../config/redis.js";
 

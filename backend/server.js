@@ -12,10 +12,10 @@ import notificationRouter from './routes/notificationRoutes.js';
 import analyticsRouter from './routes/analyticsRoutes.js';
 import layoutRouter from './routes/layoutRoutes.js';
 import http from "http";
-import { initSocketServer } from './socketServer.js';
+import { initSocketServer } from './serverSocket.js';
 
-const server = HttpStatusCode.createServer(app);
-const app = express ();
+const app = express();
+const server = http.createServer(app);
 
 //middlewares
 app.use(express.json({limit:'50mb'}));

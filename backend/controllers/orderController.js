@@ -2,30 +2,52 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import CourseModel from "../models/courseModel.js";
 import UserModel from "../models/userModel.js";
-import OrderModel from "../models/orderModel.js";
 import path from "path";
 import ejs from "ejs";
 import sendEmail from "../utils/sendMail.js";
 import { getAllOrdersService, newOrder } from "../services/orderService.js";
 import { fileURLToPath } from "url";
 import NotificationModel from "../models/notificationModel.js";
+import { redis } from "../config/redis.js";
+import axios from "axios";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const KHALTI_LOOKUP_URL = "https://a.khalti.com/api/v2/epayment/lookup/";
+
+async function verifyKhaltiPayment(pidx) {
+    const secretKey = process.env.KHALTI_SECRET_KEY;
+    if (!secretKey || !pidx) {
+        return false;
+    }
+    try {
+        const response = await axios.post(
+            KHALTI_LOOKUP_URL,
+            { pidx },
+            {
+                headers: {
+                    Authorization: `Key ${secretKey}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        const status = response.data?.status;
+        return typeof status === "string" && status.toLowerCase() === "completed";
+    } catch {
+        return false;
+    }
+}
 
 export const createOrder = catchAsyncErrors(async (req, res, next) => {
     try{
         const { courseId, payment_info } = req.body || {};
 
         if(payment_info){
-            if("id" in payment_info){
-                const paymentIntentId = payment_info.id;
-                const paymentIntent = await khalti.paymentIntents.retrieve(
-                  paymentIntentId  
-                );
-
-                if(paymentIntent.status === "suceeded"){
-                    return next(new ErrorHandler("Payment not authorized!, 400"));
+            if("pidx" in payment_info){
+                const ok = await verifyKhaltiPayment(payment_info.pidx);
+                if (!ok) {
+                    return next(new ErrorHandler(400, "Payment not authorized!"));
                 }
             }
         }
@@ -81,19 +103,19 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(500, err.message));
         }
 
-        user?.courses.push(course._id);
+        user?.courses.push(course?._id);
 
-        await redis.set(req.user?._id, JSON.stringify(user));
+        await redis.set(req.user?._id.toString(), JSON.stringify(user));
 
         await user?.save();
 
         await NotificationModel.create({
-            user: user._id,
+            user: user?._id,
             title: "New Order",
-            message: `You have a new order from ${course.name}`,
+            message: `You have a new order from ${course?.name}`,
         });
 
-        course.purchased = (course.purchased || 0) + 1;
+        course.purchased = course?.purchased+1;
         
         await course.save();
 
@@ -113,33 +135,66 @@ export const getAllOrders = catchAsyncErrors(async (req, res, next) => {
     }
 });
  
-//send khalti key
+//send Khalti public key (same route name as before)
 export const sendStripePublishableKey = catchAsyncErrors(async (req, res) => {
     res.status(200).json({
-        key: process.env.STRIPE_PUBLISHABLE_KEY,
+        publishableKey: process.env.KHALTI_PUBLIC_KEY || "",
     })
 });
 
-//New payment
+//New payment — Khalti ePayment initiate
 export const newPayment = catchAsyncErrors(async (req, res, next) => {
     try {
-        const myPayment = await stripe.paymentIntents.create({
-            amount: req.body.amount,
-            currency: "Rs.",
-            metadata: {
-                company: "SmartLearn",
+        const secretKey = process.env.KHALTI_SECRET_KEY;
+        if (!secretKey) {
+            return next(new ErrorHandler(500, "Khalti is not configured. Set KHALTI_SECRET_KEY."));
+        }
+
+        const amount = req.body.amount;
+        const courseId = req.body.courseId;
+        if (amount == null || !courseId) {
+            return next(new ErrorHandler(400, "amount and courseId are required"));
+        }
+
+        const appUrl =
+            process.env.FRONTEND_URL ||
+            process.env.CLIENT_URL ||
+            "http://localhost:3000";
+        const returnUrl = `${appUrl.replace(/\/$/, "")}/course/${courseId}?khalti_return=1`;
+        const websiteUrl = appUrl.replace(/\/$/, "");
+
+        const purchaseOrderId = `course_${courseId}_${Date.now()}`;
+
+        const response = await axios.post(
+            "https://a.khalti.com/api/v2/epayment/initiate/",
+            {
+                return_url: returnUrl,
+                website_url: websiteUrl,
+                amount: amount,
+                purchase_order_id: purchaseOrderId,
+                purchase_order_name: "SmartLearn Course",
+                customer_info: {
+                    name: req.user?.name || "",
+                    email: req.user?.email || "",
+                },
             },
-            automatic_payment_methods: {
-                enabled:true,
+            {
+                headers: {
+                    Authorization: `Key ${secretKey}`,
+                    "Content-Type": "application/json",
+                },
             }
+        );
 
-        });
-
+        const payload = response.data;
         res.status(201).json({
             success:true,
-            client_secret:myPayment.client_secret,
+            client_secret: payload.pidx,
+            payment_url: payload.payment_url,
         })
-    } catch (error: any){
-        return next(new ErrorHandler(error.message, 500))
+    } catch (error) {
+        const detail = error.response?.data?.detail || error.response?.data || error.message;
+        const message = typeof detail === "string" ? detail : JSON.stringify(detail);
+        return next(new ErrorHandler(500, message))
     }
 })

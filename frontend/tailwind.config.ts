@@ -1,11 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./app/components/**/*.{js,ts,jsx,tsx}",
-    "./app/utils/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 
   // Dark mode should be here (NOT inside extend)
   darkMode: "class",
