@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { userLoggedIn } from "../auth/authSlice";
+import { userLoggedIn, userLoggedOut } from "../auth/authSlice";
 
 export const apiSlice = createApi({
     reducerPath: "api",
@@ -8,6 +8,7 @@ export const apiSlice = createApi({
             import.meta.env.VITE_API_URL || "http://localhost:7000/api/v1",
         credentials: "include",
     }),
+    tagTypes: ["Layout", "Notifications"],
     endpoints: (builder) => ({
         refreshToken: builder.query({
             query: (data) => ({
@@ -35,6 +36,7 @@ export const apiSlice = createApi({
                     );
                 } catch (error) {
                       console.log(error);
+                      dispatch(userLoggedOut());
                 }
             },
         })

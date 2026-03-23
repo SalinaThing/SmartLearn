@@ -73,30 +73,49 @@ export const editLayout = catchAsyncErrors(async (req, res, next) => {
     try{
         const {type} = req.body || {};
 
-        if(type === "Banner"){
-            const bannerData = await layoutModel.findOne({type: "Banner"});
-            const {image, title, subTitle} = req.body || {};
+        if (type === "Banner") {
+            const bannerData = await layoutModel.findOne({ type: "Banner" });
+            const { image, title, subTitle } = req.body || {};
 
-            const data= image.startsWith("https")
-                ? bannerData
-                : await cloudinary.v2.uploader.upload(image, {
+            let banner = {};
+
+            if (bannerData) {
+                const data = image.startsWith("https")
+                    ? bannerData.banner.image
+                    : await cloudinary.v2.uploader.upload(image, {
+                        folder: "layout",
+                    });
+
+                banner = {
+                    image: {
+                        public_id: image.startsWith("https")
+                            ? bannerData.banner.image.public_id
+                            : data?.public_id,
+                        url: image.startsWith("https")
+                            ? bannerData.banner.image.url
+                            : data?.secure_url,
+                    },
+                    title,
+                    subTitle,
+                };
+                await layoutModel.findByIdAndUpdate(bannerData._id, { banner });
+            } else {
+                // If it doesn't exist, create it
+                const myCloud = await cloudinary.v2.uploader.upload(image, {
                     folder: "layout",
                 });
-
-            const banner = {
-                image: {
-                    public_id: image.startsWith("https")
-                        ? bannerData.banner.image.public_id
-                        : data?.public_id,
-                    url: image.startsWith("https")
-                        ? bannerData.banner.image.url
-                        : data?.secure_url,
-                },
-                title,
-                subTitle,
-            };
-
-            await layoutModel.findByIdAndUpdate(bannerData._id, {banner});
+                await layoutModel.create({
+                    type: "Banner",
+                    banner: {
+                        image: {
+                            public_id: myCloud.public_id,
+                            url: myCloud.secure_url,
+                        },
+                        title,
+                        subTitle,
+                    }
+                });
+            }
         }
 
         if(type === "FAQ"){

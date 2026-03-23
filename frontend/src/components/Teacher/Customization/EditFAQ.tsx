@@ -20,7 +20,7 @@ const EditFAQ = (props: Props) => {
 
     useEffect(() =>{
         if(data){
-            setQuestions(data.layout.faq);
+            setQuestions(data.layout.faqs);
         }
         if(isSuccess){
             toast.success("FAQ updated successfully!!")
@@ -88,7 +88,7 @@ const EditFAQ = (props: Props) => {
         return questions.some((q) => q.question ==="" || q.answer ==="");
       };
     const handleEdit = async () => {
-        if(!areQuestionsUnchanged(data.layout.faq, questions ) &&
+        if(!areQuestionsUnchanged(data.layout.faqs, questions ) &&
             !isAnyQuestionEmpty(questions)
         ) {
             await editLayout({
@@ -179,7 +179,7 @@ const EditFAQ = (props: Props) => {
                     <div
                         className={`${styles.button}!w-[100px] !min-h-[40px] !h-[40px] dark:text-white text-black bg[#cccccc34]
                                     ${
-                                        areQuestionsUnchanged(data.layout.faq, questions) ||
+                                        areQuestionsUnchanged(data.layout.faqs, questions) ||
                                         isAnyQuestionEmpty(questions)
                                             ?"!cursor-not-allowed"
                                             :"!cursor-pointer !bg-[#42d383]"
@@ -187,7 +187,7 @@ const EditFAQ = (props: Props) => {
                                     !rounded absolute bottom-12 right-12`
                                   }
                         onClick={
-                            areQuestionsUnchanged(data.layout.faq, questions) ||
+                            areQuestionsUnchanged(data.layout.faqs, questions) ||
                             isAnyQuestionEmpty(questions)
                                 ? () => null
                                 : handleEdit

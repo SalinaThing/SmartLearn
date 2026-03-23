@@ -7,7 +7,8 @@ export const layoutApi = apiSlice.injectEndpoints({
                 url: `get-layout/${type}`,
                 method: "GET",
                 credentials: "include" as const,
-            })
+            }),
+            providesTags: ["Layout"],
         }),
         editLayout: builder.mutation({
             query: ({image, type, title, subTitle, faqs, categories}) => ({
@@ -15,7 +16,8 @@ export const layoutApi = apiSlice.injectEndpoints({
                 method: "PUT",
                 credentials: "include" as const,
                 body: {image, type, title, subTitle, faqs, categories}
-            })
+            }),
+            invalidatesTags: ["Layout"],
         }),
 
     })

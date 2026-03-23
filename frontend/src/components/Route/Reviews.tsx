@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from '@/utils/Image';
 import { styles } from '@/styles/style';
-import HeroImg from "../../../public/assets/Hero.jpg";
+import HeroImg from "../../assets/Hero.jpg";
 import ReviewCard from '../Reviews/ReviewCard';
 
 type Props = {}

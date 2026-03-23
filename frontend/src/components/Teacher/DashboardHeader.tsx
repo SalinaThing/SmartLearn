@@ -74,10 +74,8 @@ return (
                     Notifications
                 </h5>
                 {
-                    notifications && notifications.map((item:any, index:number) => {
-                          {/* Notification 1 */}
-                        <div className="dark:bg-[#2d3a4ea1] bg-[#00000013] font-Poppins border-b dark:border-b-[#ffffff47] border-b-[#0000000f]">
-                            
+                    notifications && notifications.map((item:any, index:number) => (
+                        <div key={index} className="dark:bg-[#2d3a4ea1] bg-[#00000013] font-Poppins border-b dark:border-b-[#ffffff47] border-b-[#0000000f]">
                             <div className="w-full flex items-center justify-between p-2">
                                 <p className="text-black dark:text-white">
                                     {item.title}
@@ -98,7 +96,7 @@ return (
                                 {format(item.createdAt)}
                             </p>
                         </div>
-                    })
+                    ))
                 }
 
             </div>

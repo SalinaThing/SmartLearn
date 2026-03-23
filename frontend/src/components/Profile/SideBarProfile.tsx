@@ -1,7 +1,7 @@
 "use client"
 import React, { FC } from 'react'
 import Image from '@/utils/Image'
-import avatarDefault from "../../../public/assets/heroicon3.jpg"
+import avatarDefault from "../../assets/pro7.jpg"
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { AiOutlineLogout } from 'react-icons/ai';
 import { MdOutlineAdminPanelSettings, MdOutlineQuiz } from 'react-icons/md';

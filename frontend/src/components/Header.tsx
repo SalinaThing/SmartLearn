@@ -67,11 +67,11 @@ const Header: FC<Props> = ({
           toast.success("Login Successfully");
         }
       }
-      if(data === null && !isLoading && !userData?.user && !userData?.success){
+      if (data === null && !isLoading && !userData?.user && !userData?.success && user) {
         setLogoutUser(true);
       }
     }
-  }, [data, userData, socialAuth, isLoading, isSuccess, refetch]);
+  }, [data, userData, socialAuth, isLoading, isSuccess, refetch, user]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -153,10 +153,10 @@ const Header: FC<Props> = ({
 
               {/* Desktop User Icon */}
               {
-                userData ? (
+                userData?.success && userData?.user ? (
                   <Link to={"/profile"}>
                     <Image
-                      src={userData?.user.avatar  ? userData.user.avatar.url : avatar}
+                      src={userData.user.avatar?.url || avatar}
                       alt=" "
                       width={30}
                       height={30}

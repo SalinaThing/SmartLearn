@@ -115,7 +115,7 @@ const EditHero = (props: Props) => {
                 data?.layout?.banner?.subTitle !== subTitle ||
                 data?.layout?.banner?.image?.url !== image
                   ? "!cursor-pointer !bg-[#42d383]"
-                  : "!curso r-not-allowed"
+                  : "!cursor-not-allowed"
               }: !rounded absolute bottom-12 right-12`}
               onClick={
                 data?.layout?.banner?.title !== title ||
