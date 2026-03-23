@@ -48,9 +48,9 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
         await createResult({
             courseId,
             quizId: activeQuiz._id,
-            score: finalScore,
+            title: activeQuiz.title,
             totalQuestions: activeQuiz.questions.length,
-            correctAnswers: correctCount,
+            correct: correctCount,
         });
         refetchResults();
     };

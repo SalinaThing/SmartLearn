@@ -5,10 +5,12 @@ import DashboardHeader from '@/components/Teacher/DashboardHeader';
 import AllQuizzes from '@/components/Teacher/Quizzes/AllQuizzes';
 import AllResultsTeacher from '@/components/Teacher/Quizzes/AllResultsTeacher';
 import CreateQuiz from '@/components/Teacher/Quizzes/CreateQuiz';
+import EditQuiz from '@/components/Teacher/Quizzes/EditQuiz';
 import TeacherProtected from '@/hooks/teacherProtected';
 
 const Quizzes = () => {
     const [route, setRoute] = useState("All Quizzes");
+    const [quizData, setQuizData] = useState<any>(null);
 
     return (
         <TeacherProtected>
@@ -43,8 +45,9 @@ const Quizzes = () => {
                             Student Results
                         </button>
                     </div>
-                    {route === "All Quizzes" && <AllQuizzes />}
+                    {route === "All Quizzes" && <AllQuizzes setRoute={setRoute} setQuizData={setQuizData} />}
                     {route === "Create Quiz" && <CreateQuiz setRoute={setRoute} />}
+                    {route === "Edit Quiz" && <EditQuiz setRoute={setRoute} quizData={quizData} />}
                     {route === "All Results" && <AllResultsTeacher />}
                 </div>
             </div>

@@ -36,8 +36,8 @@ const UserAnalytics = ({isDashboard}: Props) => {
     //     {name: "Dec 2023", count:700},
     // ]
 
-   const analyticsData = data?.users?.last12Months?.map((item: any) => ({
-        name: item.month,
+   const analyticsData = data?.users?.map((item: any) => ({
+        name: item.monthYear,
         count: item.count,
     })) ?? [];
 

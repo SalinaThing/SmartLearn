@@ -48,8 +48,8 @@ type Props = {
 const OrderAnalytics = ({isDashboard}: Props) => {
   const {isLoading, data} = useGetOrdersAnaltyicsQuery({});
 
-  const analyticsData = data?.orders?.last12Months?.map((item: any) => ({
-    name: item.month,
+  const analyticsData = data?.orders?.map((item: any) => ({
+    name: item.monthYear,
     count: item.count,
   })) ?? [];
 

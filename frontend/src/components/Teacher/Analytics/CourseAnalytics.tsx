@@ -27,8 +27,8 @@ const CourseAnalytics = (props: Props) => {
     //     {name: "Dec 2023", uv:7},
     // ]
 
-    const analyticsData = data?.courses?.last12Months?.map((item: any) => ({
-        name: item.month,
+    const analyticsData = data?.courses?.map((item: any) => ({
+        name: item.monthYear,
         count: item.count,
     })) ?? [];
 

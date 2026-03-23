@@ -4,14 +4,15 @@ export const connectDB = async () => {
   const dbUrl = process.env.MONGO_URI || '';
 
   try {
-    const data = await mongoose.connect(dbUrl);
+    console.log("Connecting to MongoDB with URL:", dbUrl.split('@')[1] || dbUrl); // Log base URL for privacy
+    const data = await mongoose.connect(dbUrl, {
+        serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+    });
 
     console.log(`Database connected with ${data.connection.host}`);
-
   } catch (error) {
     console.error("MongoDB Connection Error:", error.message);
-
-    // Retry connection after 5 seconds if it fails
+    // console.log(error); // Detailed error
     setTimeout(connectDB, 5000);
   }
 };

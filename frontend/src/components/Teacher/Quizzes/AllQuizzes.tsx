@@ -11,7 +11,12 @@ import { styles } from '@/styles/style';
 import toast from 'react-hot-toast';
 import { useTheme } from '@/utils/ThemeProvider';
 
-const AllQuizzes = () => {
+type Props = {
+    setRoute: (route: string) => void;
+    setQuizData: (data: any) => void;
+}
+
+const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
     const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [quizId, setQuizId] = useState("");
@@ -50,7 +55,14 @@ const AllQuizzes = () => {
         {
             field: 'edit', headerName: "Edit", flex: 0.2,
             renderCell: (params: any) => (
-                <FiEdit2 className="dark:text-white text-black cursor-pointer" size={20} />
+                <FiEdit2 
+                    className="dark:text-white text-black cursor-pointer" 
+                    size={20} 
+                    onClick={() => {
+                        setQuizData(params.row.item);
+                        setRoute("Edit Quiz");
+                    }}
+                />
             )
         },
         {
@@ -70,6 +82,7 @@ const AllQuizzes = () => {
             title: item.title,
             questions: item.questions.length,
             created_at: format(item.createdAt),
+            item: item,
         });
     });
 
