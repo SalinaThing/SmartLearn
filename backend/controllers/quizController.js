@@ -18,7 +18,7 @@ export const createQuiz = catchAsyncErrors(async (req, res, next) => {
             questions,
         });
 
-        res.status(210).json({
+        res.status(201).json({
             success: true,
             quiz,
         });

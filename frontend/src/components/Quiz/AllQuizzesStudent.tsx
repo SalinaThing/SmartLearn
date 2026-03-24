@@ -5,14 +5,14 @@ import Loader from '@/components/Loader/Loader';
 import { styles } from '@/styles/style';
 import { Link } from 'react-router-dom';
 
-const AllQuizzesStudent = () => {
+const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
     const { data: userData, isLoading: userLoading } = useLoadUserQuery(undefined, {});
     const user = userData?.user;
 
     if (userLoading) return <Loader />;
 
     return (
-        <div className="w-[90%] 800px:w-[85%] m-auto mt-[120px]">
+        <div className={`w-[90%] 800px:w-[85%] m-auto ${embedded ? "mt-0" : "mt-[120px]"}`}>
             <h1 className={`${styles.title} text-left`}>Your Quizzes</h1>
             <br />
             {user?.courses?.length === 0 ? (

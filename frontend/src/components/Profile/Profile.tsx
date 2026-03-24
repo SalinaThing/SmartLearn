@@ -5,6 +5,10 @@ import { useLogoutUserQuery } from '@/redux/features/auth/authApi';
 import { signOut } from '@/auth/oauth';
 import ProfileInfo from "./ProfileInfo"
 import ChangePassword from "./ChangePassword"
+import { useGetAllCoursesByUserQuery } from '@/redux/features/courses/coursesApi';
+import CourseCard from '../Course/CourseCard';
+import AllQuizzesStudent from '../Quiz/AllQuizzesStudent';
+import { Link } from 'react-router-dom';
 
 type Props = {
   user: any;
@@ -19,6 +23,7 @@ const Profile: FC<Props> = ({ user }) => {
     skip: !logoutUser ? true : false,
   });
   const [active, setActive] = useState(1);
+  const { data: allCoursesData, isLoading: coursesLoading } = useGetAllCoursesByUserQuery({});
 
   const logOutHandler = async () => {
     setLogoutUser(true);
@@ -40,6 +45,14 @@ const Profile: FC<Props> = ({ user }) => {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const enrolledCourseIds = (user?.courses || [])
+    .map((c: any) => c?.courseId || c)
+    .filter(Boolean);
+
+  const enrolledCourses = (allCoursesData?.courses || []).filter((course: any) =>
+    enrolledCourseIds.includes(course?._id)
+  );
 
   return (
     <div className="w-[85%] flex mx-auto">
@@ -68,13 +81,29 @@ const Profile: FC<Props> = ({ user }) => {
 
         {active === 3 && (
           <div className="text-black dark:text-white">
-            Enrolled Courses
+            <h2 className="text-[24px] font-[600] mb-4">Enrolled Courses</h2>
+            {coursesLoading ? (
+              <p>Loading...</p>
+            ) : enrolledCourses.length === 0 ? (
+              <div>
+                <p>You have not enrolled in any course yet.</p>
+                <Link to="/courses" className="text-blue-500 underline mt-2 inline-block">
+                  Browse Courses
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 800px:grid-cols-2 1100px:grid-cols-3 gap-4">
+                {enrolledCourses.map((course: any) => (
+                  <CourseCard key={course._id} item={course} isProfile={true} />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         {active === 4 && (
           <div className="text-black dark:text-white">
-            Quiz section
+            <AllQuizzesStudent embedded />
           </div>
         )}
       </div>

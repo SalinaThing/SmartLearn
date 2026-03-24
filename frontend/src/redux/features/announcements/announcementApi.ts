@@ -15,6 +15,13 @@ export const announcementApi = apiSlice.injectEndpoints({
                 method: "GET",
             }),
         }),
+        updateAnnouncement: builder.mutation({
+            query: ({ id, data }) => ({
+                url: `update-announcement/${id}`,
+                method: "PUT",
+                body: data,
+            }),
+        }),
         deleteAnnouncement: builder.mutation({
             query: (id) => ({
                 url: `delete-announcement/${id}`,
@@ -27,5 +34,6 @@ export const announcementApi = apiSlice.injectEndpoints({
 export const {
     useCreateAnnouncementMutation,
     useGetAnnouncementsByCourseQuery,
+    useUpdateAnnouncementMutation,
     useDeleteAnnouncementMutation,
 } = announcementApi;

@@ -47,10 +47,46 @@ const CreateQuiz = ({ setRoute }: { setRoute?: (route: string) => void }) => {
         setQuizInfo({ ...quizInfo, questions: updatedQuestions });
     };
 
+    const validateQuiz = () => {
+        if (!quizInfo.courseId || !quizInfo.title.trim()) {
+            toast.error("Please select course and enter quiz title");
+            return false;
+        }
+        if (quizInfo.questions.length === 0) {
+            toast.error("Please add at least one question");
+            return false;
+        }
+
+        for (let i = 0; i < quizInfo.questions.length; i++) {
+            const q = quizInfo.questions[i];
+            if (!q.question.trim()) {
+                toast.error(`Question ${i + 1} cannot be empty`);
+                return false;
+            }
+
+            const normalizedOptions = q.options.map((opt) => opt.trim());
+            if (normalizedOptions.some((opt) => !opt)) {
+                toast.error(`All options are required for Question ${i + 1}`);
+                return false;
+            }
+
+            if (!q.correctAnswer.trim()) {
+                toast.error(`Please select correct answer for Question ${i + 1}`);
+                return false;
+            }
+
+            if (!normalizedOptions.includes(q.correctAnswer.trim())) {
+                toast.error(`Correct answer must match one option in Question ${i + 1}`);
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        if (!quizInfo.courseId || !quizInfo.title || quizInfo.questions.length === 0) {
-            toast.error("Please fill all fields");
+        if (!validateQuiz()) {
             return;
         }
         await createQuiz(quizInfo);
@@ -68,7 +104,8 @@ const CreateQuiz = ({ setRoute }: { setRoute?: (route: string) => void }) => {
             if(setRoute) setRoute("All Quizzes");
         }
         if (error) {
-            toast.error("Failed to create quiz");
+            const err = error as any;
+            toast.error(err?.data?.message || "Failed to create quiz");
         }
     }, [isSuccess, error]);
 

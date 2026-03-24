@@ -5,6 +5,7 @@ import avatarDefault from "../../assets/pro7.jpg"
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { AiOutlineLogout } from 'react-icons/ai';
 import { MdOutlineAdminPanelSettings, MdOutlineQuiz } from 'react-icons/md';
+import { BiBookOpen } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 
 type Props = {
@@ -55,18 +56,19 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
       </h5>
     </div>
 
-    {/* Enrolled courses */}
-    <div 
-      className={`w-full flex items-center px-3 py-4 cursor-pointer ${
-      active ===3 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
-        }`}
-      onClick={() => setActive(3)}
-    >
-      <MdOutlineQuiz size={20} className="text-black dark:text-white" />
-      <h5 className="pl-2 block font-Poppins dark:text-white text-black">
-        Enrolled Courses
-      </h5>
-    </div>
+    {user?.role === "student" && (
+      <div 
+        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+        active ===3 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
+          }`}
+        onClick={() => setActive(3)}
+      >
+        <BiBookOpen size={20} className="text-black dark:text-white" />
+        <h5 className="pl-2 block font-Poppins dark:text-white text-black">
+          Enrolled Courses
+        </h5>
+      </div>
+    )}
 
     {/* Admin Dashboard */}
     {
@@ -85,18 +87,19 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
       )
     }
 
-      {/* Quiz */}
-    <div 
-      className={`w-full flex items-center px-3 py-4 cursor-pointer ${
-      active ===4 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
-        }`}
-      onClick={() => setActive(4)}
-    >
-      <AiOutlineLogout size={20} className="text-black dark:text-white" />
-      <h5 className="pl-2 block font-Poppins dark:text-white text-black">
-        Quiz
-      </h5>
-    </div>
+    {user?.role === "student" && (
+      <div 
+        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+        active ===4 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
+          }`}
+        onClick={() => setActive(4)}
+      >
+        <MdOutlineQuiz size={20} className="text-black dark:text-white" />
+        <h5 className="pl-2 block font-Poppins dark:text-white text-black">
+          Quiz
+        </h5>
+      </div>
+    )}
 
     {/* Logout */}
     <div 
