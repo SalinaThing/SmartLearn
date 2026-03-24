@@ -24,7 +24,6 @@ import Quizzes from "./pages/teacher/Quizzes";
 import Feedback from "./pages/teacher/Feedback";
 import QuizPage from "./pages/QuizPage";
 import FeedbackPage from "./pages/FeedbackPage";
-import Announcements from "./pages/teacher/Announcements";
 import AboutPage from "./pages/About";
 import FAQPage from "./pages/FAQ";
 
@@ -60,7 +59,6 @@ export default function App() {
         <Route path="/teacher/allcourses" element={<AllCourses />} />
         <Route path="/teacher/quizzes" element={<Quizzes />} /> 
         <Route path="/teacher/feedback" element={<Feedback />} /> 
-        <Route path="/teacher/announcements" element={<Announcements />} />
         <Route path="/quiz" element={<QuizPage />} /> 
         <Route path="/feedback" element={<FeedbackPage />} /> 
         <Route path="/about" element={<AboutPage />} />

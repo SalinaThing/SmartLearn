@@ -41,9 +41,9 @@ const CircularProgressWithLabel: FC<Props> = ({ value }) => {
 
 const DashboardWidgets: FC<Props> = ({ value }) => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
-
+                
                 {/* Main Analytics Row */}
                 <div className="grid grid-cols-1 gap-4 sm:gap-6">
                     {/* Top Section - User Analytics */}
@@ -64,8 +64,22 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                     </div>
                 </div>
 
-                {/* Comparison Section - Side by Side Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-6 sm:mt-8">
+                {/* Analytics Grid - 2x2 Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-6 sm:mt-8">
+                    {/* Course Analytics */}
+                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                        <div className="p-2 sm:p-3 md:p-4">
+                            <CourseAnalytics isDashboard={true} />
+                        </div>
+                    </div>
+
+                    {/* Order Analytics */}
+                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                        <div className="p-2 sm:p-3 md:p-4">
+                            <OrderAnalytics isDashboard={true} />
+                        </div>
+                    </div>
+
                     {/* Sales Card */}
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
                         <div className="p-3 sm:p-4 md:p-6">
@@ -95,8 +109,6 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                             </div>
                         </div>
                     </div>
-                    <br />
-                    <br />
 
                     {/* New Users Card */}
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -125,27 +137,6 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <br />
-                <br />
-
-                {/* Bottom Section - Analytics Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-6 sm:mt-8">
-                    {/* Course Analytics */}
-                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-                        <div className="p-2 sm:p-3 md:p-4">
-                            <CourseAnalytics isDashboard={true} />
-                        </div>
-                    </div>
-                    <br />
-                    <br />
-
-                    {/* Order Analytics */}
-                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-                        <div className="p-2 sm:p-3 md:p-4">
-                            <OrderAnalytics isDashboard={true} />
                         </div>
                     </div>
                 </div>

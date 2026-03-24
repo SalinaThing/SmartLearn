@@ -131,19 +131,27 @@ const EditCourse:FC <Props> = ({id}) => {
         return data;
     };
 
-    console.log(courseData);
+    useEffect(() => {
+        if(active === 3) {
+            setCourseData(prepareCoursePayload());
+        }
+    }, [courseInfo, benefits, prerequisites, courseContentData, active]);
 
     const handleCourseCreate = async () => {
         const data = prepareCoursePayload();
         setCourseData(data);
-        await editCourse({ id: editCourseData?._id, data });
+        try {
+            await editCourse({ id: editCourseData?._id, data }).unwrap();
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to update course content.");
+        }
     };
 
   return (
     <div className="w-full flex min-h-screen">
 
         {/* Course Information */}
-        <div className="w-[80%]">
+        <div className="w-full 1100px:w-[80%] 1100px:pr-[22%]">
             {
                 active === 0 &&(
                     <CourseInformation
@@ -198,7 +206,7 @@ const EditCourse:FC <Props> = ({id}) => {
 
         </div>
 
-        <div className="w-[20%] mt-[100px] h-screen fixed z-[-1] top-18 right-0">
+        <div className="hidden 1100px:block w-[20%] fixed top-[100px] right-0 h-[calc(100vh-100px)] z-[10] pr-6">
             <CourseOptions 
                 active={active}
                 setActive={setActive} 

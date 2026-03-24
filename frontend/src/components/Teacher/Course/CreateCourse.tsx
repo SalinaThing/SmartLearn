@@ -130,7 +130,7 @@ const CreateCourse = (props: Props) => {
     <div className="w-full flex min-h-screen">
 
         {/* Course Information */}
-        <div className="w-[80%]">
+        <div className="w-full 1100px:w-[80%] 1100px:pr-[22%]">
             {
                 active === 0 &&(
                     <CourseInformation
@@ -184,7 +184,7 @@ const CreateCourse = (props: Props) => {
 
         </div>
 
-        <div className="w-[20%] mt-[100px] h-screen fixed z-[-1] top-18 right-0">
+        <div className="hidden 1100px:block w-[20%] fixed top-[100px] right-0 h-[calc(100vh-100px)] z-[10] pr-6">
             <CourseOptions 
                 active={active}
                 setActive={setActive} 

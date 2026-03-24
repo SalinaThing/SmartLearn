@@ -17,7 +17,7 @@ const page = (props: Props) => {
                     keywords="SmartLearn, Online Education, Courses, Students, Teachers"
                 />
 
-                <div className='flex h-[200vh]'>
+                <div className='flex min-h-screen'>
                     <div className="1500px:w-[16%] w-1/5">
                         <TeacherSidebar />
                     </div>

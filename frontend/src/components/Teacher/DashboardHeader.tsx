@@ -64,7 +64,7 @@ const DashboardHeader: FC<Props> = ({ open: propOpen, setOpen: propSetOpen }) =>
     }
 
 return ( 
-    <div className="w-full flex items-center justify-end p-6 fixed top-5 right-0">
+    <div className="w-full flex items-center justify-end p-6 relative">
         <ThemeSwitcher />
 
         <div

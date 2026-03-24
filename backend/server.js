@@ -14,7 +14,6 @@ import layoutRouter from './routes/layoutRoutes.js';
 import quizRouter from './routes/quizRoutes.js';
 import resultRouter from './routes/resultRoutes.js';
 import feedbackRouter from './routes/feedbackRoutes.js';
-import announcementRouter from './routes/announcementRoutes.js';
 import http from "http";
 import { initSocketServer } from './serverSocket.js';
 
@@ -40,7 +39,6 @@ app.use('/api/v1', layoutRouter);
 app.use('/api/v1', quizRouter);
 app.use('/api/v1', resultRouter);
 app.use('/api/v1', feedbackRouter);
-app.use('/api/v1', announcementRouter);
 
 //test route
 app.get('/', (req,res)=>{

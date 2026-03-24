@@ -11,52 +11,52 @@ type Props = {
 
 const CourseCard: FC<Props> = ({ item, isProfile }) => {
     return (
-        <Link to={!isProfile ? `/course/${item._id}` : `/course-access/${item._id}`}>
-            <div className="w-full min-h-[35vh] dark:bg-slate-500 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015] dark:shadow-slate-700 rounded-lg p-3 shadow-sm dark:shadow-inner">
+        <Link to={!isProfile ? `/course/${item?._id}` : `/course-access/${item?._id}`}>
+            <div className="w-full min-h-[35vh] dark:bg-slate-500 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015] dark:shadow-slate-700 rounded-lg p-3 shadow-sm dark:shadow-inner hover:shadow-lg transition-shadow duration-300">
                 <Image
-                    src={item.thumbnail?.url}
-                    width={500}
+                    src={item?.thumbnail?.url || "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                    width={400}
                     height={300}
-                    style={{ objectFit: "contain" }}
-                    className="rounded w-full"
-                    alt=""
+                    style={{ objectFit: "cover" }}
+                    className="rounded w-full h-[180px] object-cover"
+                    alt={item?.name || "Course thumbnail"}
                 />
                 <br />
 
-                <h1 className="font-Poppins text-[16px] text-black dark:text-[#fff]">
-                    {item.name}
+                <h1 className="font-Poppins text-[16px] font-semibold text-black dark:text-[#fff] line-clamp-2 min-h-[50px]">
+                    {item?.name || "Untitled Course"}
                 </h1>
 
                 <div className="w-full flex items-center justify-between pt-2">
-                    <Ratings rating={item.ratings} />
+                    <Ratings rating={item?.ratings || 0} />
                     <h5
-                        className={`text-black dark:text-[#fff] ${isProfile && "hidden 800px:inline"
+                        className={`text-black dark:text-[#fff] text-sm ${isProfile && "hidden 800px:inline"
                             }`}
                     >
-                        {item.purchased} Students
+                        {item?.purchased || 0} Students
                     </h5>
                 </div>
 
                 <div className="w-full flex items-center justify-between pt-3">
-                    <div className="flex">
-                        <h3 className="text-black dark:text-[#fff]">
-                            {item.price === 0 ? "Free" : item.price + "Rs."}
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-black dark:text-[#fff] font-bold text-lg">
+                            {item?.price === 0 ? "Free" : `Rs. ${item?.price || 0}`}
                         </h3>
 
-                        <h5 className="pl-3 text-[14px] mt-[-5px] line-through opacity-80 text-black dark:text-[#fff]">
-                            {item.estimatedPrice}Rs.
-                        </h5>
+                        {item?.estimatedPrice && item?.estimatedPrice > 0 && (
+                            <h5 className="text-[14px] line-through opacity-60 text-black dark:text-[#fff]">
+                                Rs. {item?.estimatedPrice}
+                            </h5>
+                        )}
                     </div>
 
-                    <div className="flex items-center pb-3">
-                        <AiOutlineUnorderedList size={20} fill="#fff" />
-                        <h5 className="pl-2 text-black dark:text-[#fff]">
-                            {item.courseData?.length}Lectures
+                    <div className="flex items-center">
+                        <AiOutlineUnorderedList size={20} className="text-black dark:text-[#fff]" />
+                        <h5 className="pl-2 text-black dark:text-[#fff] text-sm">
+                            {item?.courseData?.length || 0} {item?.courseData?.length === 1 ? "Lecture" : "Lectures"}
                         </h5>
                     </div>
                 </div>
-
-
             </div>
         </Link>
     )

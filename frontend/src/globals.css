@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@config "../tailwind.config.ts";
+@config "../tailwind.config.js";
 
 :root {
   --foreground-rgb: 0, 0, 0;

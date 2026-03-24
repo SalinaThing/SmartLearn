@@ -1,4 +1,3 @@
- "use client"
  
 import Heading from '@/utils/Heading'
 import TeacherProtected from '@/hooks/teacherProtected'

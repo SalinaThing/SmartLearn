@@ -26,6 +26,12 @@ const Footer = (props: Props) => {
                   FAQ
                 </Link>
               </li>
+
+              <li>
+                <Link to="/feedback" className="text-[16px] text-[#000000a4] hover:text-[#000]">
+                  Feedback
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -43,8 +49,13 @@ const Footer = (props: Props) => {
                 </Link>
               </li>
               <li>
-                <Link to="/course-dashboard" className="text-[16px] text-[#000000a4] hover:text-[#000]">
-                  Course Dashboard
+                <Link to="/quizes" className="text-[16px] text-[#000000a4] hover:text-[#000]">
+                  Quizes
+                </Link>
+              </li>
+               <li>
+                <Link to="/notice" className="text-[16px] text-[#000000a4] hover:text-[#000]">
+                  Notice
                 </Link>
               </li>
             </ul>
@@ -80,7 +91,18 @@ const Footer = (props: Props) => {
                   rel="noopener noreferrer"
                   className="text-[16px] text-[#000000a4] hover:text-[#000]"
                 >
-                  github
+                  Github
+                </a>
+              </li>
+
+               <li>
+                <a
+                  href="https://www.twitter.com/shahriarsajeeb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[16px] text-[#000000a4] hover:text-[#000]"
+                >
+                  Twitter
                 </a>
               </li>
             </ul>
@@ -89,20 +111,20 @@ const Footer = (props: Props) => {
           <div className="space-y-4">
             <h3 className="text-[24px] font-[600] text-black">Contact Info</h3>
             <p className="text-[16px] text-[#000000a4] leading-6">
-              Call Us: 1-885-665-2022
+              Call Us: 01-1234567, 01-7654321
             </p>
             <p className="text-[16px] text-[#000000a4] leading-6">
-              Address: +7011 Vermont Ave, Los Angeles, CA 90044
+              Address: Gokarna 6, Kathmandu, Nepal
             </p>
             <p className="text-[16px] text-[#000000a4] leading-6">
-              Mail Us: hello@elearning.com
+              Mail Us: smart@elearning.com
             </p>
           </div>
         </div>
         <br />
         <br />
         <p className="text-center text-black text-[16px] pb-2">
-          Copyright © 2023 ELearning | All Rights Reserved
+          Copyright © 2023 Smart | All Rights Reserved
         </p>
       </div>
     </footer>
