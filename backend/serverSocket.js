@@ -1,7 +1,9 @@
 import { Server as SocketIOServer } from "socket.io";
 
+let io;
+
 export const initSocketServer = (server) => {
-    const io = new SocketIOServer(server);
+    io = new SocketIOServer(server);
 
     io.on("connection", (socket) => {
         console.log("A user is connected!!");
@@ -15,3 +17,5 @@ export const initSocketServer = (server) => {
         });
     });
 };
+
+export { io };

@@ -27,7 +27,6 @@ import FeedbackPage from "./pages/FeedbackPage";
 import Announcements from "./pages/teacher/Announcements";
 import AboutPage from "./pages/About";
 import FAQPage from "./pages/FAQ";
-import ContactPage from "./pages/Contact";
 
 
 export default function App() {
@@ -66,7 +65,6 @@ export default function App() {
         <Route path="/feedback" element={<FeedbackPage />} /> 
         <Route path="/about" element={<AboutPage />} />
         <Route path="/faq" element={<FAQPage />} />
-        <Route path="/contact" element={<ContactPage />} />
       </Route>
     </Routes>
   );

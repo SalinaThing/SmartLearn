@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import NotificationModel from "../models/notificationModel.js";
 import { redis } from "../config/redis.js";
 import axios from "axios";
+import { io } from "../serverSocket.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -110,7 +111,12 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
         await user?.save();
 
         await NotificationModel.create({
-            user: user?._id,
+            title: "New Order",
+            message: `You have a new order from ${course?.name}`,
+        });
+
+        // Emit socket event
+        io.emit("newNotification", {
             title: "New Order",
             message: `You have a new order from ${course?.name}`,
         });

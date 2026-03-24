@@ -17,10 +17,20 @@ type Props = {
     setOpen?: any;
 };
 
-const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
+const DashboardHeader: FC<Props> = ({ open: propOpen, setOpen: propSetOpen }) => {
     const {data, refetch} = useGetAllNotificationsQuery(undefined, {refetchOnMountOrArgChange:true})
     const [updateNotification, {isSuccess}]= useUpdateNotificationStatusMutation();
     const [notifications, setNotifications] = useState<any>([]);
+    const [open, setOpen] = useState(false);
+
+    const handleToggle = () => {
+        if (propSetOpen) {
+            propSetOpen(!propOpen);
+        }
+        setOpen(!open);
+    };
+
+    const isOpen = propOpen !== undefined ? propOpen : open;
     const [audio] = useState(
         new Audio(
         "https://res.cloudinary.com/damk25wo5/video/upload/v1693465789/notification_vcetjn.mp3"
@@ -59,7 +69,7 @@ return (
 
         <div
             className="relative cursor-pointer m-2"
-            onClick={() => setOpen(!open)}
+            onClick={handleToggle}
         >
             <IoMdNotificationsOutline className="text-2xl cursor-pointer dark:text-white text-black" />
             <span className="absolute -top-2 -right-2 bg-[#3ccbae] rounded-full w-[20px] h-[20px] text-[12px] flex items-center justify-center text-white">
@@ -67,8 +77,8 @@ return (
             </span>
         </div>
 
-        {open && (
-            <div className="w-[350px] h-[50vh] dark:bg-[#111C43] bg-white shadow-xl absolute top-16 z-10 rounded">
+        {isOpen && (
+            <div className="w-[350px] h-[50vh] dark:bg-[#111C43] bg-white shadow-xl absolute top-16 right-0 z-[9999] rounded overflow-y-auto">
             
                 <h5 className="text-center text-[20px] font-Poppins text-black dark:text-white p-3">
                     Notifications

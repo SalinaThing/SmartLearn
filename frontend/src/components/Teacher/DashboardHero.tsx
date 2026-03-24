@@ -6,16 +6,13 @@ type Props = {
   isDashboard?: boolean;
 }
 
-const DashboardHero = ({isDashboard}: Props) => {
-  const [open, setOpen] = useState(false);
+const DashboardHero = ({ isDashboard }: Props) => {
   return (
     <div>
-      <DashboardHeader open={open} setOpen={setOpen} />
+      <DashboardHeader />
       {
         isDashboard &&
-          <DashboardWidgets 
-            open={open}
-          />
+        <DashboardWidgets />
       }
     </div>
   )

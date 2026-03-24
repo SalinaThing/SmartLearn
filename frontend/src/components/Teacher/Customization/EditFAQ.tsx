@@ -9,18 +9,39 @@ import Loader from '../../Loader/Loader';
 
 type Props = {}
 
+type FAQItem = {
+    _id?: string;
+    id?: string;
+    question: string;
+    answer: string;
+    active?: boolean;
+};
+
+const getItemId = (item: FAQItem) => item._id || item.id || "";
+
+const normalizeFaqs = (faqs: FAQItem[]) =>
+    faqs.map((item) => ({
+        question: item.question?.trim() ?? "",
+        answer: item.answer?.trim() ?? "",
+    }));
+
 const EditFAQ = (props: Props) => {
     const {data, isLoading} = useGetHeroDataQuery(
         "FAQ", 
         {refetchOnMountOrArgChange: true}
     );
 
-    const [questions, setQuestions] = useState<any[]>([]);
+    const [questions, setQuestions] = useState<FAQItem[]>([]);
     const [editLayout, {isSuccess, error}]= useEditLayoutMutation();
 
     useEffect(() =>{
-        if(data){
-            setQuestions(data.layout.faqs);
+        if(data?.layout?.faqs){
+            setQuestions(
+                data.layout.faqs.map((item: FAQItem) => ({
+                    ...item,
+                    active: false,
+                }))
+            );
         }
         if(isSuccess){
             toast.success("FAQ updated successfully!!")
@@ -29,14 +50,16 @@ const EditFAQ = (props: Props) => {
           if("data" in error){
                 const errorData = error as any;
                 toast.error(errorData?.data?.message);
+            } else {
+                toast.error("Unable to update FAQ");
             }
         }
     }, [data, error, isSuccess]);
 
-    const toggleQuestion = (id:any) => {
+    const toggleQuestion = (id: string) => {
         setQuestions((prevQuestions) =>
             prevQuestions.map((q) => 
-                (q._id === id 
+                (getItemId(q) === id 
                     ? { ...q, active: !q.active} 
                     : q
                 )
@@ -44,10 +67,10 @@ const EditFAQ = (props: Props) => {
         );
     };
 
-    const handleQuestionChange = (id: any, value:string) => {
+    const handleQuestionChange = (id: string, value:string) => {
         setQuestions((prevQuestions) =>
             prevQuestions.map((q) => 
-                (q._id === id 
+                (getItemId(q) === id 
                     ? { ...q, question: value} 
                     : q
                 )
@@ -55,10 +78,10 @@ const EditFAQ = (props: Props) => {
         );
     };
 
-    const handleAnswerChange = (id: any, value:string) => {
+    const handleAnswerChange = (id: string, value:string) => {
         setQuestions((prevQuestions) =>
             prevQuestions.map((q) => 
-                (q._id === id 
+                (getItemId(q) === id 
                     ? { ...q, answer: value} 
                     : q
                 )
@@ -70,35 +93,63 @@ const EditFAQ = (props: Props) => {
         setQuestions([
             ...questions,
             {
+                id: `new-${Date.now()}-${Math.random()}`,
                 question:"",
                 answer:"",
+                active: true,
             }
         ]);
     };
 
-    //Function to check if the FAQ arrays are unchanged
     const areQuestionsUnchanged = (
-        originalQuestions: any[],
-        newQuestions:any[]
+        originalQuestions: FAQItem[],
+        newQuestions: FAQItem[]
       ) => {
-        return JSON.stringify(originalQuestions) === JSON.stringify(newQuestions);
+        const origNormalized = normalizeFaqs(originalQuestions);
+        const newNormalized = normalizeFaqs(newQuestions);
+
+        if (origNormalized.length !== newNormalized.length) return false;
+
+        return JSON.stringify(origNormalized) === JSON.stringify(newNormalized);
       };
 
-      const isAnyQuestionEmpty = (questions:any[]) => {
-        return questions.some((q) => q.question ==="" || q.answer ==="");
+      const isAnyQuestionEmpty = (questions: FAQItem[]) => {
+        return questions.some((q) =>
+            !q.question?.trim() || !q.answer?.trim()
+        );
       };
+
     const handleEdit = async () => {
-        if(!areQuestionsUnchanged(data.layout.faqs, questions ) &&
-            !isAnyQuestionEmpty(questions)
-        ) {
+        if (!data?.layout?.faqs) {
+            toast.error("Unable to load existing FAQ data.");
+            return;
+        }
+
+        if (areQuestionsUnchanged(data.layout.faqs, questions)) {
+            toast.error("No changes detected.");
+            return;
+        }
+
+        if (isAnyQuestionEmpty(questions)) {
+            toast.error("Please fill out all FAQ question and answer fields.");
+            return;
+        }
+
+        try {
             await editLayout({
-                type:"FAQ",
-                faqs:questions,
-            })
+                type: "FAQ",
+                faqs: normalizeFaqs(questions),
+            }).unwrap();
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to save FAQ updates.");
         }
     }
 
+    const hasChanges = Boolean(
+        data?.layout?.faqs && !areQuestionsUnchanged(data.layout.faqs, questions)
+    );
 
+    const isSaveDisabled = !hasChanges || isAnyQuestionEmpty(questions);
 
     
   return (
@@ -110,23 +161,25 @@ const EditFAQ = (props: Props) => {
                 <div className="w-[90%] 800px:w-[80%] m-auto mt-[120px]">
                     <div className="mt-12">
                     <dl className="space-y-8">
-                        {questions.map((q: any) => (
+                        {questions.map((q: FAQItem) => {
+                        const itemId = getItemId(q);
+                        return (
                         <div
-                            key={q._id}
+                            key={itemId}
                             className={`${
-                            q._id !== questions[0]?._id && "border-t"
+                            itemId !== getItemId(questions[0]) && "border-t"
                             } border-gray-200 pt-6`}
                         >
                             <dt className="text-lg">
                             <button
                                 className="flex items-start dark:text-white text-black justify-between w-full text-left focus:outline-none"
-                                onClick={() => toggleQuestion(q._id)}
+                                onClick={() => toggleQuestion(itemId)}
                             >
                                 <input
                                 className={`${styles.input} border-none`}
                                 value={q.question}
                                 onChange={(e: any) =>
-                                    handleQuestionChange(q._id, e.target.value)
+                                    handleQuestionChange(itemId, e.target.value)
                                 }
                                 placeholder="Add your question..."
                                 />
@@ -146,7 +199,7 @@ const EditFAQ = (props: Props) => {
                                         className={`${styles.input} border-none`}
                                         value={q.answer}
                                         onChange={(e: any) =>
-                                            handleAnswerChange(q._id, e.target.value)
+                                            handleAnswerChange(itemId, e.target.value)
                                         }
                                         placeholder="Add your answer..."
                                     />
@@ -156,7 +209,7 @@ const EditFAQ = (props: Props) => {
                                             className="dark:text-white text-black text-[18px] cursor-pointer"
                                             onClick={()=> {
                                                 setQuestions((prevQuestions) =>
-                                                    prevQuestions.filter((item) => item._id !== q._id)
+                                                    prevQuestions.filter((item) => getItemId(item) !== itemId)
                                                 );
                                             }}
                                         />
@@ -164,7 +217,7 @@ const EditFAQ = (props: Props) => {
                                 </dd>
                             )}
                         </div>
-                        ))}
+                        )})}
                     </dl>
 
                     <br/>
@@ -176,25 +229,18 @@ const EditFAQ = (props: Props) => {
                     />
                     </div>
 
-                    <div
-                        className={`${styles.button}!w-[100px] !min-h-[40px] !h-[40px] dark:text-white text-black bg[#cccccc34]
-                                    ${
-                                        areQuestionsUnchanged(data.layout.faqs, questions) ||
-                                        isAnyQuestionEmpty(questions)
-                                            ?"!cursor-not-allowed"
-                                            :"!cursor-pointer !bg-[#42d383]"
-                                    }
-                                    !rounded absolute bottom-12 right-12`
-                                  }
-                        onClick={
-                            areQuestionsUnchanged(data.layout.faqs, questions) ||
-                            isAnyQuestionEmpty(questions)
-                                ? () => null
-                                : handleEdit
-                        }
+                    <button
+                        type="button"
+                        disabled={isSaveDisabled}
+                        onClick={handleEdit}
+                        className={`${styles.button} w-[100px] min-h-[40px] h-[40px] absolute bottom-12 right-12 rounded transition-all duration-200 ${
+                            isSaveDisabled
+                                ? "opacity-50 cursor-not-allowed bg-gray-400"
+                                : "cursor-pointer bg-[#42d383] hover:bg-[#34b768]"
+                        }`}
                     >
                         Save
-                    </div>
+                    </button>
                 </div>
             )
         }

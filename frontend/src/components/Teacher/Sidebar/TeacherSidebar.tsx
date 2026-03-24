@@ -275,15 +275,6 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
                             {!isCollapsed && "Customization"}
                         </Typography>
 
-                        {/* Teacher Hero */}
-                        <Item
-                            title="Hero"
-                            to="/teacher/hero-layout"
-                            icon={<WebIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
                         <Item
                             title="Quizzes"
                             to="/teacher/quizzes"
@@ -303,6 +294,14 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
                         <Item
                             title="FeedBack"
                             to="/teacher/feedback"
+                            icon={<FeedbackIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+
+                        <Item
+                            title="Faq"
+                            to="/teacher/faq"
                             icon={<FeedbackIcon />}
                             selected={selected}
                             setSelected={setSelected}

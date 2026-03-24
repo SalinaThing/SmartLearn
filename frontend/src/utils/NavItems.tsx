@@ -14,21 +14,10 @@ export const navItemsData = [
     name: "Quiz",
     link: "/quiz"
   },
-  {
-    name: "Feedback",
-    link: "/feedback"
-  },
-  {
-    name: "FAQ",
-    link: "/faq"
-  },
+ 
   {
     name: "About Us",
     link: "/about"
-  },
-  {
-    name: "Contact Us",
-    link: "/contact"
   },
 ];
 type Props = {

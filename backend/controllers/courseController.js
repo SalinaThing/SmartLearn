@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 import NotificationModel from "../models/notificationModel.js";
 import { getAllCoursesService } from "../services/courseService.js";
 import axios from "axios";
+import { io } from "../serverSocket.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -219,7 +220,12 @@ export const addQuestion = catchAsyncErrors(async (req, res, next) => {
         courseContent.questions.push(newQuestion);
 
         await NotificationModel.create({
-            user: req.user?._id,
+            title: "New Question Added",
+            message: `You have a new question in course ${courseContent.title}`,
+        });
+
+        // Emit socket event for real-time notification
+        io.emit("newNotification", {
             title: "New Question Added",
             message: `You have a new question in course ${courseContent.title}`,
         });
@@ -278,7 +284,12 @@ export const addAnswer = catchAsyncErrors(async (req, res, next) => {
         if (req.user?._id.toString() === question.user._id.toString()) {
             //create a notification for the question asker
             await NotificationModel.create({
-                user: question.user._id,
+                title: "New Question Reply received",
+                message: `You have a new question reply in ${courseContent.title}`,
+            });
+
+            // Emit socket event
+            io.emit("newNotification", {
                 title: "New Question Reply received",
                 message: `You have a new question reply in ${courseContent.title}`,
             });
@@ -355,7 +366,12 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
 
         //create notification for course instructor
         await NotificationModel.create({
-            user: req.user?._id,
+            title: "New Review Received",
+            message: `${req.user.name} has given a review in "${course?.name}" course`,
+        });
+
+        // Emit socket event
+        io.emit("newNotification", {
             title: "New Review Received",
             message: `${req.user.name} has given a review in "${course?.name}" course`,
         });

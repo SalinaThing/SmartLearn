@@ -60,7 +60,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
     const { errors, touched, values, handleChange, handleSubmit } = formik;
 
     return (
-        <div className="w-full">
+        <div className="w-full max-w-md mx-auto p-6 rounded-2xl bg-white/80 dark:bg-slate-900/90 shadow-lg backdrop-blur-sm">
             <h1 className={`${styles.title}`}>
                 Login with SmartLearn
             </h1>
