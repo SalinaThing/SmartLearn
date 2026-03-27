@@ -4,7 +4,8 @@ import { activateUser, deleteUser,
          loginUser, logoutUser, registrationUser, 
          socialAuth, updateAccessToken, 
          updatePassword, updateProfilePicture, 
-         updateUserInfo, updateUserRole
+         updateUserInfo, updateUserRole,
+         sendDirectEmail
         } from "../controllers/userController.js";
 import { authorizeRoles, isAuthenticated } from "../middlewares/auth.js";
 
@@ -43,5 +44,6 @@ userRouter.get("/get-users", updateAccessToken, isAuthenticated, authorizeRoles(
 userRouter.put("/update-user-role", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), updateUserRole);
 userRouter.delete("/delete-user/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteUser);
 
+userRouter.post("/send-email", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), sendDirectEmail);
 
 export default userRouter;

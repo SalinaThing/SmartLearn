@@ -59,6 +59,14 @@ const courseDataSchema = new mongoose.Schema({
   description: String,
   videoLength: Number,
   videoPlayer: String,
+  pdfUrl: {
+    type: String,
+    default: "",
+  },
+  pdfName: {
+    type: String,
+    default: "",
+  },
   links: {
     type: [linkSchema],
     default: [],

@@ -85,6 +85,9 @@ export const editCourse = catchAsyncErrors(async (req, res, next) => {
             { new: true }
         );
 
+        // Invalidate Redis cache so students get fresh data
+        await redis.del(courseId);
+
         res.status(200).json({
             success: true,
             course: updatedCourse,
@@ -467,7 +470,7 @@ export const generateVideoUrl = catchAsyncErrors(async (req, res, next) => {
     try {
         const { videoId } = req.body || {};
         const response = await axios.post(
-            `http://dev.vdocipher.com/api/videos/${videoId}/otp`,
+            `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
             { ttl: 300 },
             {
                 headers: {
@@ -483,3 +486,73 @@ export const generateVideoUrl = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler(400, err.message));
     }
 });
+
+//Upload video to Cloudinary
+export const uploadVideo = catchAsyncErrors(async (req, res, next) => {
+    try {
+        if (!req.file) {
+            return next(new ErrorHandler(400, "No video file provided"));
+        }
+
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.v2.uploader.upload_stream(
+                {
+                    resource_type: "video",
+                    folder: "course-videos",
+                    chunk_size: 6000000,
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            uploadStream.end(req.file.buffer);
+        });
+
+        res.status(200).json({
+            success: true,
+            public_id: result.public_id,
+            url: result.secure_url,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
+
+//Upload PDF to Cloudinary
+export const uploadPdf = catchAsyncErrors(async (req, res, next) => {
+    try {
+        if (!req.file) {
+            return next(new ErrorHandler(400, "No PDF file provided"));
+        }
+
+        if (req.file.mimetype !== "application/pdf") {
+            return next(new ErrorHandler(400, "Only PDF files are allowed"));
+        }
+
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.v2.uploader.upload_stream(
+                {
+                    resource_type: "raw",
+                    folder: "course-pdfs",
+                    format: "pdf",
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            uploadStream.end(req.file.buffer);
+        });
+
+        res.status(200).json({
+            success: true,
+            public_id: result.public_id,
+            url: result.secure_url,
+            originalName: req.file.originalname,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
+

@@ -462,3 +462,49 @@ export const deleteUser = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler(400, err.message));
     }
 });
+
+//Send direct email from teacher dashboard
+export const sendDirectEmail = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { email, subject, message } = req.body || {};
+
+        if (!email || !subject || !message) {
+            return next(new ErrorHandler(400, "Please provide email, subject, and message"));
+        }
+
+        const nodeMailer = (await import("nodemailer")).default;
+        const transporter = nodeMailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT || "587"),
+            service: process.env.SMTP_SERVICE,
+            auth: {
+                user: process.env.SMTP_MAIL,
+                pass: process.env.SMTP_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.SMTP_MAIL,
+            to: email,
+            subject,
+            html: `
+                <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <h2 style="color: #37a39a;">SmartLearn - Message from Teacher</h2>
+                    <hr style="border-color: #e0e0e0;" />
+                    <p style="font-size: 15px; line-height: 1.6; color: #333;">${message.replace(/\n/g, '<br/>')}</p>
+                    <hr style="border-color: #e0e0e0;" />
+                    <p style="font-size: 12px; color: #999;">This email was sent from SmartLearn Teacher Dashboard.</p>
+                </div>
+            `,
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({
+            success: true,
+            message: "Email sent successfully",
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
