@@ -83,9 +83,9 @@ const Verification: FC<Props> = ({setRoute}) => {
     };
 
   return (
-    <div>
-        <h1 className={`${styles.title}`}>Verify your account</h1>
-        <br/>
+    <div className="w-full max-w-md mx-auto p-8 rounded-2xl bg-white/95 dark:bg-slate-900/95 shadow-2xl backdrop-blur-md border border-gray-100 dark:border-gray-800 transition-all duration-300">
+        <h1 className={`${styles.title} text-[28px] font-bold tracking-tight text-gray-900 dark:text-white mb-2`}>Verify Your Account</h1>
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6 font-Poppins">Enter the 4-digit code sent to your email.</p>
 
         <div className="w-full flex items-center justify-center mt-2">
             <div className="w-[80px] h-[80px] rounded-full bg-[#497DF2] flex items-center justify-center">
@@ -102,10 +102,10 @@ const Verification: FC<Props> = ({setRoute}) => {
                         key={index}
                         type="text"
                         ref={inputRefs[index]}
-                        className={`w-[65px] h-[65px] bg-transparent border-[3px] rounded-[10px] flex items-center text-black dark:text-white justify-center text-[18px] font-Poppins outline-none text-center ${
+                        className={`w-[60px] h-[60px] bg-transparent border-[2.5px] rounded-xl flex items-center text-black dark:text-white justify-center text-[22px] font-Poppins outline-none text-center transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 shadow-sm ${
                              invalidError
-                              ? "shake border-red-500"
-                              : "dark:border-white border-[#0000004a]"
+                              ? "shake border-red-500 ring-2 ring-red-500 font-bold"
+                              : "dark:border-gray-600 border-gray-300"
                         }`}
                         maxLength={1}
                         placeholder=''
@@ -118,9 +118,9 @@ const Verification: FC<Props> = ({setRoute}) => {
         <br/>
         <br/>
 
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center mt-8">
             <button
-                className={`${styles.button}`}
+                className={`${styles.button} hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5 transition-all duration-200 font-bold active:scale-95 text-white`}
                 onClick={verificationHandler}
             >
                 Verify Account
@@ -128,15 +128,15 @@ const Verification: FC<Props> = ({setRoute}) => {
         </div>
         <br/>
 
-        <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
+        <div className="text-center pt-6 font-Poppins text-[15px] text-gray-600 dark:text-gray-300">
             Go back to sign in?{" "}
             <span
-                className="text-[#2190ff] pl-1 cursor-pointer"
+                className="text-blue-600 dark:text-blue-400 font-semibold cursor-pointer hover:underline"
                 onClick={() => setRoute("Login")}
             >
-                Sign In
+                Login
             </span>
-        </h5>
+        </div>
        
     </div>
   )

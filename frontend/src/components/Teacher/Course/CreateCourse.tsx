@@ -53,6 +53,8 @@ const CreateCourse = (props: Props) => {
             description:"",
             videoSection:"Untitled Section",
             videoLength:"",
+            pdfUrl: "",
+            pdfName: "",
             links: [
                 {
                     title:"",
@@ -75,6 +77,8 @@ const CreateCourse = (props: Props) => {
             description: courseContent.description,
             videoLength: courseContent.videoLength,
             videoSection: courseContent.videoSection,
+            pdfUrl: courseContent.pdfUrl || "",
+            pdfName: courseContent.pdfName || "",
             links: courseContent.links.map((link) => ({
                 title: link.title,
                 url: link.url,

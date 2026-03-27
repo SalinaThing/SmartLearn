@@ -61,6 +61,8 @@ const EditCourse:FC <Props> = ({id}) => {
             title:"",
             description:"",
             videoSection:"Untitled Section",
+            pdfUrl: "",
+            pdfName: "",
             links: [
                 {
                     title:"",
@@ -101,6 +103,8 @@ const EditCourse:FC <Props> = ({id}) => {
             title: courseContent.title,
             description: courseContent.description,
             videoSection: courseContent.videoSection,
+            pdfUrl: courseContent.pdfUrl || "",
+            pdfName: courseContent.pdfName || "",
             links: courseContent.links.map((link) => ({
                 title: link.title,
                 url: link.url,
@@ -131,20 +135,12 @@ const EditCourse:FC <Props> = ({id}) => {
         return data;
     };
 
-    useEffect(() => {
-        if(active === 3) {
-            setCourseData(prepareCoursePayload());
-        }
-    }, [courseInfo, benefits, prerequisites, courseContentData, active]);
+    console.log(courseData);
 
     const handleCourseCreate = async () => {
         const data = prepareCoursePayload();
         setCourseData(data);
-        try {
-            await editCourse({ id: editCourseData?._id, data }).unwrap();
-        } catch (err: any) {
-            toast.error(err?.data?.message || "Failed to update course content.");
-        }
+        await editCourse({ id: editCourseData?._id, data });
     };
 
   return (

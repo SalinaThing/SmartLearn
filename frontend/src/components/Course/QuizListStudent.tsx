@@ -6,7 +6,7 @@ import { styles } from '@/styles/style';
 import toast from 'react-hot-toast';
 
 const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) => {
-    const { data, isLoading } = useGetQuizzesByCourseQuery(courseId);
+    const { data, isLoading } = useGetQuizzesByCourseQuery(courseId, { refetchOnMountOrArgChange: true });
     const { data: resultsData, refetch: refetchResults } = useGetResultsQuery(courseId);
     const [createResult] = useCreateResultMutation();
 
@@ -72,12 +72,21 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                                     <p className="text-gray-600 dark:text-gray-400 mt-2">{quiz.description}</p>
                                     <div className="mt-4 flex justify-between items-center">
                                         <span className="text-sm dark:text-gray-500">{quiz.questions.length} Questions</span>
-                                        <button 
-                                            onClick={() => handleStartQuiz(quiz)}
-                                            className={`${styles.button} !w-[100px] !h-[35px] !text-[14px]`}
-                                        >
-                                            Start Quiz
-                                        </button>
+                                        {resultsData?.results?.find((r: any) => r.quizId === quiz._id) ? (
+                                            <button 
+                                                disabled
+                                                className={`${styles.button} !bg-gray-400 !cursor-not-allowed !w-[100px] !h-[35px] !text-[14px]`}
+                                            >
+                                                Completed
+                                            </button>
+                                        ) : (
+                                            <button 
+                                                onClick={() => handleStartQuiz(quiz)}
+                                                className={`${styles.button} !w-[100px] !h-[35px] !text-[14px]`}
+                                            >
+                                                Start Quiz
+                                            </button>
+                                        )}
                                     </div>
                                     {resultsData?.results?.find((r: any) => r.quizId === quiz._id) && (
                                         <div className="mt-2 text-green-500 text-sm font-medium text-right">

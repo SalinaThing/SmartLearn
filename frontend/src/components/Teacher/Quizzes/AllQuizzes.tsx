@@ -4,6 +4,7 @@ import { Box, Button, Modal } from '@mui/material';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { FiEdit2 } from 'react-icons/fi';
 import { useDeleteQuizMutation, useGetQuizzesByCourseQuery } from '@/redux/features/quizzes/quizApi';
+import { useGetAllResultsQuery } from '@/redux/features/quizzes/resultApi';
 import { useGetAllCoursesQuery } from '@/redux/features/courses/coursesApi';
 import Loader from '../../Loader/Loader';
 import { format } from "timeago.js";
@@ -25,6 +26,9 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
     const { data: coursesData } = useGetAllCoursesQuery({});
     const { isLoading, data, refetch, error } = useGetQuizzesByCourseQuery(selectedCourse, { skip: !selectedCourse });
     const [deleteQuiz, { isSuccess, error: errorDelete }] = useDeleteQuizMutation();
+    const { data: allResultsData } = useGetAllResultsQuery({});
+    const [resultsModalOpen, setResultsModalOpen] = useState(false);
+    const [viewingQuizId, setViewingQuizId] = useState("");
 
     useEffect(() => {
         if (coursesData && coursesData.courses.length > 0 && !selectedCourse) {
@@ -55,14 +59,22 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
         {
             field: 'edit', headerName: "Edit", flex: 0.2,
             renderCell: (params: any) => (
-                <FiEdit2 
-                    className="dark:text-white text-black cursor-pointer" 
-                    size={20} 
+                <FiEdit2
+                    className="dark:text-white text-black cursor-pointer"
+                    size={20}
                     onClick={() => {
                         setQuizData(params.row.item);
                         setRoute("Edit Quiz");
                     }}
                 />
+            )
+        },
+        {
+            field: 'results', headerName: "Results", flex: 0.2,
+            renderCell: (params: any) => (
+                <Button onClick={() => { setViewingQuizId(params.row.id); setResultsModalOpen(true); }}>
+                    <FiEdit2 className="dark:text-white text-black cursor-pointer" size={20} />
+                </Button>
             )
         },
         {
@@ -135,6 +147,39 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
                                 <div className="flex w-full items-center justify-between mt-6">
                                     <div className={`${styles.button} !w-[120px] !h-[30px] bg-[#57c7a3]`} onClick={() => setOpen(!open)}>Cancel</div>
                                     <div className={`${styles.button} !w-[120px] !h-[30px] bg-[#d63f3f]`} onClick={handleDelete}>Delete</div>
+                                </div>
+                            </Box>
+                        </Modal>
+                    )}
+
+                    {resultsModalOpen && (
+                        <Modal open={resultsModalOpen} onClose={() => setResultsModalOpen(false)}>
+                            <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[600px] p-6 bg-white dark:bg-slate-900 rounded-lg max-h-[80vh] overflow-y-auto">
+                                <h1 className={styles.title}>Quiz Results</h1>
+                                <div className="mt-4 flex flex-col gap-3">
+                                    {(allResultsData?.results || [])
+                                        .filter((r: any) => r.quizId === viewingQuizId)
+                                        .map((result: any, i: number) => (
+                                            <div key={i} className="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg">
+                                                <div>
+                                                    <p className="dark:text-white font-medium">{result.user?.name || "Unknown Student"}</p>
+                                                    <p className="text-xs text-gray-500">{result.user?.email || "N/A"}</p>
+                                                </div>
+                                                <div className="flex flex-col items-end">
+                                                    <span className={`font-bold ${Math.round(result.score) >= 50 ? 'text-green-500' : 'text-red-500'}`}>
+                                                        {Math.round(result.score)}%
+                                                    </span>
+                                                    <span className="text-xs text-gray-500">{result.correct} / {result.totalQuestions} correct</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                    {(allResultsData?.results || []).filter((r: any) => r.quizId === viewingQuizId).length === 0 && (
+                                        <p className="text-center mt-6 dark:text-gray-400 text-gray-600">No students have taken this quiz yet.</p>
+                                    )}
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button className={`${styles.button} !w-[120px]`} onClick={() => setResultsModalOpen(false)}>Close</button>
                                 </div>
                             </Box>
                         </Modal>

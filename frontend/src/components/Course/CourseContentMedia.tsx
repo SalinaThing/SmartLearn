@@ -18,7 +18,7 @@ import { io } from "socket.io-client";
 const ENDPOINT = import.meta.env.VITE_SOCKET_SERVER_URI || "";
 
 const socketId = io(ENDPOINT, {
-  transports: ["websocket"],
+    transports: ["websocket"],
 });
 
 type Props = {
@@ -224,9 +224,9 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
             )}
 
             <div className="w-full flex items-center justify-between my-3">
-                <button 
+                <button
                     className={`${styles.button} text-white !w-[unset] !min-h-[40px] !py-[unset] ${activeVideo === 0 && "!cursor-no-drop opacity-[.8]"
-                    }`}
+                        }`}
                     onClick={() =>
                         setActiveVideo(activeVideo === 0 ? 0 : activeVideo - 1)
                     }
@@ -236,9 +236,9 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                     Prev Lesson
                 </button>
 
-                <button 
+                <button
                     className={`${styles.button} text-white !w-[unset] !min-h-[40px] !py-[unset] ${data.length - 1 === activeVideo && "!cursor-no-drop opacity-[.8]"
-                    }`}
+                        }`}
                     onClick={() =>
                         setActiveVideo(
                             data && data.length - 1 === activeVideo
@@ -285,6 +285,37 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
 
                 {activeBar === 1 && (
                     <div>
+                        {/* PDF Resource */}
+                        {data[activeVideo]?.pdfUrl && (
+                            <div className="mb-5 flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <span className="text-3xl">📄</span>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[16px] font-semibold dark:text-white text-black truncate">
+                                        {data[activeVideo]?.pdfName || 'Course PDF'}
+                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">PDF Document</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <a
+                                        href={data[activeVideo].pdfUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`${styles.button} !w-[unset] !min-h-[36px] !py-[unset] px-4 text-white text-sm`}
+                                    >
+                                        View PDF
+                                    </a>
+                                    <a
+                                        href={data[activeVideo].pdfUrl}
+                                        download
+                                        className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-black dark:text-white rounded-lg text-sm transition-colors"
+                                    >
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Links */}
                         {data[activeVideo]?.links?.map((item: any, index: number) => (
                             <div className="mb-5" key={index}>
                                 <h2 className="800px:text-[20px] 800px:inline-block dark:text-white text-black">
@@ -301,6 +332,10 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                                 </a>
                             </div>
                         ))}
+
+                        {!data[activeVideo]?.pdfUrl && (!data[activeVideo]?.links || data[activeVideo].links.length === 0) && (
+                            <p className="text-center text-gray-500 py-8">No resources for this lesson.</p>
+                        )}
                     </div>
                 )}
 
@@ -582,7 +617,7 @@ const CommentItem = ({
 }: any) => {
 
     const [replyActive, setReplyActive] = useState(false);
-    
+
     return (
         <>
             <div className="my-4">

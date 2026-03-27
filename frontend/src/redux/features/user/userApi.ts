@@ -57,6 +57,15 @@ export const userApi = apiSlice.injectEndpoints({
                 credentials: "include" as const,
             })
         }),
+
+        sendDirectEmail: builder.mutation({
+            query:({ email, subject, message }: { email: string; subject: string; message: string }) => ({
+                url: "send-email",
+                method:"POST",
+                body:{ email, subject, message },
+                credentials: "include" as const,
+            })
+        }),
     })
 })
 
@@ -67,4 +76,5 @@ export const {
     useGetAllUsersQuery,
     useUpdateUserRoleMutation,
     useDeleteUserMutation,
+    useSendDirectEmailMutation,
 } = userApi;

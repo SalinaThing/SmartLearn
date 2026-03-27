@@ -9,6 +9,8 @@ import { format } from "timeago.js";
 import { useGetAllOrdersQuery } from '@/redux/features/orders/orderApi';
 import { AiOutlineMail, AiOutlineUser, AiOutlineShoppingCart, AiOutlineDollarCircle } from 'react-icons/ai';
 import { FaRegClock } from 'react-icons/fa';
+import { useSendDirectEmailMutation } from '@/redux/features/user/userApi';
+import toast from 'react-hot-toast';
 
 type Props = {
   isDashboard?: boolean;
@@ -22,6 +24,10 @@ const All_Invoices = ({ isDashboard }: Props) => {
 
   const [orderData, setOrderData] = useState<any>([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailMessage, setEmailMessage] = useState('');
+  const [sendDirectEmail, { isLoading: isSending }] = useSendDirectEmailMutation();
 
   useEffect(() => {
     if (data) {
@@ -46,12 +52,33 @@ const All_Invoices = ({ isDashboard }: Props) => {
     }
   }, [data, usersData, coursesData]);
 
+  const handleSendEmail = async () => {
+    if (!emailSubject.trim() || !emailMessage.trim()) {
+      toast.error('Please fill in both subject and message');
+      return;
+    }
+    try {
+      await sendDirectEmail({
+        email: selectedOrder.userEmail,
+        subject: emailSubject,
+        message: emailMessage,
+      }).unwrap();
+      toast.success('Email sent successfully!');
+      setShowEmailForm(false);
+      setEmailSubject('');
+      setEmailMessage('');
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to send email');
+    }
+  };
+
   // Define columns with better styling
   const columns: any = [
     { 
       field: "id", 
       headerName: "Order ID", 
       flex: 0.4,
+      minWidth: 100,
       renderCell: (params: any) => (
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs">{params.value?.slice(-8)}</span>
@@ -62,6 +89,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
       field: "userName", 
       headerName: "Customer", 
       flex: isDashboard ? 0.7 : 0.5,
+      minWidth: 150,
       renderCell: (params: any) => (
         <div className="flex items-center gap-2">
           <span className="font-medium">{params.value}</span>
@@ -76,6 +104,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
             field: "userEmail", 
             headerName: "Email", 
             flex: 1,
+            minWidth: 200,
             renderCell: (params: any) => (
               <div className="flex items-center gap-2">
                 <a 
@@ -91,6 +120,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
             field: "title", 
             headerName: "Course", 
             flex: 1,
+            minWidth: 200,
             renderCell: (params: any) => (
               <div className="flex items-center gap-2">
                 <span className="truncate max-w-[200px]">{params.value}</span>
@@ -103,6 +133,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
       field: "price", 
       headerName: "Amount", 
       flex: 0.4,
+      minWidth: 100,
       renderCell: (params: any) => (
         <div className="flex items-center gap-2">
           <span className="font-bold text-green-600 dark:text-green-400">{params.value}</span>
@@ -116,6 +147,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
             field: "created_at", 
             headerName: "Date", 
             flex: 0.5,
+            minWidth: 120,
             renderCell: (params: any) => (
               <div className="flex items-center gap-2">
                 <span className="text-sm">{params.value}</span>
@@ -128,6 +160,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
             field: "actions",
             headerName: "Actions",
             flex: 0.3,
+            minWidth: 130,
             renderCell: (params: any) => {
               return (
                 <button
@@ -334,21 +367,73 @@ const All_Invoices = ({ isDashboard }: Props) => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => window.location.href = `mailto:${selectedOrder.userEmail}`}
-                  className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  Send Email
-                </button>
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300"
-                >
-                  Close
-                </button>
-              </div>
+              {/* Action Buttons / Email Form */}
+              {!showEmailForm ? (
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      setShowEmailForm(true);
+                      setEmailSubject(`Regarding your order: ${selectedOrder.title}`);
+                    }}
+                    className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+                  >
+                    <AiOutlineMail size={18} />
+                    Send Email
+                  </button>
+                  <button
+                    onClick={() => setSelectedOrder(null)}
+                    className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-4 space-y-3">
+                  <h4 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                    <AiOutlineMail className="text-blue-500" />
+                    Compose Email to {selectedOrder.userName}
+                  </h4>
+                  <div>
+                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Subject</label>
+                    <input
+                      type="text"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Email subject..."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Message</label>
+                    <textarea
+                      value={emailMessage}
+                      onChange={(e) => setEmailMessage(e.target.value)}
+                      rows={5}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      placeholder="Write your message here..."
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleSendEmail}
+                      disabled={isSending}
+                      className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white rounded-lg transition-all duration-300 transform hover:scale-105"
+                    >
+                      {isSending ? 'Sending...' : 'Send Email'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowEmailForm(false);
+                        setEmailSubject('');
+                        setEmailMessage('');
+                      }}
+                      className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
