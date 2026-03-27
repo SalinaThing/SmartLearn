@@ -106,87 +106,76 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
         }
     }
 
+    // Question success/error handling
     useEffect(() => {
         if (isSuccess) {
             setQuestion("");
             refetch();
             toast.success("Question added successfully");
-
             socketId.emit("notification", {
                 title: "New Question Received",
                 message: `You have a new question in ${data[activeVideo]?.title}`,
                 userId: user?._id
-            })
+            });
         }
-
-        if (error) {
-            if ("data" in error) {
-                const errorMessage = error as any;
-                toast.error(errorMessage.data?.message || "Failed to add question");
-            }
+        if (error && "data" in error) {
+            const errorMessage = error as any;
+            toast.error(errorMessage.data?.message || "Failed to add question");
         }
+    }, [isSuccess, error]);
 
+    // Answer success/error handling
+    useEffect(() => {
         if (answerSuccess) {
             setAnswer("");
             refetch();
             toast.success("Answer added successfully");
-
             if (user?.role !== "teacher") {
                 socketId.emit("notification", {
                     title: "New Reply Received",
                     message: `You have a new question reply in ${data[activeVideo]?.title}`,
                     userId: user?._id
-                })
+                });
             }
         }
-
-        if (answerError) {
-            if ("data" in answerError) {
-                const errorMessage = answerError as any;
-                toast.error(errorMessage.data?.message || "Failed to add answer");
-            }
+        if (answerError && "data" in answerError) {
+            const errorMessage = answerError as any;
+            toast.error(errorMessage.data?.message || "Failed to add answer");
         }
+    }, [answerSuccess, answerError]);
 
+    // Review success/error handling
+    useEffect(() => {
         if (reviewSuccess) {
             setReview("");
             setRating(1);
             courseRefetch();
             toast.success("Review added successfully");
-
             socketId.emit("notification", {
                 title: "New Review Received",
                 message: `You have a new review on your course`,
                 userId: user?._id
-            })
+            });
         }
-
-        if (reviewError) {
-            if ("data" in reviewError) {
-                const errorMessage = reviewError as any;
-                toast.error(errorMessage.data?.message || "Failed to add review");
-            }
+        if (reviewError && "data" in reviewError) {
+            const errorMessage = reviewError as any;
+            toast.error(errorMessage.data?.message || "Failed to add review");
         }
+    }, [reviewSuccess, reviewError]);
 
+    // Reply success/error handling
+    useEffect(() => {
         if (replySuccess) {
             setReply("");
             setIsReviewReply(false);
             courseRefetch();
             toast.success("Reply added successfully");
         }
-
-        if (replyError) {
-            if ("data" in replyError) {
-                const errorMessage = replyError as any;
-                toast.error(errorMessage.data?.message || "Failed to add reply");
-            }
+        if (replyError && "data" in replyError) {
+            const errorMessage = replyError as any;
+            toast.error(errorMessage.data?.message || "Failed to add reply");
         }
-    }, [
-        isSuccess, error,
-        answerSuccess, answerError,
-        reviewError, reviewSuccess,
-        replySuccess, replyError,
-        data, activeVideo, refetch, courseRefetch, user
-    ]);
+    }, [replySuccess, replyError]);
 
     return (
         <div className="w-[95%] 800px:w-[86%] py-4 m-auto">

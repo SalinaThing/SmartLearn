@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGetQuizzesByCourseQuery } from '@/redux/features/quizzes/quizApi';
 import { useCreateResultMutation, useGetResultsQuery } from '@/redux/features/quizzes/resultApi';
 import Loader from '../Loader/Loader';
 import { styles } from '@/styles/style';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'react-router-dom';
 
 const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) => {
     const { data, isLoading } = useGetQuizzesByCourseQuery(courseId, { refetchOnMountOrArgChange: true });
     const { data: resultsData, refetch: refetchResults } = useGetResultsQuery(courseId);
     const [createResult] = useCreateResultMutation();
+    const [searchParams] = useSearchParams();
+    const urlQuizId = searchParams.get("quizId");
+    const autoStarted = useRef(false);
 
     const [activeQuiz, setActiveQuiz] = useState<any>(null);
     const [answers, setAnswers] = useState<string[]>([]);
@@ -21,6 +25,16 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
         setIsSubmitted(false);
         setScore(0);
     };
+
+    useEffect(() => {
+        if (data && urlQuizId && !activeQuiz && !autoStarted.current) {
+            const quiz = data.quizzes.find((q: any) => q._id === urlQuizId);
+            if (quiz) {
+                autoStarted.current = true;
+                handleStartQuiz(quiz);
+            }
+        }
+    }, [data, urlQuizId, activeQuiz]);
 
     const handleAnswerChange = (index: number, value: string) => {
         const updatedAnswers = [...answers];
@@ -40,7 +54,6 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                 correctCount++;
             }
         });
-
         const finalScore = (correctCount / activeQuiz.questions.length) * 100;
         setScore(finalScore);
         setIsSubmitted(true);
@@ -72,27 +85,32 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                                     <p className="text-gray-600 dark:text-gray-400 mt-2">{quiz.description}</p>
                                     <div className="mt-4 flex justify-between items-center">
                                         <span className="text-sm dark:text-gray-500">{quiz.questions.length} Questions</span>
-                                        {resultsData?.results?.find((r: any) => r.quizId === quiz._id) ? (
-                                            <button 
-                                                disabled
-                                                className={`${styles.button} !bg-gray-400 !cursor-not-allowed !w-[100px] !h-[35px] !text-[14px]`}
-                                            >
-                                                Completed
-                                            </button>
-                                        ) : (
-                                            <button 
-                                                onClick={() => handleStartQuiz(quiz)}
-                                                className={`${styles.button} !w-[100px] !h-[35px] !text-[14px]`}
-                                            >
-                                                Start Quiz
-                                            </button>
-                                        )}
+                                        {(() => {
+                                            const result = resultsData?.results?.find((r: any) => r.quizId === quiz._id);
+                                            if (result) {
+                                                const scorePercent = Math.round((result.correct / result.totalQuestions) * 100);
+                                                const isGood = scorePercent >= 70;
+                                                return (
+                                                    <div className={`px-4 py-2 rounded-lg text-center ${isGood ? 'bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700' : 'bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700'}`}>
+                                                        <p className={`text-lg font-bold ${isGood ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                                                            {scorePercent}%
+                                                        </p>
+                                                        <p className="text-xs dark:text-gray-400 text-gray-600">
+                                                            {result.correct}/{result.totalQuestions} correct
+                                                        </p>
+                                                    </div>
+                                                );
+                                            }
+                                            return (
+                                                <button
+                                                    onClick={() => handleStartQuiz(quiz)}
+                                                    className={`${styles.button} !w-[100px] !h-[35px] !text-[14px]`}
+                                                >
+                                                    Start Quiz
+                                                </button>
+                                            );
+                                        })()}
                                     </div>
-                                    {resultsData?.results?.find((r: any) => r.quizId === quiz._id) && (
-                                        <div className="mt-2 text-green-500 text-sm font-medium text-right">
-                                            Completed - Score: {Math.round(resultsData.results.find((r: any) => r.quizId === quiz._id).score)}%
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>

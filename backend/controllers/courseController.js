@@ -38,6 +38,22 @@ export const uploadCourse = catchAsyncErrors(async (req, res, next) => {
             };
         }
         createCourse(data, res, next);
+
+        // Notify students about new course
+        try {
+            await NotificationModel.create({
+                title: "New Course Available",
+                message: `A new course "${data.name}" has been published!`,
+                role: 'student'
+            });
+            // Emit socket event
+            io.to("student").emit("newNotification", {
+                title: "New Course Available",
+                message: `A new course "${data.name}" has been published!`,
+            });
+        } catch (error) {
+            console.log("New course notification error:", error);
+        }
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
@@ -92,6 +108,22 @@ export const editCourse = catchAsyncErrors(async (req, res, next) => {
             success: true,
             course: updatedCourse,
         });
+
+        // Notify students about course update
+        try {
+            await NotificationModel.create({
+                title: "Course Updated",
+                message: `Course "${updatedCourse.name}" has been updated with new content.`,
+                role: 'student'
+            });
+            // Emit socket event
+            io.to("student").emit("newNotification", {
+                title: "Course Updated",
+                message: `Course "${updatedCourse.name}" has been updated with new content.`,
+            });
+        } catch (error) {
+            console.log("Course update notification error:", error);
+        }
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
@@ -135,20 +167,34 @@ export const getSingleCourse = catchAsyncErrors(async (req, res, next) => {
 //Get all courses without purchasing
 export const getAllCourse = catchAsyncErrors(async (req, res, next) => {
     try {
-        // const isCacheExists = await redis.get("allCourses");
-        // if (isCacheExists) {
-        //     const courses = JSON.parse(isCacheExists);
-        //     return res.status(200).json({
-        //         success: true,
-        //         courses,
-        //     });
-        // }else{
+        const { search, category, level, minPrice, maxPrice, sort } = req.query;
+        let query = {};
 
-        const courses = await CourseModel.find().select(
+        if (search) {
+            query.name = { $regex: search, $options: "i" };
+        }
+        if (category && category !== "All") {
+            query.categories = category;
+        }
+        if (level && level !== "All") {
+            query.level = level;
+        }
+        if (minPrice !== undefined || maxPrice !== undefined) {
+             query.price = {};
+             if (minPrice) query.price.$gte = Number(minPrice);
+             if (maxPrice) query.price.$lte = Number(maxPrice);
+        }
+
+        // Sorting logic
+        let sortQuery = { createdAt: -1 }; // default newest
+        if (sort === "price_asc") sortQuery = { price: 1 };
+        if (sort === "price_desc") sortQuery = { price: -1 };
+        if (sort === "popular") sortQuery = { purchased: -1 };
+        if (sort === "newest") sortQuery = { createdAt: -1 };
+
+        const courses = await CourseModel.find(query).sort(sortQuery).select(
             "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
         );
-
-        // await redis.set("allCourses", JSON.stringify(courses));
 
         res.status(200).json({
             success: true,
@@ -171,7 +217,7 @@ export const getCourseByUser = catchAsyncErrors(async (req, res, next) => {
             (course) => course.courseId === courseId
         );
 
-        if (!courseExists) {
+        if (!courseExists && req.user.role !== "admin" && req.user.role !== "teacher") {
             return next(new ErrorHandler(400, "You are not eligible. You have not purchased this course"));
         }
 
@@ -225,10 +271,11 @@ export const addQuestion = catchAsyncErrors(async (req, res, next) => {
         await NotificationModel.create({
             title: "New Question Added",
             message: `You have a new question in course ${courseContent.title}`,
+            role: 'teacher'
         });
 
         // Emit socket event for real-time notification
-        io.emit("newNotification", {
+        io.to("teacher").emit("newNotification", {
             title: "New Question Added",
             message: `You have a new question in course ${courseContent.title}`,
         });
@@ -287,12 +334,14 @@ export const addAnswer = catchAsyncErrors(async (req, res, next) => {
         if (req.user?._id.toString() === question.user._id.toString()) {
             //create a notification for the question asker
             await NotificationModel.create({
+                user: question.user._id,
                 title: "New Question Reply received",
                 message: `You have a new question reply in ${courseContent.title}`,
             });
 
             // Emit socket event
-            io.emit("newNotification", {
+            io.to(question.user._id.toString()).emit("newNotification", {
+                user: question.user._id,
                 title: "New Question Reply received",
                 message: `You have a new question reply in ${courseContent.title}`,
             });
@@ -336,9 +385,9 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
         const userCourseList = req.user?.courses || [];
         const courseId = req.params.id;
 
-        //check if courseId already exists in userCourselist based on _id
+        //check if courseId already exists in userCourselist
         const courseExists = userCourseList?.some((course) =>
-            course._id.toString() === courseId.toString());
+            course.courseId === courseId || (course._id && course._id.toString() === courseId.toString()));
         if (!courseExists) {
             return next(new ErrorHandler(400, "You are not eligible. You have not purchased this course"));
         }
@@ -371,10 +420,11 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
         await NotificationModel.create({
             title: "New Review Received",
             message: `${req.user.name} has given a review in "${course?.name}" course`,
+            role: 'teacher'
         });
 
         // Emit socket event
-        io.emit("newNotification", {
+        io.to("teacher").emit("newNotification", {
             title: "New Review Received",
             message: `${req.user.name} has given a review in "${course?.name}" course`,
         });
@@ -421,6 +471,19 @@ export const addReplyToReview = catchAsyncErrors(async (req, res, next) => {
         await course?.save();
         await redis.set(courseId, JSON.stringify(course), "EX", 604800); //7days
 
+        // Create notification for the reviewer
+        await NotificationModel.create({
+            user: review.user._id,
+            title: "New Review Reply",
+            message: `The instructor replied to your review in "${course?.name}"`,
+        });
+
+        // Emit socket event
+        io.to(review.user._id.toString()).emit("newNotification", {
+            user: review.user._id,
+            title: "New Review Reply",
+            message: `The instructor replied to your review in "${course?.name}"`,
+        });
 
         res.status(200).json({
             success: true,
@@ -556,3 +619,144 @@ export const uploadPdf = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
+//get all questions by user
+export const getQuestionsByUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const userId = req.user?._id;
+        const courses = await CourseModel.find({ "courseData.questions.user._id": userId.toString() });
+
+        const userQuestions = [];
+
+        courses.forEach((course) => {
+            course.courseData.forEach((content) => {
+                content.questions.forEach((question) => {
+                    if (question.user._id.toString() === userId.toString()) {
+                        userQuestions.push({
+                            ...question.toObject(),
+                            courseName: course.name,
+                            courseId: course._id,
+                            contentTitle: content.title
+                        });
+                    }
+                });
+            });
+        });
+
+        res.status(200).json({
+            success: true,
+            questions: userQuestions,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
+
+//get all reviews by user
+export const getReviewsByUser = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const userId = req.user?._id;
+        const courses = await CourseModel.find({ "reviews.user._id": userId.toString() });
+
+        const userReviews = [];
+
+        courses.forEach((course) => {
+            course.reviews.forEach((review) => {
+                if (review.user._id.toString() === userId.toString()) {
+                    userReviews.push({
+                        ...review.toObject(),
+                        courseName: course.name,
+                        courseId: course._id
+                    });
+                }
+            });
+        });
+
+        res.status(200).json({
+            success: true,
+            reviews: userReviews,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
+
+//edit review
+export const editReview = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { rating, review, courseId, reviewId } = req.body || {};
+        const course = await CourseModel.findById(courseId);
+
+        if (!course) {
+            return next(new ErrorHandler(404, "Course not found"));
+        }
+
+        const reviewItem = course.reviews.id(reviewId);
+        if (!reviewItem) {
+            return next(new ErrorHandler(404, "Review not found"));
+        }
+
+        if (reviewItem.user._id.toString() !== req.user?._id.toString()) {
+            return next(new ErrorHandler(403, "You can only edit your own reviews"));
+        }
+
+        reviewItem.rating = rating;
+        reviewItem.comment = review;
+        reviewItem.updatedAt = new Date().toISOString();
+
+        // Recalculate average rating
+        let avg = 0;
+        course.reviews.forEach((rev) => {
+            avg += rev.rating;
+        });
+        course.ratings = avg / course.reviews.length;
+
+        await course.save();
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
+
+        res.status(200).json({
+            success: true,
+            course,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});
+
+//edit question
+export const editQuestion = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { question, courseId, contentId, questionId } = req.body || {};
+        const course = await CourseModel.findById(courseId);
+
+        if (!course) {
+            return next(new ErrorHandler(404, "Course not found"));
+        }
+
+        const courseContent = course.courseData.find((item) => item._id.toString() === contentId.toString());
+        if (!courseContent) {
+            return next(new ErrorHandler(404, "Content not found"));
+        }
+
+        const questionItem = courseContent.questions.find((q) => q._id.toString() === questionId.toString());
+        if (!questionItem) {
+            return next(new ErrorHandler(404, "Question not found"));
+        }
+
+        if (questionItem.user._id.toString() !== req.user?._id.toString()) {
+            return next(new ErrorHandler(403, "You can only edit your own questions"));
+        }
+
+        questionItem.question = question;
+        questionItem.updatedAt = new Date().toISOString();
+
+        await course.save();
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
+
+        res.status(200).json({
+            success: true,
+            course,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});

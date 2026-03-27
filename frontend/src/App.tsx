@@ -23,6 +23,13 @@ import AllCourses from "./pages/teacher/AllCourses";
 import Quizzes from "./pages/teacher/Quizzes";
 import Announcements from "./pages/teacher/Announcements";
 import Feedback from "./pages/teacher/Feedback";
+import StudentDashboard from "./pages/student/Dashboard";
+import StudentQuizzes from "./pages/student/Quizzes";
+import StudentAnnouncements from "./pages/student/Announcements";
+import StudentFeedback from "./pages/student/Feedback";
+import StudentFAQ from "./pages/student/FAQ";
+import StudentReviews from "./pages/student/Reviews";
+import EnrolledCoursesPage from "./pages/student/EnrolledCourses";
 import QuizPage from "./pages/QuizPage";
 import FeedbackPage from "./pages/FeedbackPage";
 import AboutPage from "./pages/About";
@@ -58,11 +65,21 @@ export default function App() {
         <Route path="/teacher/team" element={<Team />} />
         <Route path="/teacher/all-users" element={<AllUsers />} />
         <Route path="/teacher/allcourses" element={<AllCourses />} />
-        <Route path="/teacher/quizzes" element={<Quizzes />} /> 
-        <Route path="/teacher/announcements" element={<Announcements />} /> 
-        <Route path="/teacher/feedback" element={<Feedback />} /> 
-        <Route path="/quiz" element={<QuizPage />} /> 
-        <Route path="/feedback" element={<FeedbackPage />} /> 
+        <Route path="/teacher/quizzes" element={<Quizzes />} />
+        <Route path="/teacher/announcements" element={<Announcements />} />
+        <Route path="/teacher/feedback" element={<Feedback />} />
+
+        {/* Student Routes */}
+        <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/courses" element={<EnrolledCoursesPage />} />
+        <Route path="/student/quizzes" element={<StudentQuizzes />} />
+        <Route path="/student/announcements" element={<StudentAnnouncements />} />
+        <Route path="/student/feedback" element={<StudentFeedback />} />
+        <Route path="/student/faq" element={<StudentFAQ />} />
+        <Route path="/student/reviews" element={<StudentReviews />} />
+
+        <Route path="/quiz" element={<QuizPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/faq" element={<FAQPage />} />
       </Route>

@@ -4,9 +4,9 @@ import { createQuiz, getQuizzesByCourse, updateQuiz, deleteQuiz } from "../contr
 
 const quizRouter = express.Router();
 
-quizRouter.post("/create-quiz", isAuthenticated, authorizeRoles("teacher", "admin"), createQuiz);
+quizRouter.post("/create-quiz", isAuthenticated, authorizeRoles("teacher"), createQuiz);
 quizRouter.get("/get-quizzes/:courseId", isAuthenticated, getQuizzesByCourse);
-quizRouter.put("/update-quiz/:id", isAuthenticated, authorizeRoles("teacher", "admin"), updateQuiz);
-quizRouter.delete("/delete-quiz/:id", isAuthenticated, authorizeRoles("teacher", "admin"), deleteQuiz);
+quizRouter.put("/update-quiz/:id", isAuthenticated, authorizeRoles("teacher"), updateQuiz);
+quizRouter.delete("/delete-quiz/:id", isAuthenticated, authorizeRoles("teacher"), deleteQuiz);
 
 export default quizRouter;

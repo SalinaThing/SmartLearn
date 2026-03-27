@@ -7,19 +7,25 @@ export const resultApi = apiSlice.injectEndpoints({
                 url: "create-result",
                 method: "POST",
                 body: data,
+                credentials: "include" as const,
             }),
+            invalidatesTags: ["Results"],
         }),
         getResults: builder.query({
             query: (courseId) => ({
                 url: `get-results?courseId=${courseId}`,
                 method: "GET",
+                credentials: "include" as const,
             }),
+            providesTags: ["Results"],
         }),
         getAllResults: builder.query({
             query: () => ({
                 url: "get-all-results",
                 method: "GET",
+                credentials: "include" as const,
             }),
+            providesTags: ["Results"],
         }),
     }),
 });

@@ -1,17 +1,23 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { useUser } from "./useUser";
 
 interface ProtectedProps {
   children: React.ReactNode;
 }
 
 export default function TeacherProtected({ children }: ProtectedProps) {
-  const { user } = useSelector((state: any) => state.auth);
+  const { user, isLoading } = useUser();
 
-  if (!user) {
+  if (isLoading) {
     return null;
   }
-  const isTeacher = user?.role === "teacher";
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  const role = user?.role?.toLowerCase();
+  const isTeacher = role === "teacher";
   return isTeacher ? <>{children}</> : <Navigate to="/" replace />;
 }

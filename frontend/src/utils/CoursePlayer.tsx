@@ -19,14 +19,11 @@ const CoursePlayer: FC<Props> = ({ videoUrl, title }) => {
     });
 
     useEffect(() => {
+        // VdoCipher API has been removed on the backend.
+        // If a video ID is not a direct URL (like Cloudinary), it might be an obsolete VdoCipher ID.
+        // We will no longer attempt to fetch the OTP.
         if (!isDirectUrl && videoUrl) {
-            axios.post("http://localhost:7000/api/v1/getVdoCipherOTP", {
-                videoId: videoUrl,
-            })
-            .then((res) => {
-                setVideoData(res.data);
-            })
-            .catch(() => {});
+            console.warn("VdoCipher is no longer supported. Please re-upload the video.");
         }
     }, [videoUrl, isDirectUrl]);
 

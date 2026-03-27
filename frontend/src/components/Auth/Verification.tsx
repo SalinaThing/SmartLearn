@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 
 type Props = {
     setRoute: (route: string) => void;
+    setOpen?: (open: boolean) => void;
 }
 
 // Otp Verification digit type
@@ -17,7 +18,7 @@ type VerifyNumber ={
     "3": string;
 };
 
-const Verification: FC<Props> = ({setRoute}) => {
+const Verification: FC<Props> = ({setRoute, setOpen}) => {
     const {token} = useSelector((state: {auth: {token: string}}) => state.auth);
     const [activation, {isSuccess, error}] = useActivationMutation();
     const [invalidError, setInvalidError] = useState<boolean>(false);
@@ -26,8 +27,12 @@ const Verification: FC<Props> = ({setRoute}) => {
     useEffect(() => {
         if(isSuccess){
             console.log('Activation successful');
-            toast.success("Account activated successfully");
-            setRoute("Login");
+            toast.success("Account activated successfully! Please login.");
+            setOpen?.(false);
+            setTimeout(() => {
+                setRoute("Login");
+                setOpen?.(true);
+            }, 500);
         }
         if(error){
             console.log('Activation error:', error);

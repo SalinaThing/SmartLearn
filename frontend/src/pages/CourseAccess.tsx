@@ -12,8 +12,8 @@ export default function CourseAccessPage() {
 
     useEffect(()=>{
       if(data && id){
-        const isPurchased = data.user.courses.find((item:any) => item._id === id);
-        if(!isPurchased){
+        const isPurchased = data.user.courses.find((item:any) => item.courseId === id || item._id === id);
+        if(!isPurchased && data.user.role !== "admin" && data.user.role !== "teacher"){
           navigate("/", { replace: true });
         }
       }

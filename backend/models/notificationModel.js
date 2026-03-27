@@ -9,10 +9,18 @@ const notificationSchema = new mongoose.Schema({
             type: String,
             required: true,
     },
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
     status:{
         type: String,
         required: true,
         default: "unread",
+    },
+    role:{
+        type: String,
+        default: "all",
     }
 }, { timestamps: true });
 

@@ -8,7 +8,7 @@ export const apiSlice = createApi({
             import.meta.env.VITE_API_URL || "http://localhost:7000/api/v1",
         credentials: "include",
     }),
-    tagTypes: ["Layout", "Notifications"],
+    tagTypes: ["Layout", "Notifications", "Results"],
     endpoints: (builder) => ({
         refreshToken: builder.query({
             query: (data) => ({

@@ -1,6 +1,8 @@
 import Announcement from "../models/announcementModel.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
+import { io } from "../serverSocket.js";
+import NotificationModel from "../models/notificationModel.js";
 
 const normalizeDate = (value, fallback = null) => {
   if (!value) return fallback;
@@ -35,6 +37,21 @@ export const createAnnouncement = catchAsyncErrors(async (req, res, next) => {
     scheduledFor: scheduledDate,
     validTill: validTillDate,
   });
+
+  try {
+    await NotificationModel.create({
+      title: "New Announcement",
+      message: `A new announcement has been posted: "${announcement.title}"`,
+      role: 'student'
+    });
+    // Emit socket event
+    io.to("student").emit("newNotification", {
+      title: "New Announcement",
+      message: `A new announcement has been posted: "${announcement.title}"`,
+    });
+  } catch (error) {
+    console.log("Announcement notification error:", error);
+  }
 
   return res.status(201).json({
     success: true,
@@ -79,6 +96,21 @@ export const updateAnnouncement = catchAsyncErrors(async (req, res, next) => {
   announcement.validTill = nextValidTill;
 
   await announcement.save();
+
+  try {
+    await NotificationModel.create({
+      title: "Announcement Updated",
+      message: `Announcement "${announcement.title}" has been updated.`,
+      role: 'student'
+    });
+    // Emit socket event
+    io.to("student").emit("newNotification", {
+      title: "Announcement Updated",
+      message: `Announcement "${announcement.title}" has been updated.`,
+    });
+  } catch (error) {
+    console.log("Announcement update notification error:", error);
+  }
 
   return res.status(200).json({
     success: true,

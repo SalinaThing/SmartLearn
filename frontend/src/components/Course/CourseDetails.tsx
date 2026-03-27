@@ -8,7 +8,7 @@ import { IoCheckmarkDoneCircleOutline, IoCloseOutline } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import CourseContentList from './CourseContentList';
 import CheckOutForm from "../Payment/CheckOutForm";
-import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
+import { useUser } from '@/hooks/useUser';
 import Image from '@/utils/Image';
 import { VscVerifiedFilled } from 'react-icons/vsc';
 
@@ -21,9 +21,7 @@ type Props = {
 }
 
 const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:openAuthModal}: Props) => {
-    const {data: userData} = useLoadUserQuery(undefined, {});
-    // const user=userData?.user;
-    const[user, setUser] = useState<any>();
+    const { user } = useUser();
     const [open, setOpen] = useState(false);
 
     const discountPercentage =
@@ -32,11 +30,10 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
     const discountPercentagePrice = discountPercentage.toFixed(0);
 
     const isPurchased =
-        user && user?.courses?.find((item: any) =>  item._id === data._id);
-
-    useEffect(() => {
-        setUser(userData?.user)
-    }, [userData])
+        (user && user?.courses?.find((item: any) => {
+            const courseId = item._id || item.courseId || item;
+            return courseId === data._id;
+        })) || user?.role === "teacher";
 
     const handleOrder = (e: any) => {
         if(user){
@@ -277,7 +274,7 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
                                     </Link>
                                 ) : (
                                     <button
-                                        className={`${styles.button} w-full !bg-gradient-to-r !from-[#crimson] !to-red-600 hover:shadow-lg transition-all`}
+                                        className={`${styles.button} w-full !bg-gradient-to-r !from-red-500 !to-red-600 hover:shadow-lg transition-all`}
                                         onClick={handleOrder}
                                     >
                                         Buy Now - Rs. {data.price}

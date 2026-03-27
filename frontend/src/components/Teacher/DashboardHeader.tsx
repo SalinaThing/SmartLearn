@@ -6,6 +6,7 @@ import { format } from "timeago.js";
 import React, { FC, useEffect, useState } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
 
+import { useUser } from "@/hooks/useUser";
 import { io } from "socket.io-client";
 const ENDPOINT = import.meta.env.VITE_SOCKET_SERVER_URI || "";
 const socketId = io(ENDPOINT, {
@@ -18,6 +19,7 @@ type Props = {
 };
 
 const DashboardHeader: FC<Props> = ({ open: propOpen, setOpen: propSetOpen }) => {
+    const { user } = useUser();
     const {data, refetch} = useGetAllNotificationsQuery(undefined, {refetchOnMountOrArgChange:true})
     const [updateNotification, {isSuccess}]= useUpdateNotificationStatusMutation();
     const [notifications, setNotifications] = useState<any>([]);
@@ -40,24 +42,39 @@ const DashboardHeader: FC<Props> = ({ open: propOpen, setOpen: propSetOpen }) =>
     }
 
     useEffect(() => {
-        if(data){
+        if (data) {
             setNotifications(
-                data.notifications.filter((item:any) => item.status === "unread")
+                data.notifications.filter((item: any) => item.status === "unread")
             );
         }
+    }, [data]);
 
-        if(isSuccess){
+    useEffect(() => {
+        if (isSuccess) {
             refetch();
         }
+    }, [isSuccess]);
+
+    useEffect(() => {
         audio.load();
-    }, [data, isSuccess]);
+    }, [audio]);
+
+    useEffect(() => {
+        if (user) {
+            socketId.emit("join", { userId: user._id, role: user.role });
+        }
+    }, [user]);
 
     useEffect(() => {
         socketId.on("newNotification", (data) => {
             refetch();
             playerNotificationSound();
         });
-    }, [])
+        
+        return () => {
+            socketId.off("newNotification");
+        };
+    }, [refetch]);
 
     const handleNotificationStatusChange = async (id:string) => {
         await updateNotification(id);

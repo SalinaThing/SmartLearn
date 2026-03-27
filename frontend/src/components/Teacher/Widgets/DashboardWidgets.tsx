@@ -6,6 +6,7 @@ import { PiUsersFourLight } from 'react-icons/pi';
 import OrderAnalytics from '../Analytics/OrderAnalytics';
 import All_Invoices from '../Orders/All_Invoices';
 import CourseAnalytics from '../Analytics/CourseAnalytics';
+import { useUser } from '@/hooks/useUser';
 
 type Props = {
     open?: boolean;
@@ -40,10 +41,13 @@ const CircularProgressWithLabel: FC<Props> = ({ value }) => {
 }
 
 const DashboardWidgets: FC<Props> = ({ value }) => {
+    const { user } = useUser();
+    const isAdmin = user?.role?.toLowerCase() === "admin";
+
     return (
         <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
-                
+
                 {/* Main Analytics Row */}
                 <div className="grid grid-cols-1 gap-4 sm:gap-6">
                     {/* Top Section - User Analytics */}
@@ -66,49 +70,55 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
 
                 {/* Analytics Grid - 2x2 Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-6 sm:mt-8">
-                    {/* Course Analytics */}
-                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-                        <div className="p-2 sm:p-3 md:p-4">
-                            <CourseAnalytics isDashboard={true} />
+                    {/* Course Analytics (Hidden for Admin) */}
+                    {!isAdmin && (
+                        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                            <div className="p-2 sm:p-3 md:p-4">
+                                <CourseAnalytics isDashboard={true} />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Order Analytics */}
-                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-                        <div className="p-2 sm:p-3 md:p-4">
-                            <OrderAnalytics isDashboard={true} />
+                    {/* Order Analytics (Hidden for Admin) */}
+                    {!isAdmin && (
+                        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                            <div className="p-2 sm:p-3 md:p-4">
+                                <OrderAnalytics isDashboard={true} />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Sales Card */}
-                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-                        <div className="p-3 sm:p-4 md:p-6">
-                            <div className="flex items-start justify-between gap-3 sm:gap-4">
-                                <div className="flex-1 min-w-0">
-                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#3ccbae] bg-opacity-10 flex items-center justify-center mb-2 sm:mb-3">
-                                        <BiBorderLeft className="dark:text-[#45CBA0] text-[#3ccbae] text-xl sm:text-2xl md:text-3xl" />
+                    {/* Sales Card (Hidden for Admin) */}
+                    {!isAdmin && (
+                        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                            <div className="p-3 sm:p-4 md:p-6">
+                                <div className="flex items-start justify-between gap-3 sm:gap-4">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#3ccbae] bg-opacity-10 flex items-center justify-center mb-2 sm:mb-3">
+                                            <BiBorderLeft className="dark:text-[#45CBA0] text-[#3ccbae] text-xl sm:text-2xl md:text-3xl" />
+                                        </div>
+                                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mt-1 sm:mt-2">
+                                            120
+                                        </h3>
+                                        <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1 break-words">
+                                            Sales Obtained
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400 whitespace-nowrap">
+                                                ↑ +120%
+                                            </span>
+                                        </div>
                                     </div>
-                                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mt-1 sm:mt-2">
-                                        120
-                                    </h3>
-                                    <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1 break-words">
-                                        Sales Obtained
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400 whitespace-nowrap">
-                                            ↑ +120%
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="text-center flex-shrink-0">
-                                    <CircularProgressWithLabel value={100} />
-                                    <div className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-green-600 dark:text-green-400">
-                                        +120%
+                                    <div className="text-center flex-shrink-0">
+                                        <CircularProgressWithLabel value={100} />
+                                        <div className="mt-1 sm:mt-2 text-xs sm:text-sm font-medium text-green-600 dark:text-green-400">
+                                            +120%
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* New Users Card */}
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -143,22 +153,24 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                 <br />
                 <br />
 
-                {/* Bottom Section - Recent Transactions */}
-                <div className="grid grid-cols-1 mt-6 sm:mt-8">
-                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-                        <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
-                                Recent Transactions
-                            </h2>
-                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                Latest transactions overview
-                            </p>
-                        </div>
-                        <div className="p-0">
-                            <All_Invoices isDashboard={true} />
+                {/* Bottom Section - Recent Transactions (Hidden for Admin) */}
+                {!isAdmin && (
+                    <div className="grid grid-cols-1 mt-6 sm:mt-8">
+                        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                            <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+                                    Recent Transactions
+                                </h2>
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Latest transactions overview
+                                </p>
+                            </div>
+                            <div className="p-0">
+                                <All_Invoices isDashboard={true} />
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     )

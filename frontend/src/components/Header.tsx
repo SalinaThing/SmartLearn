@@ -12,9 +12,9 @@ import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import Image from "@/utils/Image";
 const avatar = "/assets/heroicon3.jpg";
+import { useUser } from "@/hooks/useUser";
 import { useSession } from "@/auth/session";
 import { useLogoutUserQuery, useSocialAuthMutation } from "@/redux/features/auth/authApi";
-import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 type Props = {
   open: boolean;
@@ -36,10 +36,9 @@ const Header: FC<Props> = ({
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const socialAuthAttempted = React.useRef(false);
-  const { data: userData, isLoading, refetch } = useLoadUserQuery(undefined, {});
-  const { data } = useSession();
+  const { user, isLoading, isFetching, refetch } = useUser();
+  const { data: sessionData } = useSession(); 
   const [logoutUser, setLogoutUser] = useState(false);
-  const { user } = useSelector((state: any) => state.auth);
 
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
   const { } = useLogoutUserQuery(undefined, {
@@ -48,30 +47,35 @@ const Header: FC<Props> = ({
 
   useEffect(() => {
     if(!isLoading){
-      if (!userData?.user) {
-        if(data && !socialAuthAttempted.current){
+      if (!user) {
+        if(sessionData && !socialAuthAttempted.current){
           socialAuthAttempted.current = true;
           socialAuth({
-            email: data.user?.email,
-            name: data.user?.name,
-            avatar: data.user?.image,
-          }).unwrap().then(() => {
-            refetch();
+            email: sessionData.user?.email,
+            name: sessionData.user?.name,
+            avatar: sessionData.user?.image,
+          }).unwrap().then(async () => {
+            // Wait until user is loaded so protected routes don't temporarily redirect.
+            try {
+              await refetch();
+            } catch {
+              // Errors are handled by existing guards/toasts
+            }
           }).catch((err: any) => {
              console.error("Social auth failed:", err);
           });
         }
       } 
-      if (data === null){
+      if (sessionData === null){
         if(isSuccess){
           toast.success("Login Successfully");
         }
       }
-      if (data === null && !isLoading && !userData?.user && !userData?.success && user) {
+      if (sessionData === null && !isLoading && !isFetching && !user) {
         setLogoutUser(true);
       }
     }
-  }, [data, userData, socialAuth, isLoading, isSuccess, refetch, user]);
+  }, [sessionData, user, socialAuth, isLoading, isFetching, isSuccess, refetch]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -112,8 +116,15 @@ const Header: FC<Props> = ({
     }
   };
 
-  //console.log(user) getting user data in browser
-  const profileImage = user?.avatar?.url && user.avatar.url.trim() !== "" ? user.avatar.url : avatar;
+  // Derive auth state from the unified useUser hook
+  const isAuthenticated = !!user;
+  const currentUser = user;
+  const profileImage = currentUser?.avatar?.url && currentUser.avatar.url.trim() !== "" ? currentUser.avatar.url : avatar;
+
+  // Once we are authenticated, make sure any auth modal (Login/SignUp/Verification) is closed.
+  useEffect(() => {
+    if (open && isAuthenticated) setOpen(false);
+  }, [open, isAuthenticated, setOpen]);
 
   return (
     <div className="w-full relative">
@@ -153,29 +164,49 @@ const Header: FC<Props> = ({
 
               {/* Desktop User Icon */}
               {
-                userData?.success && userData?.user ? (
-                  <Link to={"/profile"}>
-                    <Image
-                      src={userData.user.avatar?.url || avatar}
-                      alt=" "
-                      width={30}
-                      height={30}
-                      className="w-[30px] h-[30px] rounded-full cursor-pointer border-2"
-                      style={{
-                        borderColor: activeItem === 5 ? "#ffc107" : "transparent",
-                      }}
-                    />
-                  </Link>
+                isAuthenticated ? (
+                  <div className="flex items-center gap-2 800px:gap-4">
+                    <Link 
+                      to={user.role === 'teacher' ? "/teacher" : "/student/dashboard"}
+                      className="hidden 800px:block text-[15px] font-Poppins font-[500] text-black dark:text-white hover:text-[#39c1f3] transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link to={"/profile"}>
+                      <Image
+                        src={profileImage}
+                        alt=" "
+                        width={30}
+                        height={30}
+                        className="w-[30px] h-[30px] rounded-full cursor-pointer border-2"
+                        style={{
+                          borderColor: activeItem === 5 ? "#ffc107" : "transparent",
+                        }}
+                      />
+                    </Link>
+                  </div>
 
                 ) : (
-                  <HiOutlineUserCircle
-                    size={25}
-                    className="hidden 800px:block cursor-pointer dark:text-white text-black ml-4"
-                    onClick={() => {
-                      setOpen(true);
-                      setRoute("Login");
-                    }}
-                  />
+                  <div className="hidden 800px:flex items-center gap-4 ml-4">
+                    <button
+                      className="text-[15px] px-5 py-2 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
+                      onClick={() => {
+                        setOpen(true);
+                        setRoute("Login");
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button
+                      className="text-[15px] px-5 py-2 font-Poppins font-[500] text-white bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] hover:from-[#2a9fd8] hover:to-[#1f8bc0] rounded-lg transition duration-300 shadow-sm hover:shadow-md"
+                      onClick={() => {
+                        setOpen(true);
+                        setRoute("SignUp");
+                      }}
+                    >
+                      Sign Up
+                    </button>
+                  </div>
                 )
               }
             </div>
@@ -192,14 +223,43 @@ const Header: FC<Props> = ({
               <div className="w-[70%] fixed z-[99999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
                 <NavItems activeItem={activeItem} isMobile={true} />
 
-                <HiOutlineUserCircle
-                  size={25}
-                  className="cursor-pointer ml-5 my-2 text-black dark:text-white"
-                  onClick={() => {
-                    setOpen(true);
-                    setRoute("Login");
-                  }}
-                />
+                {
+                  isAuthenticated ? (
+                    <Link to={"/profile"} className="ml-5 my-2 inline-block">
+                      <Image
+                        src={profileImage}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                        className="w-[40px] h-[40px] rounded-full cursor-pointer border-2"
+                        style={{
+                          borderColor: activeItem === 5 ? "#ffc107" : "transparent",
+                        }}
+                      />
+                    </Link>
+                  ) : (
+                    <div className="flex flex-col gap-4 mt-6 px-5">
+                      <button
+                        className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
+                        onClick={() => {
+                          setOpen(true);
+                          setRoute("Login");
+                        }}
+                      >
+                        Login
+                      </button>
+                      <button
+                        className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-white bg-[#39c1f3] hover:bg-[#2a9fd8] rounded-lg transition duration-300 shadow-sm"
+                        onClick={() => {
+                          setOpen(true);
+                          setRoute("SignUp");
+                        }}
+                      >
+                        Sign Up
+                      </button>
+                    </div>
+                  )
+                }
 
                 <br />
                 <br />
@@ -241,6 +301,7 @@ const Header: FC<Props> = ({
                   activeItem={activeItem}
                   component={SignUp}
                   setRoute={setRoute}
+                  refetch={refetch}
                 />
               )
             }
@@ -258,6 +319,7 @@ const Header: FC<Props> = ({
                   activeItem={activeItem}
                   component={Verification}
                   setRoute={setRoute}
+                  refetch={refetch}
                 />
               )
             }

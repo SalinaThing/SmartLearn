@@ -21,7 +21,7 @@ import {
     ExitToAppIcon,
     FeedbackIcon,
 } from "./Icon";
-import { useSelector } from "react-redux"
+import { useUser } from "@/hooks/useUser";
 import Image from "@/utils/Image";
 import { useTheme } from "@/utils/ThemeProvider";
 import { useLogoutUserQuery } from "@/redux/features/auth/authApi";
@@ -29,7 +29,7 @@ import { signOut } from "@/auth/oauth";
 import { FC, useEffect, useState } from "react";
 import { JSX } from "@emotion/react/jsx-runtime";
 import { Box, IconButton, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const avatarDefault = "/assets/heroicon3.jpg";
 
@@ -42,18 +42,23 @@ interface itemProps {
 }
 
 const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
+    const navigate = useNavigate();
+    
+    const handleClick = () => {
+        setSelected(title);
+        navigate(to);
+    };
+
     return (
         <MenuItem
             active={selected === title}
-            onClick={() => setSelected(title)}
+            onClick={handleClick}
             icon={icon}
         >
             <Typography className="!text-[16px] !font-Poppins">
                 {title}
             </Typography>
-            <Link to={to} />
         </MenuItem>
-
     );
 };
 
@@ -62,10 +67,11 @@ type Props = {
 }
 
 const Sidebar: FC<Props> = ({ activeItem }) => {
-    const { user } = useSelector((state: any) => state.auth);
+    const { user } = useUser();
     const [logoutUser, setLogoutUser] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [selected, setSelected] = useState("Dashboard");
+    const isAdmin = user?.role?.toLowerCase() === "admin";
     const [mounted, setMounted] = useState(false);
     const { theme, setTheme } = useTheme();
 
@@ -82,12 +88,12 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
     }, [activeItem]);
 
     useEffect(() => {
-        if (isSuccess || error) {
+        if (isSuccess) {
             signOut({ redirect: false }).then(() => {
                 window.location.href = "/";
             });
         }
-    }, [isSuccess, error]);
+    }, [isSuccess]);
 
     if (!mounted) {
         return null;
@@ -131,11 +137,9 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
             <ProSidebar
                 collapsed={isCollapsed}
                 style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
                     height: "100vh",
-                    width: isCollapsed ? "0%" : "16%",
+                    width: isCollapsed ? "0" : "100%",
+                    zIndex: 9999,
                 }}
             >
                 <Menu iconShape="square">
@@ -175,16 +179,18 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
                         <>
                             <Box mb="25px">
                                 <Box display="flex" justifyContent="center" alignItems="center">
-                                    <Image
-                                        alt="profile-user"
-                                        width={100}
-                                        height={100}
-                                        src={user.avatar ? user.avatar.url : avatarDefault}
-                                        style={{
-                                            cursor: "pointer",
-                                            borderRadius: "50%",
-                                            border: "3px solid #5b6fe6",
-                                        }} />
+                                    <Link to="/profile">
+                                        <Image
+                                            alt="profile-user"
+                                            width={100}
+                                            height={100}
+                                            src={user?.avatar ? user.avatar.url : avatarDefault}
+                                            style={{
+                                                cursor: "pointer",
+                                                borderRadius: "50%",
+                                                border: "3px solid #5b6fe6",
+                                            }} />
+                                    </Link>
                                 </Box>
 
                                 <Box textAlign="center">
@@ -210,9 +216,17 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
 
                     <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                         <Item
+                            title="Return to Home"
+                            to="/"
+                            icon={<HomeOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+
+                        <Item
                             title="Dashboard"
                             to="/teacher"
-                            icon={<HomeOutlinedIcon />}
+                            icon={<OndemandVideoIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
@@ -323,7 +337,6 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
                             {!isCollapsed && "Controllers"}
                         </Typography>
 
-                        {/* Analytics */}
                         <Item
                             title="Manage Team"
                             to="/teacher/team"
@@ -340,7 +353,6 @@ const Sidebar: FC<Props> = ({ activeItem }) => {
                             {!isCollapsed && "Analytics"}
                         </Typography>
 
-                        {/* ANalytics */}
                         <Item
                             title="Course Analytics"
                             to="/teacher/course-analytics"

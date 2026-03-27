@@ -6,7 +6,7 @@ import { updateAccessToken } from "../controllers/userController.js";
 
 const notificationRouter = express.Router();
 
-notificationRouter.get("/get-all-notifications", updateAccessToken, isAuthenticated, authorizeRoles ("teacher"), getNotifications);
-notificationRouter.put("/update-notification-status/:id", updateAccessToken, isAuthenticated, authorizeRoles ("teacher"), updateNotificationStatus);
+notificationRouter.get("/get-all-notifications", updateAccessToken, isAuthenticated, getNotifications);
+notificationRouter.put("/update-notification-status/:id", updateAccessToken, isAuthenticated, updateNotificationStatus);
     
 export default notificationRouter;

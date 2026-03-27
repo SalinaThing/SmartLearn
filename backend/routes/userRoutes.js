@@ -1,12 +1,13 @@
 import express from "express";
-import { activateUser, deleteUser, 
-         getAllUsers, getUserInfo, 
-         loginUser, logoutUser, registrationUser, 
-         socialAuth, updateAccessToken, 
-         updatePassword, updateProfilePicture, 
-         updateUserInfo, updateUserRole,
-         sendDirectEmail
-        } from "../controllers/userController.js";
+import {
+    activateUser, deleteUser,
+    getAllUsers, getUserInfo,
+    loginUser, logoutUser, registrationUser,
+    socialAuth, updateAccessToken,
+    updatePassword, updateProfilePicture,
+    updateUserInfo, updateUserRole,
+    sendDirectEmail
+} from "../controllers/userController.js";
 import { authorizeRoles, isAuthenticated } from "../middlewares/auth.js";
 
 const userRouter = express.Router();

@@ -5,10 +5,10 @@ import express from "express";
 
 const orderRouter = express.Router();
 
-orderRouter.post("/create-order", isAuthenticated,createOrder);
+orderRouter.post("/create-order", isAuthenticated, createOrder);
 orderRouter.get("/get-all-orders", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), getAllOrders);
-  
+
 orderRouter.get("/payment/stripepublishablekey", sendStripePublishableKey);
 orderRouter.post("/payment", isAuthenticated, newPayment);
-  
+
 export default orderRouter;

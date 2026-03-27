@@ -47,6 +47,12 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
         }
     }, [isSuccess, error, success, updateError]);
 
+    useEffect(() => {
+        if (user) {
+            setName(user.name);
+        }
+    }, [user]);
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if(name !==""){

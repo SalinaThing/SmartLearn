@@ -16,6 +16,7 @@ import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FeedbackIcon from "@mui/icons-material/QuestionAnswer";
+import StarIcon from "@mui/icons-material/StarOutline";
 
 export {
   HomeOutlinedIcon,
@@ -35,4 +36,5 @@ export {
   SettingsIcon,
   ExitToAppIcon,
   FeedbackIcon,
+  StarIcon,
 };

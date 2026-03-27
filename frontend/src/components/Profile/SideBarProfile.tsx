@@ -56,7 +56,7 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
       </h5>
     </div>
 
-    {user?.role === "student" && (
+    {user?.role?.toLowerCase() === "student" && (
       <div 
         className={`w-full flex items-center px-3 py-4 cursor-pointer ${
         active ===3 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
@@ -72,7 +72,7 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
 
     {/* Admin Dashboard */}
     {
-      user.role === 'teacher' && (
+      user?.role?.toLowerCase() === 'teacher' && (
         <Link
           className={`w-full flex items-center px-3 py-4 cursor-pointer ${
             active === 6 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
@@ -87,7 +87,7 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
       )
     }
 
-    {user?.role === "student" && (
+    {user?.role?.toLowerCase() === "student" && (
       <div 
         className={`w-full flex items-center px-3 py-4 cursor-pointer ${
         active ===4 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
@@ -99,6 +99,21 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
           Quiz
         </h5>
       </div>
+    )}
+
+    {/* Student Dashboard */}
+    {user?.role?.toLowerCase() === "student" && (
+      <Link
+        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+          active === 7 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
+            }`}
+          to={"/student/dashboard"}
+        >
+        <MdOutlineAdminPanelSettings size={20} className="text-black dark:text-white" />
+        <h5 className="pl-2 block font-Poppins dark:text-white text-black">
+          Student Dashboard
+        </h5>
+      </Link>
     )}
 
     {/* Logout */}

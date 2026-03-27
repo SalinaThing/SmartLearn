@@ -38,11 +38,24 @@ export const courseApi = apiSlice.injectEndpoints({
             })
         }),
         getAllCoursesByUser: builder.query({
-            query: () => ({
-                url: "get-all-course",
-                method: "GET",
-                credentials: "include" as const,
-            })
+            query: (params) => {
+                let queryStr = "";
+                if (params) {
+                    const searchParams = new URLSearchParams();
+                    Object.keys(params).forEach((key) => {
+                        if (params[key] !== undefined && params[key] !== null && params[key] !== "") {
+                            searchParams.append(key, params[key]);
+                        }
+                    });
+                    const qs = searchParams.toString();
+                    if (qs) queryStr = `?${qs}`;
+                }
+                return {
+                    url: `get-all-course${queryStr}`,
+                    method: "GET",
+                    credentials: "include" as const,
+                };
+            }
         }),
 
         getCourseDetails: builder.query({
@@ -114,6 +127,36 @@ export const courseApi = apiSlice.injectEndpoints({
                 credentials: "include" as const,
             })
         }),
+        getQuestionsByUser: builder.query({
+            query: () => ({
+                url: `get-questions-by-user`,
+                method: "GET",
+                credentials: "include" as const,
+            })
+        }),
+        getReviewsByUser: builder.query({
+            query: () => ({
+                url: `get-reviews-by-user`,
+                method: "GET",
+                credentials: "include" as const,
+            })
+        }),
+        editReview: builder.mutation({
+            query: ({ rating, review, courseId, reviewId }) => ({
+                url: `edit-review`,
+                method: "PUT",
+                body: { rating, review, courseId, reviewId },
+                credentials: "include" as const,
+            })
+        }),
+        editQuestion: builder.mutation({
+            query: ({ question, courseId, contentId, questionId }) => ({
+                url: `edit-question`,
+                method: "PUT",
+                body: { question, courseId, contentId, questionId },
+                credentials: "include" as const,
+            })
+        }),
     })
 })
 
@@ -131,4 +174,8 @@ export const {
     useAddReplyInReviewMutation,
     useUploadVideoMutation,
     useUploadPdfMutation,
+    useGetQuestionsByUserQuery,
+    useGetReviewsByUserQuery,
+    useEditReviewMutation,
+    useEditQuestionMutation,
 } = courseApi;

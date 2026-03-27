@@ -1,15 +1,21 @@
 import express from "express";
 import multer from "multer";
-import { addAnswer, addQuestion, 
-         editCourse, uploadCourse,
-         getAllCourse, getCourseByUser, getSingleCourse, 
-         addReview, addReplyToReview,
-         getTeacherAllCourses,
-         deleteCourse,
-         generateVideoUrl,
-         uploadVideo,
-         uploadPdf } 
-        from "../controllers/courseController.js";
+import {
+    addAnswer, addQuestion,
+    editCourse, uploadCourse,
+    getAllCourse, getCourseByUser, getSingleCourse,
+    addReview, addReplyToReview,
+    getTeacherAllCourses,
+    deleteCourse,
+    generateVideoUrl,
+    uploadVideo,
+    uploadPdf,
+    getQuestionsByUser,
+    getReviewsByUser,
+    editReview,
+    editQuestion
+}
+    from "../controllers/courseController.js";
 import { authorizeRoles, isAuthenticated } from "../middlewares/auth.js";
 import { updateAccessToken } from "../controllers/userController.js";
 
@@ -45,12 +51,17 @@ courseRouter.put("/add-question", updateAccessToken, isAuthenticated, addQuestio
 courseRouter.put("/add-answer", updateAccessToken, isAuthenticated, addAnswer);
 courseRouter.put("/add-review/:id", updateAccessToken, isAuthenticated, addReview);
 courseRouter.put("/add-reply-to-review", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), addReplyToReview);
-   
+
 courseRouter.get("/get-teacher-courses", isAuthenticated, authorizeRoles("teacher"), getTeacherAllCourses);
 
 courseRouter.post("/getVdoCipherOTP", generateVideoUrl);
 courseRouter.post("/upload-video", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), videoUpload.single("video"), uploadVideo);
 courseRouter.post("/upload-pdf", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), pdfUpload.single("pdf"), uploadPdf);
+
+courseRouter.get("/get-questions-by-user", updateAccessToken, isAuthenticated, getQuestionsByUser);
+courseRouter.get("/get-reviews-by-user", updateAccessToken, isAuthenticated, getReviewsByUser);
+courseRouter.put("/edit-review", updateAccessToken, isAuthenticated, editReview);
+courseRouter.put("/edit-question", updateAccessToken, isAuthenticated, editQuestion);
 
 courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteCourse);
 

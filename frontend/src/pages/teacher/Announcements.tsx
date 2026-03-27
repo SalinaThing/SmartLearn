@@ -4,12 +4,12 @@ import TeacherSidebar from "@/components/Teacher/Sidebar/TeacherSidebar";
 import DashboardHeader from "@/components/Teacher/DashboardHeader";
 import TeacherProtected from "@/hooks/teacherProtected";
 import { useGetAllCoursesQuery } from "@/redux/features/courses/coursesApi";
-import { useSelector } from "react-redux";
-import StudentAnnouncements from "@/components/Course/StudentAnnouncements";
+import { useUser } from "@/hooks/useUser";
 import { styles } from "@/styles/style";
+import StudentAnnouncements from "@/components/Course/StudentAnnouncements";
 
 const Announcements = () => {
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useUser();
   const { data: coursesData } = useGetAllCoursesQuery({});
   const [selectedCourse, setSelectedCourse] = useState("");
 

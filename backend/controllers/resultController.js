@@ -1,6 +1,8 @@
 import Result from "../models/resultModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
+import { io } from "../serverSocket.js";
+import NotificationModel from "../models/notificationModel.js";
 
 // CREATE RESULT
 export const createResult = catchAsyncErrors(async (req, res, next) => {
@@ -24,11 +26,28 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
         };
 
         const created = await Result.create(payload);
+        // Notify teachers
+        try {
+            await NotificationModel.create({
+                title: "Quiz Attempted",
+                message: `${req.user.name} has completed the quiz "${title}" with a score of ${correct}/${totalQuestions}.`,
+                role: 'teacher'
+            });
+            // Emit socket event
+            io.to("teacher").emit("newNotification", {
+                title: "Quiz Attempted",
+                message: `${req.user.name} has completed the quiz "${title}" with a score of ${correct}/${totalQuestions}.`,
+            });
+        } catch (error) {
+            console.log("Result notification error:", error);
+        }
+
         res.status(201).json({
             success: true,
             message: "Result created successfully",
             result: created
         });
+        
       
     } catch (err) {
         return next(new ErrorHandler(500, err.message));

@@ -1,6 +1,8 @@
 import QuizModel from "../models/quizModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
+import { io } from "../serverSocket.js";
+import NotificationModel from "../models/notificationModel.js";
 
 // CREATE QUIZ
 export const createQuiz = catchAsyncErrors(async (req, res, next) => {
@@ -17,6 +19,22 @@ export const createQuiz = catchAsyncErrors(async (req, res, next) => {
             description,
             questions,
         });
+
+        // Notify students
+        try {
+            await NotificationModel.create({
+                title: "New Quiz Available",
+                message: `A new quiz "${quiz.title}" has been added to your course.`,
+                role: 'student'
+            });
+            // Emit socket event
+            io.to("student").emit("newNotification", {
+                title: "New Quiz Available",
+                message: `A new quiz "${quiz.title}" has been added to your course.`,
+            });
+        } catch (error) {
+            console.log("Quiz notification error:", error);
+        }
 
         res.status(201).json({
             success: true,
@@ -52,6 +70,22 @@ export const updateQuiz = catchAsyncErrors(async (req, res, next) => {
 
         if (!quiz) {
             return next(new ErrorHandler(404, "Quiz not found"));
+        }
+
+        // Notify students
+        try {
+            await NotificationModel.create({
+                title: "Quiz Updated",
+                message: `Quiz "${quiz.title}" has been updated with new questions.`,
+                role: 'student'
+            });
+            // Emit socket event
+            io.to("student").emit("newNotification", {
+                title: "Quiz Updated",
+                message: `Quiz "${quiz.title}" has been updated with new questions.`,
+            });
+        } catch (error) {
+            console.log("Quiz update notification error:", error);
         }
 
         res.status(200).json({

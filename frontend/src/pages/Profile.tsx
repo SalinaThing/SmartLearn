@@ -3,7 +3,7 @@ import Protected from '@/hooks/useProtected';
 import Header from '@/components/Header';
 import Heading from '@/utils/Heading';
 import Profile from '@/components/Profile/Profile';
-import { useSelector } from 'react-redux';
+import { useUser } from '@/hooks/useUser';
 import Footer from '@/components/Footer';
 
 const Page: FC = () => {
@@ -11,7 +11,8 @@ const Page: FC = () => {
   const [open, setOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(5);
   const [route, setRoute] = useState("Login");
-  const {user} = useSelector ((state: any) => state.auth);
+  const { user } = useUser();
+  const isStudent = user?.role === "student" || user?.role === "teacher" || user?.role === "admin";
 
   return (
     <div>

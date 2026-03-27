@@ -7,12 +7,14 @@ export const quizApi = apiSlice.injectEndpoints({
                 url: "create-quiz",
                 method: "POST",
                 body: data,
+                credentials: "include" as const,
             }),
         }),
         getQuizzesByCourse: builder.query({
             query: (courseId) => ({
                 url: `get-quizzes/${courseId}`,
                 method: "GET",
+                credentials: "include" as const,
             }),
         }),
         updateQuiz: builder.mutation({
@@ -20,12 +22,14 @@ export const quizApi = apiSlice.injectEndpoints({
                 url: `update-quiz/${id}`,
                 method: "PUT",
                 body: data,
+                credentials: "include" as const,
             }),
         }),
         deleteQuiz: builder.mutation({
             query: (id) => ({
                 url: `delete-quiz/${id}`,
                 method: "DELETE",
+                credentials: "include" as const,
             }),
         }),
     }),

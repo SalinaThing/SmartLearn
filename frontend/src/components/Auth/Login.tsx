@@ -43,14 +43,22 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
 
     useEffect(() => {
         if (isSuccess) {
-            toast.success("Login successfully!! Welcome back!");
-            setOpen(false);
-            refetch();
-            navigate("/profile");
+            (async () => {
+                toast.success("Login successfully!! Welcome back!");
+                setOpen(false);
+                // Wait until the authenticated user is loaded before navigating,
+                // otherwise Protected routes may redirect you back to "/".
+                try {
+                    await refetch();
+                } catch {
+                    // refetch errors are handled by the guards/toasts
+                }
+                navigate("/profile");
+            })();
         }
 
         if (error) {
-            if ('data' in error) {
+            if ("data" in error) {
                 const errorData = error as any;
                 toast.error(errorData.data?.message || "An error occurred during login");
             } else {
@@ -58,7 +66,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
                 toast.error(fetchError?.error || "Failed to connect to server");
             }
         }
-    }, [isSuccess, error, setOpen]);
+    }, [isSuccess, error, setOpen, refetch, navigate]);
 
     const { errors, touched, values, handleChange, handleSubmit } = formik;
 
