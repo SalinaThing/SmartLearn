@@ -157,6 +157,37 @@ export const courseApi = apiSlice.injectEndpoints({
                 credentials: "include" as const,
             })
         }),
+        updateCourseProgress: builder.mutation({
+            query: ({ courseId, contentId }) => ({
+                url: `update-course-progress`,
+                method: "POST",
+                body: { courseId, contentId },
+                credentials: "include" as const,
+            })
+        }),
+        logCourseView: builder.mutation({
+            query: ({ courseId }) => ({
+                url: `log-course-view`,
+                method: "POST",
+                body: { courseId },
+                credentials: "include" as const,
+            })
+        }),
+        logSearchQuery: builder.mutation({
+            query: ({ keyword }) => ({
+                url: `log-search-query`,
+                method: "POST",
+                body: { keyword },
+                credentials: "include" as const,
+            })
+        }),
+        getSuggestedCourses: builder.query({
+            query: () => ({
+                url: `get-suggested-courses`,
+                method: "GET",
+                credentials: "include" as const,
+            })
+        }),
     })
 })
 
@@ -178,4 +209,8 @@ export const {
     useGetReviewsByUserQuery,
     useEditReviewMutation,
     useEditQuestionMutation,
+    useUpdateCourseProgressMutation,
+    useLogCourseViewMutation,
+    useLogSearchQueryMutation,
+    useGetSuggestedCoursesQuery,
 } = courseApi;

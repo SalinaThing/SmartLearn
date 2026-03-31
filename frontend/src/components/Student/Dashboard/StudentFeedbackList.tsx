@@ -62,9 +62,10 @@ const StudentFeedbackList: FC = () => {
 
     return (
         <div className="w-full mt-8">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                My Feedback to Teachers
-            </h2>
+            <h1 className="text-[25px] font-Poppins font-bold mb-6">
+                <span className="text-black dark:text-white">My</span>
+                <span className="text-[#3ccbae] ml-2">Feedback</span>
+            </h1>
             <div className="space-y-4">
                 {feedbacks.length === 0 ? (
                     <div className="bg-white dark:bg-[#111C43] rounded-xl p-8 text-center shadow-md text-gray-500 dark:text-gray-400">

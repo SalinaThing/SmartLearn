@@ -74,9 +74,9 @@ const All_Invoices = ({ isDashboard }: Props) => {
 
   // Define columns with better styling
   const columns: any = [
-    { 
-      field: "id", 
-      headerName: "Order ID", 
+    {
+      field: "id",
+      headerName: "Order ID",
       flex: 0.4,
       minWidth: 100,
       renderCell: (params: any) => (
@@ -85,9 +85,9 @@ const All_Invoices = ({ isDashboard }: Props) => {
         </div>
       )
     },
-    { 
-      field: "userName", 
-      headerName: "Customer", 
+    {
+      field: "userName",
+      headerName: "Customer",
       flex: isDashboard ? 0.7 : 0.5,
       minWidth: 150,
       renderCell: (params: any) => (
@@ -100,38 +100,38 @@ const All_Invoices = ({ isDashboard }: Props) => {
     ...(isDashboard
       ? []
       : [
-          { 
-            field: "userEmail", 
-            headerName: "Email", 
-            flex: 1,
-            minWidth: 200,
-            renderCell: (params: any) => (
-              <div className="flex items-center gap-2">
-                <a 
-                  href={`mailto:${params.value}`}
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  {params.value}
-                </a>
-              </div>
-            )
-          },
-          { 
-            field: "title", 
-            headerName: "Course", 
-            flex: 1,
-            minWidth: 200,
-            renderCell: (params: any) => (
-              <div className="flex items-center gap-2">
-                <span className="truncate max-w-[200px]">{params.value}</span>
-              </div>
-            )
-          },
-        ]),
+        {
+          field: "userEmail",
+          headerName: "Email",
+          flex: 1,
+          minWidth: 200,
+          renderCell: (params: any) => (
+            <div className="flex items-center gap-2">
+              <a
+                href={`mailto:${params.value}`}
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {params.value}
+              </a>
+            </div>
+          )
+        },
+        {
+          field: "title",
+          headerName: "Course",
+          flex: 1,
+          minWidth: 200,
+          renderCell: (params: any) => (
+            <div className="flex items-center gap-2">
+              <span className="truncate max-w-[200px]">{params.value}</span>
+            </div>
+          )
+        },
+      ]),
 
-    { 
-      field: "price", 
-      headerName: "Amount", 
+    {
+      field: "price",
+      headerName: "Amount",
       flex: 0.4,
       minWidth: 100,
       renderCell: (params: any) => (
@@ -143,36 +143,36 @@ const All_Invoices = ({ isDashboard }: Props) => {
 
     ...(isDashboard
       ? [
-          { 
-            field: "created_at", 
-            headerName: "Date", 
-            flex: 0.5,
-            minWidth: 120,
-            renderCell: (params: any) => (
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{params.value}</span>
-              </div>
-            )
-          },
-        ]
+        {
+          field: "created_at",
+          headerName: "Date",
+          flex: 0.5,
+          minWidth: 120,
+          renderCell: (params: any) => (
+            <div className="flex items-center gap-2">
+              <span className="text-sm">{params.value}</span>
+            </div>
+          )
+        },
+      ]
       : [
-          {
-            field: "actions",
-            headerName: "Actions",
-            flex: 0.3,
-            minWidth: 130,
-            renderCell: (params: any) => {
-              return (
-                <button
-                  onClick={() => setSelectedOrder(params.row)}
-                  className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  View Details
-                </button>
-              );
-            },
+        {
+          field: "actions",
+          headerName: "Actions",
+          flex: 0.3,
+          minWidth: 130,
+          renderCell: (params: any) => {
+            return (
+              <button
+                onClick={() => setSelectedOrder(params.row)}
+                className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                View Details
+              </button>
+            );
           },
-        ]),
+        },
+      ]),
   ];
 
   // Prepare rows data
@@ -198,10 +198,16 @@ const All_Invoices = ({ isDashboard }: Props) => {
             <Loader />
           </div>
         ) : (
-          <Box m={isDashboard ? "0" : "40px"}>
+          <Box m={isDashboard ? "0" : "10px"}>
+            {!isDashboard && (
+              <h1 className="text-[25px] font-Poppins font-bold mb-6 ml-2">
+                <span className="text-black dark:text-white">Current</span>
+                <span className="text-[#3ccbae] ml-2">Invoices</span>
+              </h1>
+            )}
             <Box
-              m={isDashboard ? "0" : "40px 0 0 0"}
-              height={isDashboard ? "auto" : "85vh"}
+              m={isDashboard ? "0" : "10px 0 0 0"}
+              height={isDashboard ? "auto" : "80vh"}
               minHeight={isDashboard ? "400px" : "auto"}
               overflow={"auto"}
               sx={{
@@ -245,40 +251,35 @@ const All_Invoices = ({ isDashboard }: Props) => {
                   fontWeight: 500,
                 },
                 "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                  backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
                   borderBottom: "none",
-                  color: theme === "dark" ? "#fff" : "#000",
+                  color: theme === "dark" ? "#fff !important" : "#000 !important",
                   fontSize: "0.9rem",
                   fontWeight: 600,
                   borderRadius: "12px 12px 0 0",
                 },
                 "& .MuiDataGrid-virtualScroller": {
-                  backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                  backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                 },
                 "& .MuiDataGrid-footerContainer": {
-                  color: theme === "dark" ? "#fff" : "#000",
+                  color: theme === "dark" ? "#fff !important" : "#000 !important",
                   borderTop: "none",
-                  backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                  backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
                   borderRadius: "0 0 12px 12px",
                 },
                 "& .MuiCheckbox-root": {
                   color: theme === "dark"
                     ? "#b7ebde !important"
-                    : "#000 !important",
+                    : "#3ccbae !important",
                 },
                 "& .MuiDataGrid-toolbarContainer": {
                   padding: "12px 16px",
-                  backgroundColor: theme === "dark" ? "#2D3A4E" : "#E8EAF6",
+                  backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#E8EAF6 !important",
                   borderRadius: "12px 12px 0 0",
                   "& .MuiButton-text": {
-                    color: "#fff !important",
+                    color: theme === "dark" ? "#fff !important" : "#3ccbae !important",
                     textTransform: "uppercase",
                     fontWeight: 500,
-                    "&:hover": {
-                      backgroundColor: theme === "dark"
-                        ? "rgba(255,255,255,0.1) !important"
-                        : "rgba(255,255,255,0.2) !important",
-                    },
                   },
                 },
               }}

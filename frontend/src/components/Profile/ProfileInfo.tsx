@@ -14,12 +14,12 @@ type Props = {
     user: any;
 }
 
-const ProfileInfo : FC <Props> = ({avatar, user}) => {
+const ProfileInfo: FC<Props> = ({ avatar, user }) => {
     const [name, setName] = useState(user?.name ?? "");
-    const [updateAvatar, {isSuccess, error}] = useUpdateAvatarMutation();
-    const [editProfile, {isSuccess:success, error:updateError}] = useEditProfileMutation();
+    const [updateAvatar, { isSuccess, error }] = useUpdateAvatarMutation();
+    const [editProfile, { isSuccess: success, error: updateError }] = useEditProfileMutation();
     const [loadUser, setLoadUser] = useState(false);
-    const {} = useLoadUserQuery(undefined, {skip: loadUser ? false : true})
+    const { } = useLoadUserQuery(undefined, { skip: loadUser ? false : true })
 
     const imageHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const fileReader = new FileReader();
@@ -35,14 +35,14 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
     };
 
     useEffect(() => {
-        if(isSuccess || success){
+        if (isSuccess || success) {
             setLoadUser(true);
         }
-        if(error || updateError){
+        if (error || updateError) {
             console.log(error);
         }
 
-        if(success){
+        if (success) {
             toast.success("Profile updated successfully!!")
         }
     }, [isSuccess, error, success, updateError]);
@@ -55,9 +55,9 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        if(name !==""){
+        if (name !== "") {
             await editProfile({
-                name:name,
+                name: name,
             })
         }
     };
@@ -67,11 +67,11 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
             <div className="w-full flex justify-center">
                 <div className="relative">
                     <Image
-                    src={(user?.avatar && user.avatar.url) || avatar || avatarIcon}
-                    alt=""
-                    width={120}
-                    height={120}
-                    className="w-[120px] h-[120px] cursor-pointer border-[3px] border-[#37a39a] rounded-full"
+                        src={(user?.avatar && user.avatar.url) || avatar || avatarIcon}
+                        alt=""
+                        width={120}
+                        height={120}
+                        className="w-[120px] h-[120px] cursor-pointer border-[3px] border-[#37a39a] rounded-full"
                     />
 
                     <input
@@ -84,21 +84,27 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
                     />
 
                     <label htmlFor="avatar">
-                        <div className="w-[30px] h-[30px] bg-slate-900 rounded bottom-2 right-2 flex items-center justify-center cursor-pointer">
-                            <AiOutlineCamera size={20} className="z-1"/>
-                        </div>
+                        <label htmlFor="avatar" className="relative cursor-pointer">
+                            <div className="w-8 h-8 rounded-full 
+                                bg-white dark:bg-black 
+                                flex items-center justify-center 
+                                absolute bottom-0 right-0 
+                                shadow-md hover:scale-110 transition-transform">
+                                <AiOutlineCamera size={16} className="text-black dark:text-white" />
+                            </div>
+                        </label>
                     </label>
                 </div>
             </div>
-            <br/>
-            <br/>
+            <br />
+            <br />
 
             <div className="w-full pl-6 800px:pl-10">
                 <form onSubmit={handleSubmit}>
                     <div className="800px:w-[50%] m-auto block pb-4">
                         <div className="w-[100%]">
                             <label className="block pb-2">Full Name</label>
-                            <input 
+                            <input
                                 type="text"
                                 className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
                                 required
@@ -109,7 +115,7 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
 
                         <div className="w-[100%] pt-2">
                             <label className="block pb-2">Email Address</label>
-                            <input 
+                            <input
                                 type="text"
                                 readOnly
                                 className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
@@ -118,7 +124,7 @@ const ProfileInfo : FC <Props> = ({avatar, user}) => {
                             />
                         </div>
 
-                        <input 
+                        <input
                             className={`w-full 800px:w-[50px] h-[40px] border border-[#37a39a] text-center dark:text-[#fff] text-black rounded-[3px] mt-8 cursor-pointer`}
                             type="submit"
                             required

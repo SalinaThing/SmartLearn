@@ -158,13 +158,17 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
 
 
     return (
-        <div className="mt-[120px]">
+        <div className="w-full">
             {
                 isLoading ? (
                     <Loader />
                 ) : (
-                    <Box m="20px">
-                        <div className="w-full flex justify-end">
+                    <Box m="0">
+                        <div className="w-full flex justify-between items-center mb-6">
+                            <h1 className="text-[25px] font-Poppins font-bold">
+                                <span className="text-black dark:text-white">All</span>
+                                <span className="text-[#3ccbae] ml-2">Users</span>
+                            </h1>
                             <div
                                 className={`${styles.button} !w-[220px] dark:bg-["#1c60e7"] !h-[35px] dark:border dark:border-["#ffffff6c"]`}
                                 onClick={() => setActive(!active)}
@@ -174,7 +178,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                         </div>
 
                         <Box
-                            m="40px 0 0 0"
+                            m="15px 0 0 0"
                             height="80vh"
                             sx={{
                                 "& .MuiDataGrid-root": {
@@ -211,26 +215,26 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                                 },
 
                                 "& .MuiDataGrid-columnHeaders": {
-                                    backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
                                     borderBottom: "none",
-                                    color: theme === "dark" ? "#fff" : "#000",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
                                 "& .MuiDataGrid-virtualScroller": {
-                                    backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                                 },
 
                                 "& .MuiDataGrid-footerContainer": {
-                                    backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
                                     borderTop: "none",
-                                    color: theme === "dark" ? "#fff" : "#000",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
                                 "& .MuiCheckbox-root": {
                                     color:
                                         theme === "dark"
                                             ? "#b7ebde !important"
-                                            : "#000 !important",
+                                            : "#3ccbae !important",
                                 },
 
                                 "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
@@ -245,7 +249,7 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                             />
                         </Box>
 
-                        {!isAdmin && active && (
+                        {active && (
                             <div className="mt-6 p-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900">
                                 <h3 className={`${styles.title} mb-3`}>Update Team Member Role</h3>
 

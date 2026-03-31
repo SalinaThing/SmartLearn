@@ -1,4 +1,4 @@
-import { useGetCourseDetailsQuery } from '@/redux/features/courses/coursesApi';
+import { useGetCourseDetailsQuery, useLogCourseViewMutation } from '@/redux/features/courses/coursesApi';
 import React, { useEffect, useState, useRef } from 'react'
 import Loader from '../Loader/Loader';
 import Heading from '@/utils/Heading';
@@ -37,6 +37,14 @@ const CourseDetailsPage = ({ id }: Props) => {
     const [stripePromise, setStripePromise] = useState<any>(null);
     const [clientSecret, setClientSecret] = useState('');
     const [isPaymentSuccessOpen, setIsPaymentSuccessOpen] = useState(false);
+    
+    const [logCourseView] = useLogCourseViewMutation();
+
+    useEffect(() => {
+        if (data?.course && userData?.user) {
+            logCourseView({ courseId: id });
+        }
+    }, [data, userData, id]);
 
     useEffect(() => {
         if (data && data.course.price > 0) {

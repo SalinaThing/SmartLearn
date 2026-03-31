@@ -12,20 +12,35 @@ interface Props {
 }
 
 const StudentLayout: FC<Props> = ({ children, title = "Student Dashboard", description = "SmartLearn Student Workspace", activeItem }) => {
+    const [open, setOpen] = React.useState(false);
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
+
     return (
         <StudentProtected>
-            <div className='flex min-h-screen'>
+            <div className='flex min-h-screen bg-white dark:bg-gray-900'>
                 <Heading
                     title={`${title} - SmartLearn`}
                     description={description}
                     keywords="SmartLearn, Student Dashboard, Learning Progress"
                 />
-                <div className="1500px:w-[16%] w-1/5">
-                    <StudentSidebar activeItem={activeItem} />
-                </div>
-                <div className="w-[85%] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-                    <DashboardHeader />
-                    <div className="p-4 sm:p-8">
+                
+                {/* Collapsible Student Sidebar */}
+                <StudentSidebar 
+                    activeItem={activeItem} 
+                    open={open} 
+                    setOpen={setOpen}
+                    isCollapsed={isCollapsed}
+                    setIsCollapsed={setIsCollapsed}
+                />
+
+                {/* Main Content Area - Synchronized Indentation */}
+                <div 
+                    className={`flex-1 w-full transition-all duration-300 ${
+                        isCollapsed ? "800px:ml-[80px]" : "800px:ml-[250px]"
+                    }`}
+                >
+                    <DashboardHeader open={open} setOpen={setOpen} />
+                    <div className="p-4 sm:p-6 lg:p-8 w-full max-w-[1600px]">
                         {children}
                     </div>
                 </div>

@@ -11,15 +11,6 @@ import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateCourse from "./pages/teacher/CreateCourse";
 import EditCourse from "./pages/teacher/EditCourse";
 import HeroLayout from "./pages/teacher/HeroLayout";
-import Invoices from "./pages/teacher/Invoices";
-import OrderAnalytics from "./pages/teacher/OrderAnalytics";
-import UserAnalytics from "./pages/teacher/UserAnalytics";
-import CourseAnalytics from "./pages/teacher/CourseAnalytics";
-import Categories from "./pages/teacher/Categories";
-import Faq from "./pages/teacher/Faq";
-import Team from "./pages/teacher/Team";
-import AllUsers from "./pages/teacher/AllUsers";
-import AllCourses from "./pages/teacher/AllCourses";
 import Quizzes from "./pages/teacher/Quizzes";
 import Announcements from "./pages/teacher/Announcements";
 import Feedback from "./pages/teacher/Feedback";
@@ -35,6 +26,28 @@ import FeedbackPage from "./pages/FeedbackPage";
 import AboutPage from "./pages/About";
 import FAQPage from "./pages/FAQ";
 
+
+import Invoices from "./pages/teacher/Invoices";
+import OrderAnalytics from "./pages/teacher/OrderAnalytics";
+import UserAnalytics from "./pages/teacher/UserAnalytics";
+import CourseAnalytics from "./pages/teacher/CourseAnalytics";
+import Categories from "./pages/teacher/Categories";
+import Faq from "./pages/teacher/Faq";
+import Team from "./pages/teacher/Team";
+import AllUsers from "./pages/teacher/AllUsers";
+import AllCourses from "./pages/teacher/AllCourses";
+
+// Admin Imports
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminAllUsers from "./pages/admin/AllUsers";
+import AdminAllCourses from "./pages/admin/AllCourses";
+import AdminInvoices from "./pages/admin/Invoices";
+import AdminFaq from "./pages/admin/Faq";
+import AdminCategories from "./pages/admin/Categories";
+import AdminTeam from "./pages/admin/Team";
+import AdminUserAnalytics from "./pages/admin/UserAnalytics";
+import AdminOrderAnalytics from "./pages/admin/OrderAnalytics";
+import AdminCourseAnalytics from "./pages/admin/CourseAnalytics";
 
 export default function App() {
   return (
@@ -52,6 +65,8 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/course/:id" element={<CourseDetail />} />
         <Route path="/course-access/:id" element={<CourseAccess />} />
+
+        {/* Teacher Routes */}
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/teacher/create-course" element={<CreateCourse />} />
         <Route path="/teacher/edit-course/:id" element={<EditCourse />} />
@@ -60,14 +75,24 @@ export default function App() {
         <Route path="/teacher/order-analytics" element={<OrderAnalytics />} />
         <Route path="/teacher/user-analytics" element={<UserAnalytics />} />
         <Route path="/teacher/course-analytics" element={<CourseAnalytics />} />
-        <Route path="/teacher/categories" element={<Categories />} />
-        <Route path="/teacher/faq" element={<Faq />} />
         <Route path="/teacher/team" element={<Team />} />
         <Route path="/teacher/all-users" element={<AllUsers />} />
         <Route path="/teacher/allcourses" element={<AllCourses />} />
         <Route path="/teacher/quizzes" element={<Quizzes />} />
         <Route path="/teacher/announcements" element={<Announcements />} />
         <Route path="/teacher/feedback" element={<Feedback />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminAllUsers />} />
+        <Route path="/admin/courses" element={<AdminAllCourses />} />
+        <Route path="/admin/invoices" element={<AdminInvoices />} />
+        <Route path="/admin/faq" element={<AdminFaq />} />
+        <Route path="/admin/categories" element={<AdminCategories />} />
+        <Route path="/admin/team" element={<AdminTeam />} />
+        <Route path="/admin/user-analytics" element={<AdminUserAnalytics />} />
+        <Route path="/admin/order-analytics" element={<AdminOrderAnalytics />} />
+        <Route path="/admin/course-analytics" element={<AdminCourseAnalytics />} />
 
         {/* Student Routes */}
         <Route path="/student/dashboard" element={<StudentDashboard />} />

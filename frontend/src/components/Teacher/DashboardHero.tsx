@@ -9,7 +9,6 @@ type Props = {
 const DashboardHero = ({ isDashboard }: Props) => {
   return (
     <div>
-      <DashboardHeader />
       {
         isDashboard &&
         <DashboardWidgets />

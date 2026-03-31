@@ -7,9 +7,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 import sendMail from "../utils/sendMail.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
-import { accessTokenOptions, 
-         refreshTokenOptions, 
-         sendToken } from "../utils/jwt.js";
+import {
+    accessTokenOptions,
+    refreshTokenOptions,
+    sendToken
+} from "../utils/jwt.js";
 import { redis } from "../config/redis.js";
 import cloudinary from "cloudinary";
 import { getAllUsersService, updateUserRoleService } from "../services/userService.js";
@@ -111,38 +113,38 @@ export const activateUser = catchAsyncErrors(async (req, res, next) => {
 
 // LOGIN USER
 export const loginUser = catchAsyncErrors(async (req, res, next) => {
-  try{
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if(!email || !password){
-      return next(new ErrorHandler(400, "Please provide email and password"));
-    }
-    
-    const user = await userModel.findOne({ email }).select("+password");
-    if(!user){
-      return next(new ErrorHandler(400, "Invalid email or password"));
-    }
-    
-    const isPasswordMatch = await user.comparePassword(password);
-    if(!isPasswordMatch){
-      return next(new ErrorHandler(400, "Invalid email or password"));
-    }
+        if (!email || !password) {
+            return next(new ErrorHandler(400, "Please provide email and password"));
+        }
 
-    sendToken(user, 200, res);
-    
-  }catch(err){
-    return next(new ErrorHandler(400, err.message));
-  }
+        const user = await userModel.findOne({ email }).select("+password");
+        if (!user) {
+            return next(new ErrorHandler(400, "Invalid email or password"));
+        }
+
+        const isPasswordMatch = await user.comparePassword(password);
+        if (!isPasswordMatch) {
+            return next(new ErrorHandler(400, "Invalid email or password"));
+        }
+
+        sendToken(user, 200, res);
+
+    } catch (err) {
+        return next(new ErrorHandler(400, err.message));
+    }
 });
 
 //LOGOUT USER
 export const logoutUser = catchAsyncErrors(async (req, res, next) => {
-    try{
-        res.cookie("accessToken", "", {maxAge: 1});
-        res.cookie("refreshToken", "", {maxAge: 1});
+    try {
+        res.cookie("accessToken", "", { maxAge: 1 });
+        res.cookie("refreshToken", "", { maxAge: 1 });
 
         const userId = req.user?._id || '';
-         if (userId) {
+        if (userId) {
             await redis.del(userId.toString()); // IMPORTANT: await + string
         }
         res.status(200).json({
@@ -150,7 +152,7 @@ export const logoutUser = catchAsyncErrors(async (req, res, next) => {
             message: "Logged out successfully",
         });
 
-    }catch(err){
+    } catch (err) {
         return next(new ErrorHandler(400, err.message));
     }
 });
@@ -178,7 +180,7 @@ export const updateAccessToken = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(400, "Session expired, please login again"));
         }
 
-        const user = JSON.parse(session);  
+        const user = JSON.parse(session);
 
         const accessToken = jwt.sign(
             { id: user._id },
@@ -193,13 +195,14 @@ export const updateAccessToken = catchAsyncErrors(async (req, res, next) => {
         );
 
         req.user = user;
+        req.accessToken = accessToken;
 
         res.cookie("accessToken", accessToken, accessTokenOptions);
         res.cookie("refreshToken", newRefreshToken, refreshTokenOptions);
 
         await redis.set(user._id.toString(), JSON.stringify(user), "EX", 604800); // Update in 7 days 
         next();
- 
+
     } catch (err) {
         return next(new ErrorHandler(400, err.message));
     }
@@ -227,6 +230,7 @@ export const getUserInfo = catchAsyncErrors(async (req, res, next) => {
         res.status(200).json({
             success: true,
             user,
+            accessToken: req.accessToken,
         });
     } catch (err) {
         return next(new ErrorHandler(400, err.message));
@@ -234,8 +238,8 @@ export const getUserInfo = catchAsyncErrors(async (req, res, next) => {
 });
 
 //social auth
-export const socialAuth = catchAsyncErrors(async(req, res, next)=>{
-    try{
+export const socialAuth = catchAsyncErrors(async (req, res, next) => {
+    try {
         const { email, name, avatar } = req.body || {};
 
         if (!email || !name) {
@@ -257,25 +261,25 @@ export const socialAuth = catchAsyncErrors(async(req, res, next)=>{
                 isVerified: true,
                 role: "student",
             });
-        } else if (user.role !== "student" && user.role !== "teacher") {
+        } else if (user.role !== "student" && user.role !== "teacher" && user.role !== "admin") {
             // normalize legacy/invalid roles like "user"
             user.role = "student";
             await user.save();
         }
 
         sendToken(user, 200, res);
-    }catch (err){
+    } catch (err) {
         return next(new ErrorHandler(400, err.message));
     }
 
 })
 
 //update user info
-export const updateUserInfo = catchAsyncErrors(async(req, res, next)=>{
-    try{
-        const {name, email} = req.body || {};
+export const updateUserInfo = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const { name, email } = req.body || {};
         const userId = req.user?._id;
-        
+
         if (!userId) {
             return next(new ErrorHandler(400, "User not found"));
         }
@@ -286,28 +290,28 @@ export const updateUserInfo = catchAsyncErrors(async(req, res, next)=>{
             return next(new ErrorHandler(404, "User not found"));
         }
 
-        if(email){
-            const isEmailExist = await userModel.findOne({email, _id: {$ne: userId}});
-            if(isEmailExist){
+        if (email) {
+            const isEmailExist = await userModel.findOne({ email, _id: { $ne: userId } });
+            if (isEmailExist) {
                 return next(new ErrorHandler(400, "Email already exist"))
             }
-            user.email=email;
+            user.email = email;
         }
 
-        if(name){
-            user.name=name;
+        if (name) {
+            user.name = name;
         }
 
         await user.save();
         await redis.set(userId.toString(), JSON.stringify(user));
 
         res.status(200).json({
-            success:true,
+            success: true,
             user,
         })
 
 
-    }catch (err){
+    } catch (err) {
         return next(new ErrorHandler(400, err.message));
     }
 
@@ -315,110 +319,110 @@ export const updateUserInfo = catchAsyncErrors(async(req, res, next)=>{
 
 //Update userpassword
 export const updatePassword = async (req, res, next) => {
-  try {
-    const { oldPassword, newPassword } = req.body || {};
-    const userId = req.user._id;
+    try {
+        const { oldPassword, newPassword } = req.body || {};
+        const userId = req.user._id;
 
-    // Validate inputs
-    if (!oldPassword || !newPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide old password and new password"
-      });
+        // Validate inputs
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide old password and new password"
+            });
+        }
+
+        // Get user with password field
+        const user = await userModel.findById(userId).select("+password");
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // Compare old password
+        const isPasswordMatch = await user?.comparePassword(oldPassword);
+
+        if (!isPasswordMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Old password is incorrect"
+            });
+        }
+
+        // Update password
+        user.password = newPassword;
+        await user.save();
+
+        await redis.set(req.user?._id, JSON.stringify(user));
+
+        // Clear Redis cache
+        await redis.del(userId.toString());
+
+        res.status(201).json({
+            success: true,
+            message: "Password updated successfully",
+            user,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(err.message, 400));
     }
-
-    // Get user with password field
-    const user = await userModel.findById(userId).select("+password");
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    // Compare old password
-    const isPasswordMatch = await user?.comparePassword(oldPassword);
-
-    if (!isPasswordMatch) {
-      return res.status(400).json({
-        success: false,
-        message: "Old password is incorrect"
-      });
-    }
-
-    // Update password
-    user.password = newPassword;
-    await user.save();
-
-    await redis.set(req.user?._id,JSON.stringify(user));
-
-    // Clear Redis cache
-    await redis.del(userId.toString());
-
-    res.status(201).json({
-      success: true,
-      message: "Password updated successfully",
-      user,
-    });
-  } catch (err) {
-    return next(new ErrorHandler(err.message, 400));
-  }
 };
 
 //update profile picture
 export const updateProfilePicture = catchAsyncErrors(async (req, res, next) => {
-  const userId = req.user?._id;
-  const { avatar } = req.body;
+    const userId = req.user?._id;
+    const { avatar } = req.body;
 
-  if (!avatar) {
-    return next(new ErrorHandler("No avatar provided", 400));
-  }
-
-  const user = await userModel.findById(userId);
-
-  if (!user) {
-    return next(new ErrorHandler("User not found", 404));
-  }
-
-  try {
-    // Delete old image if exists
-    if (user.avatar?.public_id) {
-      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+    if (!avatar) {
+        return next(new ErrorHandler("No avatar provided", 400));
     }
 
-    // Upload new image
-    const myCloud = await cloudinary.v2.uploader.upload(avatar, {
-      folder: "avatars",
-      width: 150,
-      crop: "scale", // ensures the image resizes properly
-    });
+    const user = await userModel.findById(userId);
 
-    // Update user avatar
-    user.avatar = {
-      public_id: myCloud.public_id,
-      url: myCloud.secure_url,
-    };
+    if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+    }
 
-    await user.save();
-    await redis.set(userId.toString(), JSON.stringify(user));
+    try {
+        // Delete old image if exists
+        if (user.avatar?.public_id) {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
 
-    res.status(200).json({
-      success: true,
-      user,
-    });
-  } catch (err) {
-    console.error("Cloudinary error:", err);
-    return next(new ErrorHandler("Failed to update profile picture", 500));
-  }
+        // Upload new image
+        const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: "avatars",
+            width: 150,
+            crop: "scale", // ensures the image resizes properly
+        });
+
+        // Update user avatar
+        user.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+        };
+
+        await user.save();
+        await redis.set(userId.toString(), JSON.stringify(user));
+
+        res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (err) {
+        console.error("Cloudinary error:", err);
+        return next(new ErrorHandler("Failed to update profile picture", 500));
+    }
 });
 
 
 //get all users (teacher only)
 export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
     try {
-        getAllUsersService(res); 
-       
+        getAllUsersService(res);
+
     } catch (err) {
         return next(new ErrorHandler(400, err.message));
     }
@@ -450,7 +454,7 @@ export const deleteUser = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(404, "User not found"));
         }
 
-        await user.deleteOne({id});
+        await user.deleteOne({ id });
 
         await redis.del(id.toString());
 

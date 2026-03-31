@@ -1,37 +1,13 @@
-
-import Heading from '@/utils/Heading'
-import TeacherProtected from '@/hooks/teacherProtected'
 import React from 'react'
-import DashboardHero from '@/components/Teacher/DashboardHero'
-import TeacherSidebar from '@/components/Teacher/Sidebar/TeacherSidebar'
+import TeacherLayout from '@/layouts/TeacherLayout'
 import AllUsers from '@/components/Teacher/Users/AllUsers'
- 
- type Props = {}
- 
- const page = (props: Props) => {
-   return (
-    <div>
-      <TeacherProtected>
-            <Heading
-                title="SmartLearn - Teacher"
-                description="Welcome to the SmartLearning - your gateway to online education. Explore courses, manage your learning, and connect with educators and peers."
-                keywords="SmartLearn, Online Education, Courses, Students, Teachers"
-            />
 
-            <div className='flex h-screen'>
-                <div className="1500px:w-[16%] w-1/5">
-                    <TeacherSidebar />
-                </div>
+const page = () => {
+  return (
+    <TeacherLayout title="Teacher All Users" description="Manage your team and students" activeItem={2}>
+        <AllUsers />
+    </TeacherLayout>
+  )
+}
 
-                <div className="w-[85%]">
-                    <DashboardHero/>
-                    <AllUsers/>
-                </div>
-
-            </div>
-        </TeacherProtected>
-    </div>
-   )
- }
-
- export default page
+export default page

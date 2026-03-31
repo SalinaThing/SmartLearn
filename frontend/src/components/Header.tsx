@@ -14,7 +14,7 @@ import Image from "@/utils/Image";
 const avatar = "/assets/heroicon3.jpg";
 import { useUser } from "@/hooks/useUser";
 import { useSession } from "@/auth/session";
-import { useLogoutUserQuery, useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { useLogoutUserMutation, useSocialAuthMutation } from "@/redux/features/auth/authApi";
 
 type Props = {
   open: boolean;
@@ -37,18 +37,14 @@ const Header: FC<Props> = ({
   const [openSidebar, setOpenSidebar] = useState(false);
   const socialAuthAttempted = React.useRef(false);
   const { user, isLoading, isFetching, refetch } = useUser();
-  const { data: sessionData } = useSession(); 
-  const [logoutUser, setLogoutUser] = useState(false);
-
+  const { data: sessionData } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
-  const { } = useLogoutUserQuery(undefined, {
-    skip: !logoutUser ? true : false,
-  })
+  const [logoutUser] = useLogoutUserMutation();
 
   useEffect(() => {
-    if(!isLoading){
+    if (!isLoading) {
       if (!user) {
-        if(sessionData && !socialAuthAttempted.current){
+        if (sessionData && !socialAuthAttempted.current) {
           socialAuthAttempted.current = true;
           socialAuth({
             email: sessionData.user?.email,
@@ -62,17 +58,17 @@ const Header: FC<Props> = ({
               // Errors are handled by existing guards/toasts
             }
           }).catch((err: any) => {
-             console.error("Social auth failed:", err);
+            console.error("Social auth failed:", err);
           });
         }
-      } 
-      if (sessionData === null){
-        if(isSuccess){
+      }
+      if (sessionData === null) {
+        if (isSuccess) {
           toast.success("Login Successfully");
         }
       }
       if (sessionData === null && !isLoading && !isFetching && !user) {
-        setLogoutUser(true);
+        logoutUser({});
       }
     }
   }, [sessionData, user, socialAuth, isLoading, isFetching, isSuccess, refetch]);
@@ -82,13 +78,13 @@ const Header: FC<Props> = ({
       toast.success("Login successfully!!");
     }
     if (error) {
-        if('data' in error){
-            const errorData = error as any;
-            toast.error(errorData.data?.message || "An error occurred during social auth");
-        } else {
-            const fetchError = error as any;
-            toast.error(fetchError?.error || "Failed to connect to server");
-        }
+      if ('data' in error) {
+        const errorData = error as any;
+        toast.error(errorData.data?.message || "An error occurred during social auth");
+      } else {
+        const fetchError = error as any;
+        toast.error(fetchError?.error || "Failed to connect to server");
+      }
     }
   }, [isSuccess, error]);
 
@@ -166,8 +162,8 @@ const Header: FC<Props> = ({
               {
                 isAuthenticated ? (
                   <div className="flex items-center gap-2 800px:gap-4">
-                    <Link 
-                      to={user.role === 'teacher' ? "/teacher" : "/student/dashboard"}
+                    <Link
+                      to={user.role === 'admin' ? "/admin" : user.role === 'teacher' ? "/teacher" : "/student/dashboard"}
                       className="hidden 800px:block text-[15px] font-Poppins font-[500] text-black dark:text-white hover:text-[#39c1f3] transition-colors"
                     >
                       Dashboard
@@ -214,117 +210,117 @@ const Header: FC<Props> = ({
         </div>
 
         {/* mobile sidebar */}
-          {openSidebar && (
-            <div
-              className="fixed w-full h-screen top-0 left-0 z-[99999] dark:bg-[unset] bg-[#00000024]"
-              onClick={handleCloseSidebar}
-              id="screen"
-            >
-              <div className="w-[70%] fixed z-[99999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
-                <NavItems activeItem={activeItem} isMobile={true} />
+        {openSidebar && (
+          <div
+            className="fixed w-full h-screen top-0 left-0 z-[99999] dark:bg-[unset] bg-[#00000024]"
+            onClick={handleCloseSidebar}
+            id="screen"
+          >
+            <div className="w-[70%] fixed z-[99999999] h-screen bg-white dark:bg-slate-900 dark:bg-opacity-90 top-0 right-0">
+              <NavItems activeItem={activeItem} isMobile={true} />
 
-                {
-                  isAuthenticated ? (
-                    <Link to={"/profile"} className="ml-5 my-2 inline-block">
-                      <Image
-                        src={profileImage}
-                        alt="Profile"
-                        width={40}
-                        height={40}
-                        className="w-[40px] h-[40px] rounded-full cursor-pointer border-2"
-                        style={{
-                          borderColor: activeItem === 5 ? "#ffc107" : "transparent",
-                        }}
-                      />
-                    </Link>
-                  ) : (
-                    <div className="flex flex-col gap-4 mt-6 px-5">
-                      <button
-                        className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
-                        onClick={() => {
-                          setOpen(true);
-                          setRoute("Login");
-                        }}
-                      >
-                        Login
-                      </button>
-                      <button
-                        className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-white bg-[#39c1f3] hover:bg-[#2a9fd8] rounded-lg transition duration-300 shadow-sm"
-                        onClick={() => {
-                          setOpen(true);
-                          setRoute("SignUp");
-                        }}
-                      >
-                        Sign Up
-                      </button>
-                    </div>
-                  )
-                }
+              {
+                isAuthenticated ? (
+                  <Link to={"/profile"} className="ml-5 my-2 inline-block">
+                    <Image
+                      src={profileImage}
+                      alt="Profile"
+                      width={40}
+                      height={40}
+                      className="w-[40px] h-[40px] rounded-full cursor-pointer border-2"
+                      style={{
+                        borderColor: activeItem === 5 ? "#ffc107" : "transparent",
+                      }}
+                    />
+                  </Link>
+                ) : (
+                  <div className="flex flex-col gap-4 mt-6 px-5">
+                    <button
+                      className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
+                      onClick={() => {
+                        setOpen(true);
+                        setRoute("Login");
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button
+                      className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-white bg-[#39c1f3] hover:bg-[#2a9fd8] rounded-lg transition duration-300 shadow-sm"
+                      onClick={() => {
+                        setOpen(true);
+                        setRoute("SignUp");
+                      }}
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                )
+              }
 
-                <br />
-                <br />
+              <br />
+              <br />
 
-                <p className="text-[16px] px-2 pl-5 text-black dark:text-white">
-                  Copyright © 2023 ELearning
-                </p>
-              </div>
+              <p className="text-[16px] px-2 pl-5 text-black dark:text-white">
+                Copyright © 2026 SmartLearn
+              </p>
             </div>
-          )}
-        </div>
-
-        {/* Login Modal */}
-        {route === "Login" && (
-          <>
-            {
-              open && (
-                <CustomModal
-                  open={open}
-                  setOpen={setOpen}
-                  activeItem={activeItem}
-                  component={Login}
-                  setRoute={setRoute}
-                  refetch={refetch}
-                />
-              )
-            }
-          </>
+          </div>
         )}
+      </div>
 
-        {/* SignUp Modal */}
-        {route === "SignUp" && (
-          <>
-            {
-              open && (
-                <CustomModal
-                  open={open}
-                  setOpen={setOpen}
-                  activeItem={activeItem}
-                  component={SignUp}
-                  setRoute={setRoute}
-                  refetch={refetch}
-                />
-              )
-            }
-          </>
-        )}
+      {/* Login Modal */}
+      {route === "Login" && (
+        <>
+          {
+            open && (
+              <CustomModal
+                open={open}
+                setOpen={setOpen}
+                activeItem={activeItem}
+                component={Login}
+                setRoute={setRoute}
+                refetch={refetch}
+              />
+            )
+          }
+        </>
+      )}
 
-        {/* Verification Modal */}
-        {route === "Verification" && (
-          <>
-            {
-              open && (
-                <CustomModal
-                  open={open}
-                  setOpen={setOpen}
-                  activeItem={activeItem}
-                  component={Verification}
-                  setRoute={setRoute}
-                  refetch={refetch}
-                />
-              )
-            }
-          </>
-        )}
+      {/* SignUp Modal */}
+      {route === "SignUp" && (
+        <>
+          {
+            open && (
+              <CustomModal
+                open={open}
+                setOpen={setOpen}
+                activeItem={activeItem}
+                component={SignUp}
+                setRoute={setRoute}
+                refetch={refetch}
+              />
+            )
+          }
+        </>
+      )}
+
+      {/* Verification Modal */}
+      {route === "Verification" && (
+        <>
+          {
+            open && (
+              <CustomModal
+                open={open}
+                setOpen={setOpen}
+                activeItem={activeItem}
+                component={Verification}
+                setRoute={setRoute}
+                refetch={refetch}
+              />
+            )
+          }
+        </>
+      )}
 
     </div>
   );

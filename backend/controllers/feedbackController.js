@@ -7,7 +7,7 @@ import NotificationModel from "../models/notificationModel.js";
 // SUBMIT FEEDBACK
 export const submitFeedback = catchAsyncErrors(async (req, res, next) => {
     try {
-        const { courseId, rating, comment } = req.body;
+        const { courseId, rating, comment, contentId, contentTitle } = req.body;
 
         if (req.user.role !== 'student') {
             return next(new ErrorHandler(403, "Only students can submit feedback"));
@@ -20,6 +20,8 @@ export const submitFeedback = catchAsyncErrors(async (req, res, next) => {
         const feedback = await FeedbackModel.create({
             user: req.user?._id,
             courseId,
+            contentId,
+            contentTitle,
             rating,
             comment,
         });
@@ -33,13 +35,13 @@ export const submitFeedback = catchAsyncErrors(async (req, res, next) => {
         try {
             await NotificationModel.create({
                 title: "New Feedback Received",
-                message: `A student has given feedback for a course.`,
+                message: `A student has given feedback for ${contentTitle || "a course"}.`,
                 role: 'teacher'
             });
             // Emit socket event
             io.to("teacher").emit("newNotification", {
                 title: "New Feedback Received",
-                message: `A student has given feedback for a course.`,
+                message: `A student has given feedback for ${contentTitle || "a course"}.`,
             });
         } catch (error) {
             console.log("Feedback notification error:", error);
@@ -52,7 +54,17 @@ export const submitFeedback = catchAsyncErrors(async (req, res, next) => {
 // GET ALL FEEDBACK (Teacher/Admin only)
 export const getAllFeedback = catchAsyncErrors(async (req, res, next) => {
     try {
-        const feedback = await FeedbackModel.find().populate("user", "name email").populate("courseId", "name");
+        const rawFeedback = await FeedbackModel.find()
+            .populate("user", "name role") // Just get name and role
+            .populate("courseId", "name");
+
+        const feedback = rawFeedback.map(f => {
+            const doc = f.toObject();
+            if (req.user.role === 'teacher') {
+                doc.user.name = "Student"; // Hide student name from teacher
+            }
+            return doc;
+        });
 
         res.status(200).json({
             success: true,

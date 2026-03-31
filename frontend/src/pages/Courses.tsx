@@ -1,7 +1,8 @@
-import { useGetAllCoursesByUserQuery } from '@/redux/features/courses/coursesApi'
+import { useGetAllCoursesByUserQuery, useGetSuggestedCoursesQuery, useLogSearchQueryMutation } from '@/redux/features/courses/coursesApi'
+import { useSelector } from 'react-redux'
 import { useGetHeroDataQuery } from '@/redux/features/layout/layoutApi'
 import { useSearchParams } from 'react-router-dom'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Loader from '@/components/Loader/Loader'
 import Header from '@/components/Header'
 import Heading from '@/utils/Heading'
@@ -33,6 +34,24 @@ const page = (props: Props) => {
     });
     
     const courses = data?.courses || [];
+
+    const { user } = useSelector((state: any) => state.auth);
+
+    const { data: suggestedData } = useGetSuggestedCoursesQuery({}, {
+        skip: !user || search.length > 0 || category !== "All" // Fetch suggestions only if logged in and casually browsing
+    });
+    const suggestedCourses = suggestedData?.courses || [];
+
+    const [logSearchQuery] = useLogSearchQueryMutation();
+
+    useEffect(() => {
+        if(user && search.trim().length > 2) {
+            const timer = setTimeout(() => {
+                logSearchQuery({ keyword: search.trim() });
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [search, user]);
 
     const handleClearFilters = () => {
         setSearch("");
@@ -140,13 +159,43 @@ const page = (props: Props) => {
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-0">
-                                {courses &&
-                                    courses.map((item: any, index: number) => {
-                                        return <CourseCard item={item} key={index} />
-                                    })
-                                }
-                            </div>
+                            <>
+                                {/* Suggested Courses Section */}
+                                {!search && category === "All" && suggestedCourses.length > 0 && (
+                                    <div className="mb-12 border-b border-gray-200 dark:border-gray-800 pb-10">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
+                                                <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                </svg>
+                                            </div>
+                                            <h2 className="text-2xl font-bold dark:text-white text-gray-900 font-Poppins">
+                                                Recommended For You
+                                            </h2>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                            {suggestedCourses.map((item: any, index: number) => (
+                                                <CourseCard item={item} key={index} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* All Courses Header */}
+                                {(search || category !== "All" || suggestedCourses.length > 0) && (
+                                     <h2 className="text-2xl font-bold dark:text-white text-gray-900 font-Poppins mb-6">
+                                         {search ? "Search Results" : "All Courses"}
+                                     </h2>
+                                )}
+
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-0">
+                                    {courses &&
+                                        courses.map((item: any, index: number) => {
+                                            return <CourseCard item={item} key={index} />
+                                        })
+                                    }
+                                </div>
+                            </>
                         )}
                     </div>
                 </>

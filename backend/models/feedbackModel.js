@@ -10,6 +10,14 @@ const feedbackSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Course",
     },
+    contentId: {
+        type: String,
+        default: "",
+    },
+    contentTitle: {
+        type: String,
+        default: "",
+    },
     rating: {
         type: Number,
         required: true,

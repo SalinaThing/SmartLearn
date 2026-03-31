@@ -33,7 +33,7 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
         (user && user?.courses?.find((item: any) => {
             const courseId = item._id || item.courseId || item;
             return courseId === data._id;
-        })) || user?.role === "teacher";
+        })) || user?.role === "teacher" || user?.role === "admin";
 
     const handleOrder = (e: any) => {
         if(user){

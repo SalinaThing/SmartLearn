@@ -25,9 +25,9 @@ export const getAllUsersService = async (res) => {
 
 //Update user role
 export const updateUserRoleService = async (id, role, res) => {
-    const allowedRoles = new Set(["student", "teacher"]);
+    const allowedRoles = new Set(["student", "teacher", "admin"]);
     if (!allowedRoles.has(role)) {
-        throw new Error("Invalid role. Allowed roles are: student, teacher");
+        throw new Error("Invalid role. Allowed roles are: student, teacher, admin");
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {

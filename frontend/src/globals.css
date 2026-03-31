@@ -39,42 +39,88 @@ body {
 }
 
 .hero_animation {
-  background-image: linear-gradient(147.92deg, 
-                  hsla(239, 76%, 53%, 0.456) 10.41%,
-                  hsla(0, 0%, 100%, 0) 89.25%);
+  background-image: linear-gradient(147.92deg,
+      hsla(239, 76%, 53%, 0.456) 10.41%,
+      hsla(0, 0%, 100%, 0) 89.25%);
   animation: changeBackgroundColor 8s infinite alternate;
 }
 
 @keyframes changeBackgroundColor {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   16.67% {
     opacity: 0.9;
   }
+
   33.33% {
     opacity: 0.8;
   }
+
   50% {
     opacity: 0.6;
   }
+
   66.67% {
     opacity: 0.5;
   }
+
   83.33% {
     opacity: 0.4;
   }
 }
 
 @keyframes shake {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-2px); }
-  40% { transform: translateX(2px); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-2px);
+  }
+
+  40% {
+    transform: translateX(2px);
+  }
+
+  60% {
+    transform: translateX(-2px);
+  }
+
+  80% {
+    transform: translateX(2px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
+
 .shake {
   animation: shake 0.5s ease-in-out;
 }
 
+/* Custom Scrollbar for sidebars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3ccbae;
+  border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3ccbae;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #2ea88c;
+}

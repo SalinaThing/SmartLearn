@@ -27,6 +27,7 @@ userRouter.post("/refresh", updateAccessToken, (req, res) => {
         success: true,
         message: "Access token refreshed",
         user: req.user,
+        accessToken: req.accessToken,
     });
 });
 
@@ -40,11 +41,11 @@ userRouter.put("/update-userinfo", updateAccessToken, isAuthenticated, updateUse
 userRouter.put("/update-userpass", updateAccessToken, isAuthenticated, updatePassword);
 userRouter.put("/update-useravatar", updateAccessToken, isAuthenticated, updateProfilePicture);
 
-userRouter.get("/get-users", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), getAllUsers);
+userRouter.get("/get-users", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), getAllUsers);
 
-userRouter.put("/update-user-role", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), updateUserRole);
-userRouter.delete("/delete-user/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteUser);
+userRouter.put("/update-user-role", updateAccessToken, isAuthenticated, authorizeRoles("admin"), updateUserRole);
+userRouter.delete("/delete-user/:id", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), deleteUser);
 
-userRouter.post("/send-email", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), sendDirectEmail);
+userRouter.post("/send-email", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), sendDirectEmail);
 
 export default userRouter;

@@ -13,6 +13,7 @@ import { useLoginUserMutation } from '@/redux/features/auth/authApi';
 import toast from 'react-hot-toast';
 import { signIn } from '@/auth/oauth';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '@/hooks/useUser';
 
 type Props = {
     setRoute: (route: string) => void;
@@ -29,6 +30,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
     const [show, setShow] = useState(false);
     const [login, { isSuccess, error }] = useLoginUserMutation();
     const navigate = useNavigate();
+    const { user } = useUser();
 
     const formik = useFormik({
         initialValues: {
@@ -53,7 +55,13 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
                 } catch {
                     // refetch errors are handled by the guards/toasts
                 }
-                navigate("/profile");
+                const dashboardMap: Record<string, string> = {
+                    admin: "/admin",
+                    teacher: "/teacher",
+                    student: "/student/dashboard",
+                };
+                const userRole = (user as any)?.role || "student";
+                navigate(dashboardMap[userRole] || "/profile");
             })();
         }
 

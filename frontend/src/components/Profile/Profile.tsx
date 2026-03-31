@@ -1,7 +1,7 @@
 "use client"
 import React, { FC, useEffect, useState } from 'react'
 import SideBarProfile from './SideBarProfile';
-import { useLogoutUserQuery } from '@/redux/features/auth/authApi';
+import { useLogoutUserMutation } from '@/redux/features/auth/authApi';
 import { signOut } from '@/auth/oauth';
 import ProfileInfo from "./ProfileInfo"
 import ChangePassword from "./ChangePassword"
@@ -17,16 +17,12 @@ type Props = {
 const Profile: FC<Props> = ({ user }) => {
   const [scroll, setScroll] = useState(false);
   const [avatar, setAvatar] = useState(null);
-  const [logoutUser, setLogoutUser] = useState(false);
-
-  const { isSuccess, error } = useLogoutUserQuery(undefined, {
-    skip: !logoutUser ? true : false,
-  });
+  const [logoutUser, { isSuccess, error }] = useLogoutUserMutation();
   const [active, setActive] = useState(1);
   const { data: allCoursesData, isLoading: coursesLoading } = useGetAllCoursesByUserQuery({});
 
   const logOutHandler = async () => {
-    setLogoutUser(true);
+    await logoutUser({}).unwrap();
   }
 
   useEffect(() => {

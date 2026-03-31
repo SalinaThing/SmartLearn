@@ -1,33 +1,12 @@
-"use client"
 import React from 'react'
-import Heading from '@/utils/Heading'
-import TeacherSidebar from '@/components/Teacher/Sidebar/TeacherSidebar'
-import TeacherProtected from '@/hooks/teacherProtected'
+import TeacherLayout from '@/layouts/TeacherLayout'
 import DashboardHero from '@/components/Teacher/DashboardHero'
 
-type Props = {}
-
-const page = (props: Props) => {
+const page = () => {
     return (
-        <div>
-            <TeacherProtected>
-                <Heading
-                    title="SmartLearn - Teacher"
-                    description="Welcome to the SmartLearning - your gateway to online education. Explore courses, manage your learning, and connect with educators and peers."
-                    keywords="SmartLearn, Online Education, Courses, Students, Teachers"
-                />
-
-                <div className='flex min-h-screen'>
-                    <div className="1500px:w-[16%] w-1/5">
-                        <TeacherSidebar />
-                    </div>
-
-                    <div className="w-[85%]">
-                        <DashboardHero isDashboard={true} />
-                    </div>
-                </div>
-            </TeacherProtected>
-        </div>
+        <TeacherLayout title="Teacher Dashboard" description="SmartLearn Teacher Overview" activeItem={1}>
+            <DashboardHero isDashboard={true} />
+        </TeacherLayout>
     )
 }
 

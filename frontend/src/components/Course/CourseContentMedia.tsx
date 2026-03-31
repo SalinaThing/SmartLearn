@@ -304,23 +304,6 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                             </div>
                         )}
 
-                        {/* Links */}
-                        {data[activeVideo]?.links?.map((item: any, index: number) => (
-                            <div className="mb-5" key={index}>
-                                <h2 className="800px:text-[20px] 800px:inline-block dark:text-white text-black">
-                                    {item.title && item.title + " :"}
-                                </h2>
-
-                                <a
-                                    className="inline-block text-[#4395c4] 800px:text-[20px] 800px:pl-2 dark:text-white text-black break-all"
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {item.url}
-                                </a>
-                            </div>
-                        ))}
 
                         {!data[activeVideo]?.pdfUrl && (!data[activeVideo]?.links || data[activeVideo].links.length === 0) && (
                             <p className="text-center text-gray-500 py-8">No resources for this lesson.</p>
@@ -543,10 +526,11 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                         user={user}
                     />
                 )}
-
                 {activeBar === 5 && (
                     <FeedbackForm
                         courseId={id}
+                        contentId={activeContent?._id}
+                        contentTitle={activeContent?.title}
                     />
                 )}
 

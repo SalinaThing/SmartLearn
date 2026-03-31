@@ -6,7 +6,15 @@ import { styles } from '@/styles/style';
 import toast from 'react-hot-toast';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 
-const FeedbackForm = ({ courseId: initialCourseId }: { courseId?: string }) => {
+const FeedbackForm = ({ 
+    courseId: initialCourseId,
+    contentId,
+    contentTitle
+}: { 
+    courseId?: string,
+    contentId?: string,
+    contentTitle?: string
+}) => {
     const { user } = useUser();
     const { data: coursesData } = useGetAllCoursesByUserQuery({});
     const [selectedCourseId, setSelectedCourseId] = useState(initialCourseId || "");
@@ -30,7 +38,13 @@ const FeedbackForm = ({ courseId: initialCourseId }: { courseId?: string }) => {
             toast.error("Please provide a comment");
             return;
         }
-        await submitFeedback({ courseId: finalCourseId, rating, comment });
+        await submitFeedback({ 
+            courseId: finalCourseId, 
+            rating, 
+            comment,
+            contentId,
+            contentTitle
+        });
     };
 
     React.useEffect(() => {

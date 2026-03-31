@@ -63,12 +63,6 @@ const EditCourse:FC <Props> = ({id}) => {
             videoSection:"Untitled Section",
             pdfUrl: "",
             pdfName: "",
-            links: [
-                {
-                    title:"",
-                    url:"",
-                },
-            ],
             suggestion:"",
         },
     ]);
@@ -95,29 +89,35 @@ const EditCourse:FC <Props> = ({id}) => {
     const [courseData, setCourseData] = useState({});
 
     const prepareCoursePayload = () => {
-        const formattedBenefits = benefits.map((benefit) => ({ title: benefit.title }));
-        const formattedPrerequisites = prerequisites.map((prerequisite) => ({ title: prerequisite.title }));
+        const formattedBenefits = benefits
+            .filter(b => b.title.trim() !== "")
+            .map((benefit) => ({ title: benefit.title }));
+            
+        const formattedPrerequisites = prerequisites
+            .filter(p => p.title.trim() !== "")
+            .map((prerequisite) => ({ title: prerequisite.title }));
 
         const formattedCourseContentData = courseContentData.map((courseContent) => ({
             videoUrl: courseContent.videoUrl,
             title: courseContent.title,
             description: courseContent.description,
+            videoLength: (courseContent as any).videoLength ? Number((courseContent as any).videoLength) : 0,
             videoSection: courseContent.videoSection,
             pdfUrl: courseContent.pdfUrl || "",
             pdfName: courseContent.pdfName || "",
-            links: courseContent.links.map((link) => ({
+            links: (courseContent as any).links?.map((link: any) => ({
                 title: link.title,
                 url: link.url,
-            })),
-            suggestion: courseContent.suggestion,
+            })) || [],
+            suggestion: (courseContent as any).suggestion || "",
         }));
 
         return {
             name: courseInfo.name,
             description: courseInfo.description,
             categories: courseInfo.categories,
-            price: Number(courseInfo.price),
-            estimatedPrice: Number(courseInfo.estimatedPrice),
+            price: courseInfo.price === "" ? 0 : Number(courseInfo.price),
+            estimatedPrice: courseInfo.estimatedPrice === "" ? 0 : Number(courseInfo.estimatedPrice),
             tags: courseInfo.tags,
             level: courseInfo.level,
             demoUrl: courseInfo.demoUrl,

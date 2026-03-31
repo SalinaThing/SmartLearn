@@ -27,9 +27,7 @@ const CourseContent : FC <Props> = ({
   const [isCollapsed, setIsCollapsed] = useState(Array(courseContentData.length).fill(false));
   const [activeSection, setActiveSection] = useState(1);
   const [uploadPdf] = useUploadPdfMutation();
-  const [uploadVideo] = useUploadVideoMutation();
   const [uploadingPdfIndex, setUploadingPdfIndex] = useState<number | null>(null);
-  const [uploadingVideoIndex, setUploadingVideoIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setIsCollapsed((prev) => {
@@ -63,29 +61,6 @@ const CourseContent : FC <Props> = ({
         setCourseContentData(updatedData);
   }
 
-  const handleVideoUpload = async (e: any, index: number) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('video/')) {
-      toast.error('Please select a video file');
-      return;
-    }
-    const formData = new FormData();
-    formData.append('video', file);
-    setUploadingVideoIndex(index);
-    try {
-      const result = await uploadVideo(formData).unwrap();
-      const updatedData = [...courseContentData];
-      updatedData[index].videoUrl = result.url;
-      setCourseContentData(updatedData);
-      toast.success('Video uploaded!');
-    } catch (err: any) {
-      toast.error(err?.data?.message || 'Video upload failed');
-    } finally {
-      setUploadingVideoIndex(null);
-    }
-  };
-
   const handlePdfUpload = async (e: any, index: number) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -111,7 +86,7 @@ const CourseContent : FC <Props> = ({
   };
 
   const newContentHandler = (item:any) => {
-    if(item.title ==="" || item.description ==="" || item.videoUrl ==="" || item.links[0].title ==="" || item.links[0].url ===""){
+    if(item.title ==="" || item.description ==="" || item.videoUrl === ""){
       toast.error("Please fill all the fields first!!");
     }else {
       let newVideoSection = "";
@@ -129,7 +104,6 @@ const CourseContent : FC <Props> = ({
         title:"",
         description: "",
         videoSection: newVideoSection,
-        links: [{title: "", url:""}]
       };
 
       setCourseContentData([...courseContentData, newContent])
@@ -140,9 +114,7 @@ const CourseContent : FC <Props> = ({
     if(
       courseContentData[courseContentData.length - 1].title === "" ||
       courseContentData[courseContentData.length - 1].description === "" ||
-      courseContentData[courseContentData.length - 1].videoUrl === "" ||
-      courseContentData[courseContentData.length - 1].links[0].title === "" ||
-      courseContentData[courseContentData.length - 1].links[0].url === ""
+      courseContentData[courseContentData.length - 1].videoUrl === "" 
     )
     {
       toast.error("Please fill all the fields first!!");
@@ -153,7 +125,6 @@ const CourseContent : FC <Props> = ({
           title:"",
           description: "",
           videoSection: `Untitled Section ${activeSection}`,
-          links: [{title: "", url:""}]
         };
       setCourseContentData([...courseContentData, newContent]);
       }
@@ -166,9 +137,7 @@ const CourseContent : FC <Props> = ({
     if(
       courseContentData[courseContentData.length - 1].title === "" ||
       courseContentData[courseContentData.length - 1].description === "" ||
-      courseContentData[courseContentData.length - 1].videoUrl === "" ||
-      courseContentData[courseContentData.length - 1].links[0].title === "" ||
-      courseContentData[courseContentData.length - 1].links[0].url === ""
+      courseContentData[courseContentData.length - 1].videoUrl === "" 
     )
     {
       toast.error("Section can't be empty!!")
@@ -280,81 +249,20 @@ const CourseContent : FC <Props> = ({
                         />
                     </div>
 
-                     {/* Video — Upload or paste URL */}
+                     {/* Video URL Input */}
                     <div className="mb-3">
-                      <label className={styles.label}>Video</label>
-
-                      {/* Upload button section */}
-                      <div className="mt-2 mb-3">
-                        {item.videoUrl?.startsWith('http') ? (
-                          <div className="flex items-center gap-3 p-4 bg-green-50/50 dark:bg-green-900/10 border border-green-200 dark:border-green-800/50 rounded-lg shadow-sm">
-                            <span className="text-2xl drop-shadow-sm">🎬</span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-green-700 dark:text-green-400 font-semibold tracking-wide">Video successfully uploaded</p>
-                              <p className="text-xs text-green-600 dark:text-green-500/80 truncate mt-0.5">{item.videoUrl.split('/').pop()?.split('?')[0]}</p>
-                            </div>
-                            <button
-                              type="button"
-                              className="px-4 py-1.5 text-xs font-medium bg-red-500 hover:bg-red-600 active:scale-95 text-white rounded-md shadow-sm transition-all duration-200"
-                              onClick={() => {
-                                const updatedData = [...courseContentData];
-                                updatedData[index].videoUrl = '';
-                                setCourseContentData(updatedData);
-                              }}
-                            >
-                              Remove Link
-                            </button>
-                          </div>
-                        ) : (
-                          <label
-                            htmlFor={`video-upload-${index}`}
-                            className={`flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed ${
-                              uploadingVideoIndex === index
-                                ? 'border-blue-400 bg-blue-50/50 dark:bg-blue-900/20'
-                                : 'border-gray-300 dark:border-gray-600/50 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/30'
-                            } rounded-xl cursor-pointer transition-all duration-300 group`}
-                          >
-                            {uploadingVideoIndex === index ? (
-                              <div className="flex flex-col items-center gap-3">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                                <span className="text-blue-500 dark:text-blue-400 font-medium tracking-wide">Uploading your video...</span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-4xl group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">🎬</span>
-                                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Click to upload video file</span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">Supports MP4, WebM (Max 100MB)</span>
-                              </div>
-                            )}
-                          </label>
-                        )}
-                        <input
-                          id={`video-upload-${index}`}
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                          onChange={(e) => handleVideoUpload(e, index)}
-                          disabled={uploadingVideoIndex === index}
+                      <label className={styles.label}>Video URL</label>
+                      <input 
+                          type="text"
+                          placeholder="Enter video URL (YouTube, Vimeo, Cloudinary, etc.)"
+                          className={`${styles.input} mt-2`}
+                          value={item.videoUrl}
+                          onChange={(e) => {
+                            const updatedData = [...courseContentData];
+                            updatedData[index].videoUrl = e.target.value;
+                            setCourseContentData(updatedData);
+                          }}
                         />
-                      </div>
-
-                      {/* Or paste VdoCipher ID */}
-                      {!item.videoUrl?.startsWith('http') && (
-                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/50">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3 text-center">Or paste a VdoCipher video ID</p>
-                          <input
-                            type="text"
-                            placeholder="Enter 32-character video ID..."
-                            className={`${styles.input} bg-gray-50 dark:bg-gray-800/50`}
-                            value={item.videoUrl}
-                            onChange={(e) => {
-                              const updatedData = [...courseContentData];
-                              updatedData[index].videoUrl = e.target.value;
-                              setCourseContentData(updatedData);
-                            }}
-                          />
-                        </div>
-                      )}
                     </div>
 
                      {/* Video Length */}
@@ -420,7 +328,7 @@ const CourseContent : FC <Props> = ({
                               <div className="flex flex-col items-center gap-2">
                                 <span className="text-3xl group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">📄</span>
                                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Click to attach a PDF document</span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">Max size: 20MB</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">Max size: 1GB</span>
                               </div>
                             )}
                           </label>
@@ -453,61 +361,6 @@ const CourseContent : FC <Props> = ({
                         />
                         <br/>
                     </div>
-
-                   {item?.links.map((link:any, linkIndex:number) =>(
-                        <div className="mb-3 block" key={linkIndex}>
-                          <div className="w-full flex items-center justify-between">
-                            <label className={styles.label}>
-                              Link {linkIndex +1}
-                            </label>
-                            <AiOutlineDelete
-                              className={`${
-                                linkIndex === 0 ? "cursor-no-drop" : "cursor-pointer"
-                              } text-black dark:text-white text-[20px]`}
-                              onClick={() =>
-                                linkIndex === 0
-                                  ? null
-                                  : handleRemoveLink(index, linkIndex)
-                              }
-                            />
-                          </div>
-
-                          <input 
-                            type="text"
-                            placeholder="Source code...(Link title)"
-                            className={`${styles.input}`}
-                            value={link.title}
-                            onChange={(e) =>{
-                              const updatedData = [ ...courseContentData];
-                              updatedData[index].links[linkIndex].title = e.target.value;
-                              setCourseContentData(updatedData);
-                            }}
-                          />
-
-                          <input 
-                            type="url"
-                            placeholder="Source Code Url ...(Link URL)"
-                            className={`${styles.input} mt-6`}
-                            value={link.url}
-                            onChange={(e) =>{
-                              const updatedData = [ ...courseContentData];
-                              updatedData[index].links[linkIndex].url = e.target.value;
-                              setCourseContentData(updatedData);
-                            }}
-                          />
-                        </div>
-                      ))}
-                      <br/>
-
-                      {/* add link button */}
-                      <div className="inline-block mb-4">
-                        <p 
-                          className="flex items-center text-[18px] dark:text-white text-black cursor-pointer"
-                          onClick={() => handleAddLink(index)}
-                        > 
-                          <BsLink45Deg className="mr-2"/> Add Link
-                        </p>
-                      </div> 
                   </>
                 )}
                 <br/>

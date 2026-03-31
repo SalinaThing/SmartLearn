@@ -34,7 +34,7 @@ const AllCourses = (props: Props) => {
         { field: 'purchased', headerName: 'Purchased', flex: 0.5 },
         { field: 'created_at', headerName: "Created At", flex: 0.5 },
 
-        {
+        ...(!isAdmin ? [{
             field: '  ', headerName: "Edit", flex: 0.2,
             renderCell: (params: any) => {
                 return (
@@ -48,7 +48,7 @@ const AllCourses = (props: Props) => {
                     </>
                 )
             }
-        },
+        }] : []),
 
         {
             field: ' ', headerName: "Delete", flex: 0.2,
@@ -119,14 +119,18 @@ const AllCourses = (props: Props) => {
     }
 
     return (
-        <div className="mt-[120px]">
+        <div className="w-full">
             {
                 isLoading ? (
                     <Loader />
                 ) : (
-                    <Box m="20px">
+                    <Box m="0">
+                        <h1 className="text-[25px] font-Poppins font-bold mb-6">
+                            <span className="text-black dark:text-white">Live</span>
+                            <span className="text-[#3ccbae] ml-2">Courses</span>
+                        </h1>
                         <Box
-                            m="40px 0 0 0"
+                            m="15px 0 0 0"
                             height="80vh"
                             sx={{
                                 "& .MuiDataGrid-root": {
@@ -163,30 +167,30 @@ const AllCourses = (props: Props) => {
                                 },
 
                                 "& .MuiDataGrid-columnHeaders": {
-                                    backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
                                     borderBottom: "none",
-                                    color: theme === "dark" ? "#fff" : "#000",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
                                 "& .MuiDataGrid-virtualScroller": {
-                                    backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                                 },
 
                                 "& .MuiDataGrid-footerContainer": {
-                                    backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
                                     borderTop: "none",
-                                    color: theme === "dark" ? "#fff" : "#000",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
                                 "& .MuiCheckbox-root": {
                                     color:
                                         theme === "dark"
                                             ? "#b7ebde !important"
-                                            : "#000 !important",
+                                            : "#3ccbae !important",
                                 },
 
                                 "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                                    color: `#fff !important`,
+                                    color: theme === "dark" ? "#fff !important" : "#3ccbae !important",
                                 },
                             }}
                         >

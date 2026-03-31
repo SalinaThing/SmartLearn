@@ -2,7 +2,7 @@ import { apiSlice } from "../api/apiSlice";
 
 export const analyticsApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getCoursesAnaltyics: builder.query({
+        getCoursesAnalytics: builder.query({
             query: () => ({
                 url: `get-course-analytics`,
                 method: "GET",
@@ -10,7 +10,7 @@ export const analyticsApi = apiSlice.injectEndpoints({
             })
         }),
 
-        getUsersAnaltyics: builder.query({
+        getUsersAnalytics: builder.query({
             query: () => ({
                 url: `get-user-analytics`,
                 method: "GET",
@@ -18,7 +18,7 @@ export const analyticsApi = apiSlice.injectEndpoints({
             })
         }),
 
-        getOrdersAnaltyics: builder.query({
+        getOrdersAnalytics: builder.query({
             query: () => ({
                 url: `get-order-analytics`,
                 method: "GET",
@@ -30,8 +30,8 @@ export const analyticsApi = apiSlice.injectEndpoints({
 });
 
 export const { 
-    useGetCoursesAnaltyicsQuery,
-    useGetOrdersAnaltyicsQuery,
-    useGetUsersAnaltyicsQuery,
+    useGetCoursesAnalyticsQuery,
+    useGetOrdersAnalyticsQuery,
+    useGetUsersAnalyticsQuery,
     
 } = analyticsApi;

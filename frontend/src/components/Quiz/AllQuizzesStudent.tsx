@@ -6,6 +6,7 @@ import { styles } from '@/styles/style';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useGetAllCoursesByUserQuery } from '@/redux/features/courses/coursesApi';
 import QuizListStudent from '../Course/QuizListStudent';
+import CourseImage from '@/utils/Image';
 
 const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
     const { data: userData, isLoading: userLoading } = useLoadUserQuery(undefined, {});
@@ -42,8 +43,10 @@ const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
         <div className={`w-[90%] 800px:w-[85%] m-auto ${embedded ? "mt-0" : "mt-[120px]"}`}>
             {!activeCourse ? (
                 <>
-                    <h1 className={`${styles.title} text-left`}>Your Quizzes</h1>
-                    <br />
+                    <h1 className="text-[25px] font-Poppins font-bold mb-6">
+                        <span className="text-black dark:text-white">Your</span>
+                        <span className="text-[#3ccbae] ml-2">Quizzes</span>
+                    </h1>
                     {enrolledCourses.length === 0 ? (
                         <div className="text-center mt-10">
                             <p className="text-xl dark:text-white text-black">You haven't enrolled in any courses yet.</p>
@@ -84,21 +87,46 @@ const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
 const CourseQuizSummary = ({ course, onViewQuizzes }: { course: any, onViewQuizzes: () => void }) => {
     const { data, isLoading } = useGetQuizzesByCourseQuery(course._id, { refetchOnMountOrArgChange: true });
 
-    if (isLoading) return <div className="h-[200px] flex items-center justify-center p-4 border border-gray-200 dark:border-gray-800 rounded-lg animate-pulse">Loading...</div>;
+    if (isLoading) return <div className="h-[250px] flex items-center justify-center p-4 border border-gray-200 dark:border-gray-800 rounded-lg animate-pulse">Loading...</div>;
 
     const quizCount = data?.quizzes?.length || 0;
 
     return (
-        <div className="p-6 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-bold dark:text-white text-black mb-2">{course.name}</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{quizCount} Quizzes available</p>
-            <div className="flex justify-between items-center">
-                <button
-                    onClick={onViewQuizzes}
-                    className={`${styles.button} !w-[140px] !h-[35px] !text-[14px]`}
-                >
-                    View Quizzes
-                </button>
+        <div 
+            onClick={onViewQuizzes}
+            className="w-full min-h-[35vh] cursor-pointer dark:bg-slate-500 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015] dark:shadow-slate-700 rounded-lg p-3 shadow-sm dark:shadow-inner hover:shadow-lg transition-all duration-300"
+        >
+            <div className="relative">
+                <CourseImage
+                    src={course?.thumbnail?.url || "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                    width={400}
+                    height={300}
+                    style={{ objectFit: "cover" }}
+                    className="rounded w-full h-[180px] object-cover"
+                    alt={course?.name || "Course thumbnail"}
+                />
+                <div className="absolute top-2 right-2 px-3 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider shadow-lg">
+                    {quizCount} {quizCount === 1 ? "Quiz" : "Quizzes"}
+                </div>
+            </div>
+            
+            <div className="mt-3">
+                <h1 className="font-Poppins text-[16px] font-semibold text-black dark:text-[#fff] line-clamp-2 min-h-[50px]">
+                    {course?.name || "Untitled Course"}
+                </h1>
+
+                <div className="w-full flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800 mt-2">
+                    <div className="flex items-center gap-2">
+                        <div className="px-3 py-1 bg-[#3ccbae] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
+                            Ready to Take
+                        </div>
+                    </div>
+                    <div 
+                        className="flex items-center bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-lg text-blue-600 dark:text-blue-400 text-[13px] font-semibold hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
+                    >
+                        View Now &rarr;
+                    </div>
+                </div>
             </div>
         </div>
     );

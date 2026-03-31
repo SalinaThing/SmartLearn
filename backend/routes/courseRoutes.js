@@ -7,13 +7,16 @@ import {
     addReview, addReplyToReview,
     getTeacherAllCourses,
     deleteCourse,
-    generateVideoUrl,
     uploadVideo,
     uploadPdf,
     getQuestionsByUser,
     getReviewsByUser,
     editReview,
-    editQuestion
+    editQuestion,
+    updateCourseProgress,
+    logCourseView,
+    logSearchQuery,
+    getSuggestedCourses
 }
     from "../controllers/courseController.js";
 import { authorizeRoles, isAuthenticated } from "../middlewares/auth.js";
@@ -21,16 +24,10 @@ import { updateAccessToken } from "../controllers/userController.js";
 
 const courseRouter = express.Router();
 
-// Multer for video uploads (in-memory, max 100MB)
-const videoUpload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 100 * 1024 * 1024 },
-});
-
-// Multer for PDF uploads (in-memory, max 20MB)
+// Multer for PDF uploads (in-memory, max 1GB)
 const pdfUpload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 20 * 1024 * 1024 },
+    limits: { fileSize: 1024 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         if (file.mimetype === "application/pdf") {
             cb(null, true);
@@ -40,8 +37,21 @@ const pdfUpload = multer({
     },
 });
 
-courseRouter.post("/create-course", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), uploadCourse);
-courseRouter.put("/edit-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), editCourse);
+// Multer for Video uploads (in-memory, max 1GB)
+const videoUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 1024 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith("video/")) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only video files are allowed"), false);
+        }
+    },
+});
+
+courseRouter.post("/create-course", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), uploadCourse);
+courseRouter.put("/edit-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), editCourse);
 
 courseRouter.get("/get-single-course/:id", getSingleCourse);
 courseRouter.get("/get-all-course", getAllCourse);
@@ -50,11 +60,14 @@ courseRouter.get("/get-course-by-user/:id", updateAccessToken, isAuthenticated, 
 courseRouter.put("/add-question", updateAccessToken, isAuthenticated, addQuestion);
 courseRouter.put("/add-answer", updateAccessToken, isAuthenticated, addAnswer);
 courseRouter.put("/add-review/:id", updateAccessToken, isAuthenticated, addReview);
-courseRouter.put("/add-reply-to-review", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), addReplyToReview);
+courseRouter.put("/add-reply-to-review", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), addReplyToReview);
 
-courseRouter.get("/get-teacher-courses", isAuthenticated, authorizeRoles("teacher"), getTeacherAllCourses);
+courseRouter.get("/get-teacher-courses", isAuthenticated, authorizeRoles("teacher", "admin"), getTeacherAllCourses);
 
-courseRouter.post("/getVdoCipherOTP", generateVideoUrl);
+courseRouter.post("/log-course-view", updateAccessToken, isAuthenticated, logCourseView);
+courseRouter.post("/log-search-query", updateAccessToken, isAuthenticated, logSearchQuery);
+courseRouter.get("/get-suggested-courses", updateAccessToken, isAuthenticated, getSuggestedCourses);
+
 courseRouter.post("/upload-video", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), videoUpload.single("video"), uploadVideo);
 courseRouter.post("/upload-pdf", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), pdfUpload.single("pdf"), uploadPdf);
 
@@ -63,6 +76,8 @@ courseRouter.get("/get-reviews-by-user", updateAccessToken, isAuthenticated, get
 courseRouter.put("/edit-review", updateAccessToken, isAuthenticated, editReview);
 courseRouter.put("/edit-question", updateAccessToken, isAuthenticated, editQuestion);
 
-courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteCourse);
+courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), deleteCourse);
+
+courseRouter.post("/update-course-progress", updateAccessToken, isAuthenticated, updateCourseProgress);
 
 export default courseRouter;

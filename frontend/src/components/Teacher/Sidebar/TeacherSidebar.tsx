@@ -1,5 +1,3 @@
-
-
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import {
@@ -24,7 +22,7 @@ import {
 import { useUser } from "@/hooks/useUser";
 import Image from "@/utils/Image";
 import { useTheme } from "@/utils/ThemeProvider";
-import { useLogoutUserQuery } from "@/redux/features/auth/authApi";
+import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
 import { signOut } from "@/auth/oauth";
 import { FC, useEffect, useState } from "react";
 import { JSX } from "@emotion/react/jsx-runtime";
@@ -39,13 +37,16 @@ interface itemProps {
     icon: JSX.Element;
     selected: string;
     setSelected: any;
+    setOpen?: any;
+    isLightMode: boolean;
 }
 
-const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
+const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected, setOpen, isLightMode }) => {
     const navigate = useNavigate();
     
     const handleClick = () => {
         setSelected(title);
+        if (setOpen) setOpen(false); // Close drawer on mobile
         navigate(to);
     };
 
@@ -54,6 +55,11 @@ const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
             active={selected === title}
             onClick={handleClick}
             icon={icon}
+            style={{
+                color: selected === title 
+                    ? "#6870fa" 
+                    : isLightMode ? "#000" : "#ffffffa6",
+            }}
         >
             <Typography className="!text-[16px] !font-Poppins">
                 {title}
@@ -64,340 +70,187 @@ const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
 
 type Props = {
     activeItem?: number;
+    open?: boolean;
+    setOpen?: any;
+    isCollapsed?: boolean;
+    setIsCollapsed?: any;
 }
 
-const Sidebar: FC<Props> = ({ activeItem }) => {
+const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsCollapsed }) => {
     const { user } = useUser();
-    const [logoutUser, setLogoutUser] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [logoutUser] = useLogoutUserMutation();
     const [selected, setSelected] = useState("Dashboard");
-    const isAdmin = user?.role?.toLowerCase() === "admin";
     const [mounted, setMounted] = useState(false);
-    const { theme, setTheme } = useTheme();
-
-    const { isSuccess, error } = useLogoutUserQuery(undefined, {
-        skip: !logoutUser ? true : false,
-    });
+    const { theme } = useTheme();
 
     useEffect(() => setMounted(true), []);
 
     useEffect(() => {
+        if (activeItem === 1) setSelected("Dashboard");
+        if (activeItem === 2) setSelected("Users");
+        if (activeItem === 3) setSelected("Invoices");
+        if (activeItem === 4) setSelected("Live Courses");
         if (activeItem === 14) setSelected("Quizzes");
-        if (activeItem === 15) setSelected("Announcements");
-        // Add more mappings if needed
     }, [activeItem]);
 
-    useEffect(() => {
-        if (isSuccess) {
-            signOut({ redirect: false }).then(() => {
-                window.location.href = "/";
-            });
-        }
-    }, [isSuccess]);
+    if (!mounted) return null;
 
-    if (!mounted) {
-        return null;
-    }
-
-    const logoutHandler = () => {
-        setLogoutUser(true);
+    const logoutHandler = async () => {
+        await logoutUser({}).unwrap();
+        signOut({ redirect: false }).then(() => {
+            window.location.href = "/";
+        });
     };
 
+    const isLightMode = theme === "light";
+
     return (
-        <Box
-            sx={{
-                "& .pro-sidebar-inner": {
-                    background: `${theme === "dark" ? "#111C43 !important" : "#fff !important"
-                        }`,
-                },
+        <>
+            <style>
+                {`
+                    .pro-sidebar .pro-sidebar-inner {
+                        background-color: ${isLightMode ? "#ffffff !important" : "#111C43 !important"};
+                    }
+                    .pro-sidebar .pro-sidebar-layout {
+                        background-color: ${isLightMode ? "#ffffff !important" : "#111C43 !important"};
+                    }
+                    .pro-sidebar {
+                        background-color: ${isLightMode ? "#ffffff !important" : "#111C43 !important"};
+                    }
+                    .pro-menu-item {
+                        color: ${isLightMode ? "#000 !important" : "#ffffffa6 !important"};
+                    }
+                    .pro-menu-item.active {
+                        color: #6870fa !important;
+                    }
+                `}
+            </style>
 
-                "& .pro-icon-wrapper": {
-                    backgroundColor: "transparent !important",
-                },
+            {/* Mobile Overlay */}
+            {open && (
+                <div 
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] 800px:hidden transition-opacity duration-300"
+                    onClick={() => setOpen(false)}
+                />
+            )}
 
-                "& .pro-inner-item:hover": {
-                    color: "#868dfb !important",
-                },
-
-                "& .pro-menu-item.active": {
-                    color: "#6870fa !important",
-                },
-
-                "& .pro-inner-item": {
-                    padding: "5px 35px 5px 20px !important",
-                    opacity: 1,
-                },
-
-                "& .pro-menu-item": {
-                    color: `${theme !== "dark" && "#000"}`,
-                },
-            }}
-            className="!bg-white dark:bg-[#111C43]"
-        >
-            <ProSidebar
-                collapsed={isCollapsed}
+            <div
+                id="dashboard-sidebar"
+                className={`fixed top-0 z-[1000] h-screen transition-all duration-300 ease-in-out shadow-xl ${
+                    open ? "left-0" : "-left-[250px]"
+                } 800px:left-0 ${isCollapsed ? "w-[80px]" : "w-[250px]"} overflow-y-auto overflow-x-hidden custom-scrollbar`}
                 style={{
-                    height: "100vh",
-                    width: isCollapsed ? "0" : "100%",
-                    zIndex: 9999,
+                    backgroundColor: isLightMode ? "#ffffff" : "#111C43", // Explicit wrapper override
                 }}
             >
-                <Menu iconShape="square">
-                    {/* LOGO AND MENU ICON */}
+                <div className="h-full flex flex-col">
+                <ProSidebar
+                    collapsed={isCollapsed}
+                    style={{
+                        height: "100%",
+                        width: "100%",
+                        backgroundColor: isLightMode ? "#ffffff" : "#111C43",
+                    }}
+                >
+                    <Menu iconShape="square">
+                        <MenuItem
+                            onClick={() => setIsCollapsed(!isCollapsed)}
+                            icon={isCollapsed ? <ArrowForwardIosIcon style={{ color: isLightMode ? "#000" : "#fff" }} /> : undefined}
+                            style={{ margin: "10px 0 20px 0" }}
+                        >
+                            {!isCollapsed && (
+                                <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
+                                    <Link to="/">
+                                        <h3 className="text-[25px] font-Poppins uppercase font-bold tracking-tight" style={{ color: isLightMode ? "#000" : "#fff" }}>
+                                            SmartLearn
+                                        </h3>
+                                    </Link>
+                                    <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                                        <ArrowBackIosIcon style={{ color: isLightMode ? "#000" : "#fff", fontSize: "18px" }} />
+                                    </IconButton>
+                                </Box>
+                            )}
+                        </MenuItem>
 
-                    <MenuItem
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                        icon={isCollapsed ? <ArrowForwardIosIcon /> : undefined}
-                        style={{
-                            margin: "10px 0 20px 0",
-                        }}
-                    >
                         {!isCollapsed && (
-                            <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                ml="15px"
-                            >
-                                <Link to="/">
-                                    <h3 className="text-[25px] font-Poppins uppercase dark:text-white text-black">
-                                        SmartLearn
-                                    </h3>
+                            <Box mb="25px" className="flex flex-col items-center">
+                                <Link to="/profile" className="mb-4">
+                                    <Image
+                                        alt="profile-user"
+                                        width={100}
+                                        height={100}
+                                        src={user?.avatar ? user.avatar.url : avatarDefault}
+                                        className="cursor-pointer rounded-full border-4 border-[#5b6fe6] shadow-lg object-cover"
+                                    />
                                 </Link>
-
-                                <IconButton
-                                    onClick={() => setIsCollapsed(!isCollapsed)}
-                                    className="inline-block"
-                                >
-                                    <ArrowBackIosIcon className="text-black dark:text-[#ffffffc1]" />
-                                </IconButton>
+                                <div className="text-center px-4">
+                                    <h4 className="text-[20px] font-semibold mb-1 truncate max-w-[200px]" style={{ color: isLightMode ? "#000" : "#fff" }}>
+                                        {user?.name}
+                                    </h4>
+                                    <p className="text-[16px] font-medium" style={{ color: isLightMode ? "#4b5563" : "#d1d5db" }}>
+                                        - {user?.role} -
+                                    </p>
+                                </div>
                             </Box>
                         )}
-                    </MenuItem>
 
-                    {!isCollapsed && (
-                        <>
-                            <Box mb="25px">
-                                <Box display="flex" justifyContent="center" alignItems="center">
-                                    <Link to="/profile">
-                                        <Image
-                                            alt="profile-user"
-                                            width={100}
-                                            height={100}
-                                            src={user?.avatar ? user.avatar.url : avatarDefault}
-                                            style={{
-                                                cursor: "pointer",
-                                                borderRadius: "50%",
-                                                border: "3px solid #5b6fe6",
-                                            }} />
-                                    </Link>
-                                </Box>
-
-                                <Box textAlign="center">
-                                    <Typography
-                                        variant="h4"
-                                        className="!text-[20px] text-black dark:text-[#ffffffc1]"
-                                        sx={{ m: "10px 0 0 0" }}
-                                    >
-                                        {user?.name}
-                                    </Typography>
-
-                                    <Typography
-                                        variant="h4"
-                                        className="!text-[20px] text-black dark:text-[#ffffffc1] capitalize"
-                                        sx={{ m: "10px 0 0 0" }}
-                                    >
-                                        - {user?.role}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </>
-                    )}
-
-                    <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-                        <Item
-                            title="Return to Home"
-                            to="/"
-                            icon={<HomeOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Dashboard"
-                            to="/teacher"
-                            icon={<OndemandVideoIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Typography
-                            variant="h5"
-                            className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-                            sx={{ m: "15px 0 5px 25px" }}
+                        <Box 
+                            paddingLeft={isCollapsed ? undefined : "5%"}
+                            sx={{
+                                "& .pro-inner-item": {
+                                    padding: "5px 35px 5px 20px !important",
+                                },
+                                "& .pro-inner-item:hover": {
+                                    color: "#868dfb !important",
+                                    backgroundColor: "transparent !important",
+                                },
+                                "& .pro-icon-wrapper": {
+                                    color: isLightMode ? "#000 !important" : "#fff !important",
+                                    backgroundColor: "transparent !important"
+                                }
+                            }}
                         >
-                            {!isCollapsed && "Data"}
-                        </Typography>
+                            <Item title="Return to Home" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
+                            <Item title="Dashboard" to="/teacher" icon={<WebIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
 
-                        {/* Invoices */}
-                        <Item
-                            title="Users"
-                            to="/teacher/all-users"
-                            icon={<GroupsIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
+                            {!isCollapsed && (
+                                <p className="text-[18px] font-Poppins px-6 py-2 mt-4 font-[500]" style={{ color: isLightMode ? "#000" : "#9ca3af" }}>
+                                    Data
+                                </p>
+                            )}
+                            <Item title="Users" to="/teacher/all-users" icon={<GroupsIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
+                            <Item title="Invoices" to="/teacher/invoices" icon={<ReceiptOutlinedIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
 
-                        <Item
-                            title="Invoices"
-                            to="/teacher/invoices"
-                            icon={<ReceiptOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
+                            {!isCollapsed && (
+                                <p className="text-[18px] font-Poppins px-6 py-2 mt-4 font-[500]" style={{ color: isLightMode ? "#000" : "#9ca3af" }}>
+                                    Content
+                                </p>
+                            )}
+                            <Item title="Create Courses" to="/teacher/create-course" icon={<VideoCallIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
+                            <Item title="Live Courses" to="/teacher/allcourses" icon={<OndemandVideoIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
 
-                        <Typography
-                            variant="h5"
-                            className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-                            sx={{ m: "15px 0 5px 25px" }}
-                        >
-                            {!isCollapsed && "Content"}
-                        </Typography>
+                            {!isCollapsed && (
+                                <p className="text-[18px] font-Poppins px-6 py-2 mt-4 font-[500]" style={{ color: isLightMode ? "#000" : "#9ca3af" }}>
+                                    Customization
+                                </p>
+                            )}
+                            <Item title="Quizzes" to="/teacher/quizzes" icon={<QuizIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
+                            <Item title="FeedBack" to="/teacher/feedback" icon={<FeedbackIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
 
-                        {/* Courses */}
-                        <Item
-                            title="Create Courses"
-                            to="/teacher/create-course"
-                            icon={<VideoCallIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Live Courses"
-                            to="/teacher/allcourses"
-                            icon={<OndemandVideoIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Typography
-                            variant="h5"
-                            className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-                            sx={{ m: "15px 0 5px 25px" }}
-                        >
-                            {!isCollapsed && "Customization"}
-                        </Typography>
-
-                        <Item
-                            title="Quizzes"
-                            to="/teacher/quizzes"
-                            icon={<QuizIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Announcements"
-                            to="/teacher/announcements"
-                            icon={<WysiwygIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="FeedBack"
-                            to="/teacher/feedback"
-                            icon={<FeedbackIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Faq"
-                            to="/teacher/faq"
-                            icon={<FeedbackIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Categories"
-                            to="/teacher/categories"
-                            icon={<WysiwygIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Typography
-                            variant="h5"
-                            className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-                            sx={{ m: "15px 0 5px 20px" }}
-                        >
-                            {!isCollapsed && "Controllers"}
-                        </Typography>
-
-                        <Item
-                            title="Manage Team"
-                            to="/teacher/team"
-                            icon={<PeopleOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Typography
-                            variant="h6"
-                            className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-                            sx={{ m: "15px 0 5px 20px" }}
-                        >
-                            {!isCollapsed && "Analytics"}
-                        </Typography>
-
-                        <Item
-                            title="Course Analytics"
-                            to="/teacher/course-analytics"
-                            icon={<BarChartOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Orders Analytics"
-                            to="/teacher/order-analytics"
-                            icon={<MapOutlinedIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Item
-                            title="Users Analytics"
-                            to="/teacher/user-analytics"
-                            icon={<ManageHistoryIcon />}
-                            selected={selected}
-                            setSelected={setSelected}
-                        />
-
-                        <Typography
-                            variant="h5"
-                            className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-                            sx={{ m: "15px 0 5px 20px" }}
-                        >
-                            {!isCollapsed && "Extras"}
-                        </Typography>
-
-                        <div onClick={logoutHandler}>
-                            <Item
-                                title="LogoutUser"
-                                to="/"
-                                icon={<ExitToAppIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                            />
-                        </div>
-                    </Box>
-                </Menu>
-            </ProSidebar>
-        </Box>
+                            {!isCollapsed && (
+                                <p className="text-[18px] font-Poppins px-6 py-2 mt-4 font-[500]" style={{ color: isLightMode ? "#000" : "#9ca3af" }}>
+                                    Extras
+                                </p>
+                            )}
+                            <div className="mb-10" onClick={logoutHandler}>
+                                <Item title="LogoutUser" to="/" icon={<ExitToAppIcon />} selected={selected} setSelected={setSelected} isLightMode={isLightMode} />
+                            </div>
+                        </Box>
+                    </Menu>
+                </ProSidebar>
+                </div>
+            </div>
+        </>
     )
 }
 

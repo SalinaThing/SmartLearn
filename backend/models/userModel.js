@@ -50,8 +50,20 @@ const userSchema = new mongoose.Schema(
     courses: [
       {
         courseId: String,
+        completedLessons: {
+          type: [String],
+          default: [],
+        },
       },
     ],
+    searchHistory: {
+      type: [String],
+      default: [],
+    },
+    viewedCourses: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -67,20 +79,20 @@ userSchema.pre("save", async function () {
 //Sign access token
 userSchema.methods.SignAccessToken = function () {
   return jwt.sign(
-    { id: this._id }, 
-    process.env.ACCESS_TOKEN || '',{
-      expiresIn: "15m",
-    }
+    { id: this._id },
+    process.env.ACCESS_TOKEN || '', {
+    expiresIn: "15m",
+  }
   );
 }
 
 //Sign refresh token
 userSchema.methods.SignRefreshToken = function () {
   return jwt.sign(
-    { id: this._id }, 
-    process.env.REFRESH_TOKEN || '',{
-      expiresIn: "3d",
-    }
+    { id: this._id },
+    process.env.REFRESH_TOKEN || '', {
+    expiresIn: "3d",
+  }
   );
 }
 

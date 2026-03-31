@@ -12,7 +12,7 @@ const AllFeedback = () => {
 
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.3 },
-        { field: 'userName', headerName: 'User Name', flex: 0.5 },
+        { field: 'lectureTitle', headerName: 'Lecture Title', flex: 1.0 },
         { field: 'courseName', headerName: 'Course Name', flex: 0.8 },
         { field: 'rating', headerName: 'Rating', flex: 0.3 },
         { field: 'comment', headerName: 'Comment', flex: 1.5 },
@@ -23,7 +23,7 @@ const AllFeedback = () => {
     data && data.feedback.forEach((item: any) => {
         rows.push({
             id: item._id,
-            userName: item.user?.name || "N/A",
+            lectureTitle: item.contentTitle || "General",
             courseName: item.courseId?.name || "General",
             rating: item.rating,
             comment: item.comment,
@@ -37,25 +37,28 @@ const AllFeedback = () => {
                 <Loader />
             ) : (
                 <Box m="20px">
+                    <h1 className="text-[25px] font-Poppins font-bold mb-6">
+                        <span className="text-black dark:text-white">Current</span>
+                        <span className="text-[#3ccbae] ml-2">Feedback</span>
+                    </h1>
                     <Box
-                        m="40px 0 0 0"
                         height="80vh"
                         sx={{
                             "& .MuiDataGrid-root": { border: "none", outline: "none" },
                             "& .MuiDataGrid-row": {
-                                color: theme === "dark" ? "#fff" : "#000",
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 borderBottom: theme === "dark" ? "1px solid #ffffff30!important" : "1px solid #ccc!important",
                             },
                             "& .MuiDataGrid-columnHeaders": {
-                                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-                                color: theme === "dark" ? "#fff" : "#000",
+                                backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
                             },
                             "& .MuiDataGrid-virtualScroller": {
-                                backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                             },
                             "& .MuiDataGrid-footerContainer": {
-                                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-                                color: theme === "dark" ? "#fff" : "#000",
+                                backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
                             },
                         }}
                     >

@@ -1,4 +1,4 @@
-import { useGetCoursesAnaltyicsQuery } from '@/redux/features/analytics/analyticsApi';
+import { useGetCoursesAnalyticsQuery } from '@/redux/features/analytics/analyticsApi';
 import React from 'react'
 import {
     BarChart,
@@ -17,7 +17,7 @@ type Props = {
 }
 
 const CourseAnalytics = ({ isDashboard }: Props) => {
-    const { data, isLoading } = useGetCoursesAnaltyicsQuery({});
+    const { data, isLoading } = useGetCoursesAnalyticsQuery({});
 
     // const analyticsData=[
     //     {name: "Jun 2023", uv:3},
@@ -43,9 +43,9 @@ const CourseAnalytics = ({ isDashboard }: Props) => {
                 isLoading ? (
                     <Loader />
                 ) : (
-                    <div className={`${isDashboard ? "h-[450px] overflow-visible" : "h-screen"}`}>
-                        <div className={`${isDashboard ? "mt-0" : "mt-[50px]"}`}>
-                            <h1 className={`${styles.title} px-5 !text-start ${isDashboard && "!text-[20px]"}`}>
+                    <div className={`${isDashboard ? "h-[450px] overflow-visible pb-10" : "h-[70vh]"} w-full`}>
+                        <div className={`${isDashboard ? "mt-0" : "mt-0"}`}>
+                            <h1 className={`${styles.title} px-5 !text-start ${isDashboard && "!text-[24px]"}`}>
                                 Courses Analytics
                             </h1>
 
@@ -54,8 +54,8 @@ const CourseAnalytics = ({ isDashboard }: Props) => {
                             </p>
                         </div>
 
-                        <div className="w-full h-[90%] flex items-center justify-center">
-                            <ResponsiveContainer width={isDashboard ? "100%" : "90%"} height={isDashboard ? "100%" : "50%"}>
+                        <div className="w-full h-full flex items-center justify-center">
+                            <ResponsiveContainer width={isDashboard ? "100%" : "95%"} height={isDashboard ? "100%" : "80%"}>
                                 <BarChart data={analyticsData} margin={{ top: 20, right: 30, left: 10, bottom: 60 }}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDashboard ? "#ffffff10" : "#00000010"} />
                                     <XAxis dataKey="name" tick={{ fontSize: isDashboard ? 10 : 12 }} interval={0} height={60} />
