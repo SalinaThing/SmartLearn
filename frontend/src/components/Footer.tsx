@@ -1,9 +1,25 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import React from 'react'
+import { useUser } from '@/hooks/useUser';
 
-type Props = Record<string, never>
+type Props = {
+  setOpen?: (open: boolean) => void;
+  setRoute?: (route: string) => void;
+};
 
-const Footer = (props: Props) => {
+const Footer = ({ setOpen, setRoute }: Props) => {
+  const { isAuthenticated } = useUser();
+  const navigate = useNavigate();
+
+  const handleProtectedNavigation = (path: string) => {
+    if (!isAuthenticated && setOpen && setRoute) {
+      setOpen(true);
+      setRoute("SignUp");
+    } else {
+      navigate(path);
+    }
+  };
+
   return (
     <footer className="bg-white dark:bg-gray-900 pt-10 pb-5 font-Poppins border-t border-gray-200 dark:border-gray-800 transition-colors duration-300">
       <div className="w-[95%] 800px:w-full 800px:max-w-[85%] mx-auto px-2 sm:px-6 lg:px-8">
@@ -17,7 +33,7 @@ const Footer = (props: Props) => {
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white">
+                <Link to="/about" className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white">
                   Privacy Policy
                 </Link>
               </li>
@@ -28,9 +44,12 @@ const Footer = (props: Props) => {
               </li>
 
               <li>
-                <Link to="/feedback" className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white">
+                <div
+                  onClick={() => handleProtectedNavigation("/feedback")}
+                  className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white cursor-pointer"
+                >
                   Feedback
-                </Link>
+                </div>
               </li>
             </ul>
           </div>
@@ -49,14 +68,20 @@ const Footer = (props: Props) => {
                 </Link>
               </li>
               <li>
-                <Link to="/quizes" className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white">
-                  Quizes
-                </Link>
+                <div
+                  onClick={() => handleProtectedNavigation("/quiz")}
+                  className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white cursor-pointer"
+                >
+                  Quiz
+                </div>
               </li>
-               <li>
-                <Link to="/notice" className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white">
-                  Notice
-                </Link>
+              <li>
+                <div
+                  onClick={() => handleProtectedNavigation("/announcement")}
+                  className="text-[16px] text-[#000000a4] dark:text-gray-400 hover:text-[#000] dark:hover:text-white cursor-pointer"
+                >
+                  Announcement
+                </div>
               </li>
             </ul>
           </div>
@@ -95,7 +120,7 @@ const Footer = (props: Props) => {
                 </a>
               </li>
 
-               <li>
+              <li>
                 <a
                   href="https://www.twitter.com/shahriarsajeeb"
                   target="_blank"
@@ -124,7 +149,7 @@ const Footer = (props: Props) => {
         <br />
         <br />
         <p className="text-center text-black dark:text-white text-[16px] pb-2">
-          Copyright © 2023 Smart | All Rights Reserved
+          Copyright © 2026 SmartLearn | All Rights Reserved
         </p>
       </div>
     </footer>

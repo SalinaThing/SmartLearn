@@ -12,7 +12,7 @@ export const reviews = [
     avatar: "https://randomuser.me/api/portraits/men/1.jpg",
     profession: "Student | Cambridge university",
     comment:
-      "I had the pleasure of exploring Becodemy, a website that provides an extensive range of courses on various tech-related topics. I was thoroughly impressed with my experience, as the website offers a comprehensive selection of courses that cater to different skill levels and interests. If you're looking to enhance your knowledge and skills in the tech industry, I highly recommend checking out Becodemy!",
+      "I had the pleasure of exploring SmartLearn, a website that provides an extensive range of courses on various tech-related topics. I was thoroughly impressed with my experience, as the website offers a comprehensive selection of courses that cater to different skill levels and interests. If you're looking to enhance your knowledge and skills in the tech industry, I highly recommend checking out SmartLearn!",
     ratings: 5,
   },
   {
@@ -36,7 +36,7 @@ export const reviews = [
     avatar: "https://randomuser.me/api/portraits/women/2.jpg",
     profession: "Junior Web Developer | Indonesia",
     comment:
-      "I had the pleasure of exploring Becodemy, a website that provides an extensive range of courses on various tech-related topics. I was thoroughly impressed with my experience.",
+      "I had the pleasure of exploring SmartLearn, a website that provides an extensive range of courses on various tech-related topics. I was thoroughly impressed with my experience.",
     ratings: 5,
   },
   {
@@ -52,7 +52,7 @@ export const reviews = [
     avatar: "https://randomuser.me/api/portraits/women/4.jpg",
     profession: "Full stack web developer | Canada",
     comment:
-      "Join Becodemy! Becodemy focuses on practical applications rather than just teaching the theory behind programming languages or frameworks. I took a lesson on creating a web marketplace using React JS, and it was very helpful in teaching me the different stages involved in creating a project from start to finish. Overall, I highly recommend Becodemy to anyone looking to improve their programming skills and build practical projects. Becodemy is a great resource that will help you take your skills to the next level.",
+      "Join SmartLearn! SmartLearn focuses on practical applications rather than just teaching the theory behind programming languages or frameworks. I took a lesson on creating a web marketplace using React JS, and it was very helpful in teaching me the different stages involved in creating a project from start to finish. Overall, I highly recommend SmartLearn to anyone looking to improve their programming skills and build practical projects. SmartLearn is a great resource that will help you take your skills to the next level.",
     ratings: 5,
   },
 ]; 
@@ -80,10 +80,10 @@ const Reviews = (props: Props) => {
           <br />
 
           <p className={`${styles.label} !text-left`}>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque unde
-              voluptatum dignissimos, nulla perferendis dolorem voluptate nemo
-              possimus magni deleniti natus accusamus officiis quasi nihil commodi,
-              praesentium quidem, quis doloribus?
+              Our students are at the heart of everything we do. Their dedication, passion, and success stories 
+              are what drive us to provide the highest quality education. We take pride in seeing our learners 
+              transform their careers and achieve their goals through our comprehensive courses and supportive community. 
+              Join thousands of successful alumni who have already started their journey with us.
           </p>
         </div>
       </div>

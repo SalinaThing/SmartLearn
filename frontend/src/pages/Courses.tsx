@@ -8,6 +8,7 @@ import Header from '@/components/Header'
 import Heading from '@/utils/Heading'
 import { styles } from '@/styles/style'
 import CourseCard from '@/components/Course/CourseCard'
+import SmartChat from '@/components/Chat/SmartChat'
 
 type Props = {}
 
@@ -200,6 +201,7 @@ const page = (props: Props) => {
                     </div>
                 </>
             )}
+            <SmartChat />
         </>
     )
 }

@@ -26,17 +26,30 @@ type Props = {
   onNavClick?: () => void;
 }
 
+import { useUser } from '@/hooks/useUser';
+
 const NavItems: FC<Props> = ({ activeItem, isMobile, onNavClick }) => {
+  const { isAuthenticated } = useUser();
+  
   const handleNavClick = () => {
     if (onNavClick) {
       onNavClick();
     }
   };
+
+  // Filter nav items based on authentication
+  const filteredNavItems = navItemsData.filter(item => {
+    if (item.name === "Quiz" && !isAuthenticated) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <>
       <div className="hidden 800px:flex">
         {
-          navItemsData && navItemsData.map((item, index) => (
+          filteredNavItems.map((item, index) => (
             <Link to={item.link} key={index} onClick={handleNavClick}>
               <span className={`${activeItem === index
                   ? "dark:text-[#37a39a] text-[crimson]"
@@ -54,7 +67,7 @@ const NavItems: FC<Props> = ({ activeItem, isMobile, onNavClick }) => {
         isMobile && (
           <div className="800px:hidden mt-5">
             {
-              navItemsData && navItemsData.map((item, index) => (
+              filteredNavItems.map((item, index) => (
                 <Link to={item.link} key={index} onClick={handleNavClick}>
                   <span className={`${activeItem === index
                       ? "dark:text-[#37a39a] text-[crimson]"

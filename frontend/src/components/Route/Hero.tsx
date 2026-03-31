@@ -3,16 +3,21 @@ import Image from "@/utils/Image";
 import { BiSearch } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { FiBookOpen, FiStar, FiZap, FiPlayCircle } from "react-icons/fi";
+import { useUser } from "@/hooks/useUser";
 import profile1 from "../../assets/People1.jpg";
 import profile2 from "../../assets/People2.jpg";
 import profile3 from "../../assets/people3.jpg";
 import HeroImage from "../../assets/Hero.jpg";
 
-type Props = {};
+type Props = {
+  setOpen: (open: boolean) => void;
+  setRoute: (route: string) => void;
+};
 
-const Hero: FC<Props> = () => {
+const Hero: FC<Props> = ({ setOpen, setRoute }) => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const { isAuthenticated } = useUser();
 
   const handleSearch = () => {
     if (search === "") {
@@ -26,6 +31,15 @@ const Hero: FC<Props> = () => {
     setSearch(term);
     navigate(`/courses?title=${encodeURIComponent(term)}`);
   }
+
+  const handleProtectedNavigation = (path: string) => {
+    if (!isAuthenticated) {
+      setOpen(true);
+      setRoute("SignUp");
+    } else {
+      navigate(path);
+    }
+  };
 
   return (
     <>
@@ -58,31 +72,31 @@ const Hero: FC<Props> = () => {
           {/* Action Buttons - Clean Design */}
           <div className="1500px:w-[60%] 1100px:w-[85%] w-full mb-5">
             <div className="flex flex-wrap items-center justify-center 1000px:justify-start gap-3">
-               <Link
-                to="/login"
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+               <div
+                onClick={() => handleProtectedNavigation("/courses")}
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
               >
                 Start learning free →
-              </Link>
+              </div>
               
-              <Link
-                to="/courses"
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+              <div
+                onClick={() => handleProtectedNavigation("/courses")}
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
               >
                 Browse courses
-              </Link>
-              <Link
-                to="/premium-courses"
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+              </div>
+              <div
+                onClick={() => handleProtectedNavigation("/courses")}
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
               >
                 Premium courses
-              </Link>
-              <Link
-                to="/quizzes"
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+              </div>
+              <div
+                onClick={() => handleProtectedNavigation("/quiz")}
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
               >
                 Quiz
-              </Link>
+              </div>
             </div>
           </div>
 
@@ -190,12 +204,12 @@ const Hero: FC<Props> = () => {
                 <p className="font-Josefin dark:text-[#edfff4] text-[#000000b3] 1000px:pl-3 text-[18px] font-[600] mt-4">
                         40k+ Online Courses & 500k+ Registered Students
 
-                  <Link 
-                      to="/courses" 
-                      className="text-red-500 hover:text-indigo-600 transition duration-200"
+                  <div 
+                      onClick={() => handleProtectedNavigation("/courses")} 
+                      className="text-red-500 hover:text-indigo-600 transition duration-200 cursor-pointer px-2"
                   >
                       view courses
-                  </Link>
+                  </div>
                 </p>
 
               </div>

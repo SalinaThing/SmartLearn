@@ -3,6 +3,7 @@ import Heading from '@/utils/Heading'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AllQuizzesStudent from '@/components/Quiz/AllQuizzesStudent'
+import SmartChat from '@/components/Chat/SmartChat'
 
 const QuizPage = () => {
     const [open, setOpen] = useState(false);
@@ -26,6 +27,7 @@ const QuizPage = () => {
                 <AllQuizzesStudent />
             </div>
             <Footer />
+            <SmartChat />
         </div>
     )
 }

@@ -23,21 +23,20 @@ const TeacherLayout: FC<Props> = ({ children, title = "Teacher Dashboard", descr
                     description={description}
                     keywords="SmartLearn, Teacher Dashboard, Learning Management"
                 />
-                
+
                 {/* Collapsible Teacher Sidebar */}
-                <TeacherSidebar 
-                    activeItem={activeItem} 
-                    open={open} 
-                    setOpen={setOpen} 
-                    isCollapsed={isCollapsed} 
-                    setIsCollapsed={setIsCollapsed} 
+                <TeacherSidebar
+                    activeItem={activeItem}
+                    open={open}
+                    setOpen={setOpen}
+                    isCollapsed={isCollapsed}
+                    setIsCollapsed={setIsCollapsed}
                 />
 
                 {/* Main Content Area - Synchronized Indentation */}
-                <div 
-                    className={`flex-1 w-full transition-all duration-300 ${
-                        isCollapsed ? "800px:ml-[80px]" : "800px:ml-[250px]"
-                    }`}
+                <div
+                    className={`flex-1 w-full transition-all duration-300 ${isCollapsed ? "800px:ml-[80px]" : "800px:ml-[250px]"
+                        }`}
                 >
                     <DashboardHeader open={open} setOpen={setOpen} />
                     <div className="p-4 sm:p-6 lg:p-8 w-full max-w-[1600px]">

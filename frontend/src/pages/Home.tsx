@@ -6,6 +6,7 @@ import Courses from "@/components/Route/Courses";
 import Reviews from "@/components/Route/Reviews";
 import Faq from "@/components/FAQ/Faq";
 import Footer from "@/components/Footer";
+import SmartChat from "@/components/Chat/SmartChat";
 
 export default function HomePage() {
   const [open, setOpen] = useState(false);
@@ -28,12 +29,12 @@ export default function HomePage() {
         setRoute={setRoute}
       />
 
-      <Hero/>
+      <Hero setOpen={setOpen} setRoute={setRoute} />
       <Courses/>
       <Reviews/>
       <Faq/>
-      <Footer/>
-
+      <Footer setOpen={setOpen} setRoute={setRoute} />
+      <SmartChat />
     </div>
   );
 }

@@ -10,8 +10,27 @@ import {
   FaChalkboardTeacher, FaUserGraduate, FaRegLightbulb, 
   FaChartLine, FaComments, FaQuestionCircle 
 } from "react-icons/fa";
+import { useUser } from "@/hooks/useUser";
+import { useNavigate } from "react-router-dom";
 
-const About = () => {
+type Props = {
+    setOpen: (open: boolean) => void;
+    setRoute: (route: string) => void;
+};
+
+const About = ({ setOpen, setRoute }: Props) => {
+    const { isAuthenticated } = useUser();
+    const navigate = useNavigate();
+
+    const handleSignUpTrigger = (rolePath: string) => {
+        if (!isAuthenticated) {
+            setOpen(true);
+            setRoute("SignUp");
+        } else {
+            navigate(rolePath);
+        }
+    };
+
     const features = [
         {
             icon: <FaChalkboardTeacher className="text-3xl" />,
@@ -189,10 +208,16 @@ const About = () => {
                     <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
                     <p className="text-gray-600 dark:text-gray-400 mb-6">Join thousands of teachers and students already using SmartLearn</p>
                     <div className="flex flex-wrap justify-center gap-4">
-                        <button className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+                        <button 
+                            onClick={() => handleSignUpTrigger("/teacher")}
+                            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                        >
                             Get Started as Teacher
                         </button>
-                        <button className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+                        <button 
+                            onClick={() => handleSignUpTrigger("/student/dashboard")}
+                            className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                        >
                             Start Learning as Student
                         </button>
                     </div>
