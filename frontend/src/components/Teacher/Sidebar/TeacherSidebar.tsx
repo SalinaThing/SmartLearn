@@ -18,6 +18,7 @@ import {
     SettingsIcon,
     ExitToAppIcon,
     FeedbackIcon,
+    NotificationsIcon,
 } from "./Icon";
 import { useUser } from "@/hooks/useUser";
 import Image from "@/utils/Image";
@@ -236,6 +237,7 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
                             )}
                             <Item title="Quizzes" to="/teacher/quizzes" icon={<QuizIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
                             <Item title="FeedBack" to="/teacher/feedback" icon={<FeedbackIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
+                            <Item title="Notifications" to="/teacher/notifications" icon={<NotificationsIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
 
                             {!isCollapsed && (
                                 <p className="text-[18px] font-Poppins px-6 py-2 mt-4 font-[500]" style={{ color: isLightMode ? "#000" : "#9ca3af" }}>

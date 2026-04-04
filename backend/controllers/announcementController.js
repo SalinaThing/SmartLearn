@@ -42,10 +42,10 @@ export const createAnnouncement = catchAsyncErrors(async (req, res, next) => {
     await NotificationModel.create({
       title: "New Announcement",
       message: `A new announcement has been posted: "${announcement.title}"`,
-      role: 'student'
+      role: 'all' // Shows for students and admins
     });
-    // Emit socket event
-    io.to("student").emit("newNotification", {
+    // Emit socket event to both
+    io.to("student").to("admin").emit("newNotification", {
       title: "New Announcement",
       message: `A new announcement has been posted: "${announcement.title}"`,
     });

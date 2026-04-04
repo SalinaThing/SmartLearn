@@ -49,7 +49,7 @@ const commentSchema = new mongoose.Schema({
 const courseDataSchema = new mongoose.Schema({
   videoUrl: {
     type: String,
-    required: true,
+    default: "",
   },
   title: {
     type: String,

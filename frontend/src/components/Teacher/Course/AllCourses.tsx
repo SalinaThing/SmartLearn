@@ -34,12 +34,12 @@ const AllCourses = (props: Props) => {
         { field: 'purchased', headerName: 'Purchased', flex: 0.5 },
         { field: 'created_at', headerName: "Created At", flex: 0.5 },
 
-        ...(!isAdmin ? [{
+        {
             field: '  ', headerName: "Edit", flex: 0.2,
             renderCell: (params: any) => {
                 return (
                     <>
-                        <Link to={`/teacher/edit-course/${params.row.id}`}>
+                        <Link to={isAdmin ? `/admin/edit-course/${params.row.id}` : `/teacher/edit-course/${params.row.id}`}>
                             <FiEdit2
                                 className="dark:text-white text-black"
                                 size={20}
@@ -48,7 +48,7 @@ const AllCourses = (props: Props) => {
                     </>
                 )
             }
-        }] : []),
+        },
 
         {
             field: ' ', headerName: "Delete", flex: 0.2,
@@ -148,10 +148,27 @@ const AllCourses = (props: Props) => {
 
                                 "& .MuiDataGrid-row": {
                                     color: theme === "dark" ? "#fff" : "#000",
-                                    borderBottom:
-                                        theme === "dark"
-                                            ? "1px solid #ffffff30!important"
-                                            : "1px solid #ccc!important",
+                                    borderBottom: theme === "dark"
+                                        ? "1px solid #ffffff30!important"
+                                        : "1px solid #ccc!important",
+                                    transition: "all 0.2s ease",
+                                    "&:hover": {
+                                        backgroundColor: theme === "dark"
+                                            ? "rgba(255, 255, 255, 0.05)!important"
+                                            : "rgba(0, 0, 0, 0.02)!important",
+                                        color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                    },
+                                    "&.Mui-selected": {
+                                        backgroundColor: theme === "dark"
+                                            ? "rgba(255, 255, 255, 0.1) !important"
+                                            : "rgba(0, 0, 0, 0.08) !important",
+                                        color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                    },
+                                    "&.Mui-selected:hover": {
+                                        backgroundColor: theme === "dark"
+                                            ? "rgba(255, 255, 255, 0.15) !important"
+                                            : "rgba(0, 0, 0, 0.12) !important",
+                                    },
                                 },
 
                                 "& .MuiTablePagination-root": {
@@ -167,8 +184,15 @@ const AllCourses = (props: Props) => {
                                 },
 
                                 "& .MuiDataGrid-columnHeaders": {
-                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
-                                    borderBottom: "none",
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                    borderBottom: "1px solid #ffffff30",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                },
+                                "& .MuiDataGrid-topContainer, & .MuiDataGrid-filler, & .MuiDataGrid-columnHeader": {
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                },
+                                "& .MuiDataGrid-columnHeaderTitle": {
                                     color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
@@ -177,8 +201,8 @@ const AllCourses = (props: Props) => {
                                 },
 
                                 "& .MuiDataGrid-footerContainer": {
-                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
-                                    borderTop: "none",
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#A4A9FC !important",
+                                    borderTop: "1px solid #ffffff30",
                                     color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
@@ -197,7 +221,7 @@ const AllCourses = (props: Props) => {
                             <DataGrid
                                 checkboxSelection
                                 rows={rows}
-                                columns={columns}
+                                columns={isAdmin ? columns.filter((col: any) => col.headerName !== "Edit") : columns}
                             />
                         </Box>
 

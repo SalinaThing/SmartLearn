@@ -31,7 +31,7 @@ userRouter.post("/refresh", updateAccessToken, (req, res) => {
     });
 });
 
-userRouter.get("/logout", isAuthenticated, logoutUser);
+userRouter.get("/logout", logoutUser);
 // userRouter.delete("/delete-student", isAuthenticated, authorizeRoles("teacher"), deleteStudent);
 
 userRouter.get("/me", updateAccessToken, getUserInfo);
@@ -43,8 +43,8 @@ userRouter.put("/update-useravatar", updateAccessToken, isAuthenticated, updateP
 
 userRouter.get("/get-users", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), getAllUsers);
 
-userRouter.put("/update-user-role", updateAccessToken, isAuthenticated, authorizeRoles("admin"), updateUserRole);
-userRouter.delete("/delete-user/:id", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), deleteUser);
+userRouter.put("/update-user-role", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), updateUserRole);
+userRouter.delete("/delete-user/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteUser);
 
 userRouter.post("/send-email", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), sendDirectEmail);
 

@@ -196,10 +196,27 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
 
                                 "& .MuiDataGrid-row": {
                                     color: theme === "dark" ? "#fff" : "#000",
-                                    borderBottom:
-                                        theme === "dark"
-                                            ? "1px solid #ffffff30!important"
-                                            : "1px solid #ccc!important",
+                                    borderBottom: theme === "dark"
+                                        ? "1px solid #ffffff30!important"
+                                        : "1px solid #ccc!important",
+                                    transition: "all 0.2s ease",
+                                    "&:hover": {
+                                        backgroundColor: theme === "dark"
+                                            ? "rgba(255, 255, 255, 0.05)!important"
+                                            : "rgba(0, 0, 0, 0.02)!important",
+                                        color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                    },
+                                    "&.Mui-selected": {
+                                        backgroundColor: theme === "dark"
+                                            ? "rgba(255, 255, 255, 0.1) !important"
+                                            : "rgba(0, 0, 0, 0.08) !important",
+                                        color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                    },
+                                    "&.Mui-selected:hover": {
+                                        backgroundColor: theme === "dark"
+                                            ? "rgba(255, 255, 255, 0.15) !important"
+                                            : "rgba(0, 0, 0, 0.12) !important",
+                                    },
                                 },
 
                                 "& .MuiTablePagination-root": {
@@ -215,8 +232,15 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                                 },
 
                                 "& .MuiDataGrid-columnHeaders": {
-                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
-                                    borderBottom: "none",
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                    borderBottom: "1px solid #ffffff30",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                },
+                                "& .MuiDataGrid-topContainer, & .MuiDataGrid-filler, & .MuiDataGrid-columnHeader": {
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                },
+                                "& .MuiDataGrid-columnHeaderTitle": {
                                     color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
@@ -225,8 +249,8 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                                 },
 
                                 "& .MuiDataGrid-footerContainer": {
-                                    backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
-                                    borderTop: "none",
+                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#A4A9FC !important",
+                                    borderTop: "1px solid #ffffff30",
                                     color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 },
 
@@ -249,43 +273,54 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                             />
                         </Box>
 
-                        {active && (
-                            <div className="mt-6 p-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900">
-                                <h3 className={`${styles.title} mb-3`}>Update Team Member Role</h3>
+                        <Modal
+                            open={active}
+                            onClose={() => setActive(false)}
+                            aria-labelledby="add-member-modal-title"
+                        >
+                            <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[400px] bg-white dark:bg-slate-900 rounded-xl p-6 shadow-2xl outline-none border border-gray-200 dark:border-gray-700">
+                                <h3 id="add-member-modal-title" className={`${styles.title} mb-4 text-left`}>Update Team Member Role</h3>
 
-                                <input
-                                    type="text"
-                                    placeholder="User ID"
-                                    value={userId}
-                                    onChange={(e) => setUserId(e.target.value)}
-                                    className={`${styles.input} mb-2`}
-                                />
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User ID</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter User ID..."
+                                        value={userId}
+                                        onChange={(e) => setUserId(e.target.value)}
+                                        className={`${styles.input}`}
+                                    />
+                                </div>
 
-                                <select
-                                    className={`${styles.input} mb-2`}
-                                    value={role}
-                                    onChange={(e) => setRole(e.target.value)}
-                                >
-                                    <option value="teacher">Teacher</option>
-                                    <option value="student">Student</option>
-                                </select>
-
-                                <div className="flex gap-2">
-                                    <button
-                                        className={`${styles.button} !w-[120px] !h-[35px]`}
-                                        onClick={handleSubmit}
+                                <div className="mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Role Access (Dashboard & Sidebar)</label>
+                                    <select
+                                        className={`${styles.input}`}
+                                        value={role}
+                                        onChange={(e) => setRole(e.target.value)}
                                     >
-                                        Save
-                                    </button>
+                                        <option value="student">Student (Standard Access)</option>
+                                        <option value="teacher">Teacher (Teacher Dashboard)</option>
+                                        <option value="admin">Admin (Full Dashboard)</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex w-full justify-end gap-3 mt-4">
                                     <button
                                         className={`${styles.button} !w-[120px] !h-[35px] bg-gray-500`}
                                         onClick={() => setActive(false)}
                                     >
                                         Cancel
                                     </button>
+                                    <button
+                                        className={`${styles.button} !w-[120px] !h-[35px]`}
+                                        onClick={handleSubmit}
+                                    >
+                                        Save Role
+                                    </button>
                                 </div>
-                            </div>
-                        )}
+                            </Box>
+                        </Modal>
 
                         {open && (
                             <Modal

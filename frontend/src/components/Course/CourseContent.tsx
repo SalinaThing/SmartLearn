@@ -13,7 +13,7 @@ type Props = {
 
 const CourseContent = ({ id }: Props) => {
     const { data: userData } = useLoadUserQuery(undefined, {});
-    const { data, isLoading } = useGetCourseContentsQuery(id);
+    const { data, isLoading, refetch } = useGetCourseContentsQuery(id);
     const [updateCourseProgress] = useUpdateCourseProgressMutation();
     const [activeVideo, setActiveVideo] = useState(0);
     const [open, setOpen] = useState(false);
@@ -163,7 +163,7 @@ const CourseContent = ({ id }: Props) => {
                                 activeVideo={activeVideo}
                                 setActiveVideo={setActiveVideo}
                                 user={userData?.user}
-                                refetch={undefined}
+                                refetch={refetch}
                             />
                         </div>
 

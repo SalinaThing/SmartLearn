@@ -6,6 +6,9 @@ import { PiUsersFourLight } from 'react-icons/pi';
 import OrderAnalytics from '../Analytics/OrderAnalytics';
 import All_Invoices from '../Orders/All_Invoices';
 import CourseAnalytics from '../Analytics/CourseAnalytics';
+import AllCourses from '../Course/AllCourses';
+import AllQuizzes from '../Quizzes/AllQuizzes';
+import AllUsers from '../Users/AllUsers';
 import { useUser } from '@/hooks/useUser';
 
 type Props = {
@@ -44,36 +47,36 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
 
                 {/* Analytics Grid - 2x2 Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-6 sm:mt-8">
-                    {/* Course Analytics (Hidden for Admin) */}
+                    {/* Course Analytics */}
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
                         <div className="p-2 sm:p-3 md:p-4">
                             <CourseAnalytics isDashboard={true} />
                         </div>
                     </div>
 
-                    {/* Order Analytics (Hidden for Admin) */}
+                    {/* Order Analytics */}
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
                         <div className="p-2 sm:p-3 md:p-4">
                             <OrderAnalytics isDashboard={true} />
                         </div>
                     </div>
 
-                    {/* Sales Card (Hidden for Admin) */}
+                    {/* Sales Card */}
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
                         <div className="p-3 sm:p-4 md:p-6">
-                            <div className="flex items-start justify-between gap-3 sm:gap-4">
-                                <div className="flex-1 min-w-0">
-                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#3ccbae] bg-opacity-10 flex items-center justify-center mb-2 sm:mb-3">
-                                        <BiBorderLeft className="dark:text-[#45CBA0] text-[#3ccbae] text-xl sm:text-2xl md:text-3xl" />
-                                    </div>
-                                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mt-1 sm:mt-2">
-                                        120
-                                    </h3>
-                                    <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1 break-words">
-                                        Sales Obtained
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400 whitespace-nowrap">
+                                <div className="flex items-start justify-between gap-3 sm:gap-4">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#3ccbae] bg-opacity-10 flex items-center justify-center mb-2 sm:mb-3">
+                                            <BiBorderLeft className="dark:text-[#45CBA0] text-[#3ccbae] text-xl sm:text-2xl md:text-3xl" />
+                                        </div>
+                                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mt-1 sm:mt-2">
+                                            120
+                                        </h3>
+                                        <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mt-1 break-words">
+                                            Sales Obtained
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400 whitespace-nowrap">
                                             ↑ +120%
                                         </span>
                                     </div>
@@ -109,7 +112,7 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                 <br />
                 <br />
 
-                {/* Bottom Section - Recent Transactions (Hidden for Admin) */}
+                {/* Bottom Section - Recent Transactions */}
                 <div className="grid grid-cols-1 mt-6 sm:mt-8">
                     <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
                         <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-2 border-b border-gray-200 dark:border-gray-700">
@@ -122,6 +125,27 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                         </div>
                         <div className="p-0">
                             <All_Invoices isDashboard={true} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Additional Admin/Teacher Monitoring Tables */}
+                <div className="grid grid-cols-1 mt-6 sm:mt-8 gap-6">
+                    {/* Latest Courses */}
+                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md overflow-hidden p-4">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Latest Courses</h2>
+                        <div className="max-h-[500px] overflow-y-auto">
+                            <AllCourses />
+                        </div>
+                    </div>
+
+
+
+                    {/* Student Tracking */}
+                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md overflow-hidden p-4">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Student Tracking</h2>
+                        <div className="max-h-[500px] overflow-y-auto">
+                            <AllUsers isTeam={false} />
                         </div>
                     </div>
                 </div>

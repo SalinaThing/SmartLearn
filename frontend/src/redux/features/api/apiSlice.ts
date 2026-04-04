@@ -35,8 +35,8 @@ export const apiSlice = createApi({
                         })
                     );
                 } catch (error) {
-                      console.log(error);
-                      dispatch(userLoggedOut());
+                      // log error but don't force logout on every fetch failure as it may clear tokens during navigations
+                      console.log("loadUser error:", error);
                 }
             },
         })

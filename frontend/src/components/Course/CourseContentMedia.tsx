@@ -32,7 +32,8 @@ type Props = {
 
 const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refetch }: Props) => {
 
-    const [activeBar, setActiveBar] = useState(0);
+    const tabs = ["Overview", "Resources", "Q&A", "Reviews", "Quiz", "Feedback", "Announcements"];
+    const [activeTab, setActiveTab] = useState("Overview");
     const { data: courseData, refetch: courseRefetch } = useGetCourseDetailsQuery(id, { refetchOnMountOrArgChange: true });
     const course = courseData?.course;
 
@@ -47,7 +48,7 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
         typeof mediaUrl === "string" && /\.pdf(\?|#|$)/i.test(mediaUrl.trim());
 
     useEffect(() => {
-        setActiveBar(0);
+        setActiveTab("Overview");
     }, [activeVideo]);
 
     const [question, setQuestion] = useState("");
@@ -249,21 +250,27 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
 
             <div className="w-full p-4 flex items-center justify-between bg-slate-500 bg-opacity-20 backdrop-blur shadow-[bg-slate-700] rounded shadow-inner">
                 <div className="flex flex-wrap gap-4">
-                    {["Overview", "Resources", "Q&A", "Reviews", "Quiz", "Feedback", "Announcements"].map((text, index) => (
-                        <h5
-                            key={index}
-                            className={`800px:text-[20px] cursor-pointer transition-all duration-300 ${activeBar === index ? "text-red-500" : "dark:text-white text-black"
-                                }`}
-                            onClick={() => setActiveBar(index)}
-                        >
-                            {text}
-                        </h5>
-                    ))}
+                    {tabs
+                        .filter(text => {
+                            if (user?.role === "admin" && (text === "Feedback" || text === "Announcements")) return false;
+                            if (user?.role === "teacher" && text === "Feedback") return false;
+                            return true;
+                        })
+                        .map((text, index) => (
+                            <h5
+                                key={index}
+                                className={`800px:text-[20px] cursor-pointer transition-all duration-300 ${activeTab === text ? "text-red-500" : "dark:text-white text-black"
+                                    }`}
+                                onClick={() => setActiveTab(text)}
+                            >
+                                {text}
+                            </h5>
+                        ))}
                 </div>
             </div>
 
             <div className="mt-6">
-                {activeBar === 0 && (
+                {activeTab === "Overview" && (
                     <p className="text-[18px] whitespace-pre-line mb-3 dark:text-white text-black">
                         {activeContent?.description ||
                             activeContent?.overview ||
@@ -272,7 +279,7 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                     </p>
                 )}
 
-                {activeBar === 1 && (
+                {activeTab === "Resources" && (
                     <div>
                         {/* PDF Resource */}
                         {data[activeVideo]?.pdfUrl && (
@@ -311,36 +318,40 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                     </div>
                 )}
 
-                {activeBar === 2 && (
+                {activeTab === "Q&A" && (
                     <>
-                        <div className="flex w-full">
-                            <Image
-                                src={user?.avatar ? user.avatar.url : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
-                                alt=" "
-                                width={50}
-                                height={50}
-                                className="w-[50px] h-[50px] rounded-full object-cover"
-                            />
+                        {user?.role !== "admin" && user?.role !== "teacher" && (
+                            <>
+                                <div className="flex w-full">
+                                    <Image
+                                        src={user?.avatar ? user.avatar.url : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                                        alt=" "
+                                        width={50}
+                                        height={50}
+                                        className="w-[50px] h-[50px] rounded-full object-cover"
+                                    />
 
-                            <textarea
-                                value={question}
-                                onChange={(e) => setQuestion(e.target.value)}
-                                cols={40}
-                                rows={5}
-                                placeholder="Write your question..."
-                                className="outline-none bg-transparent ml-3 border border-[#ffffff57] 800px:w-full p-2 rounded w-[90%] 800px:text-[18px] font-Poppins dark:text-white text-black"
-                            />
-                        </div>
+                                    <textarea
+                                        value={question}
+                                        onChange={(e) => setQuestion(e.target.value)}
+                                        cols={40}
+                                        rows={5}
+                                        placeholder="Write your question..."
+                                        className="outline-none bg-transparent ml-3 border border-[#ffffff57] 800px:w-full p-2 rounded w-[90%] 800px:text-[18px] font-Poppins dark:text-white text-black"
+                                    />
+                                </div>
 
-                        <div className='w-full flex justify-end'>
-                            <button
-                                className={`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 ${questionCreationLoading && "cursor-not-allowed opacity-50"}`}
-                                onClick={questionCreationLoading ? () => { } : handleQuestionSubmit}
-                                disabled={questionCreationLoading}
-                            >
-                                Submit
-                            </button>
-                        </div>
+                                <div className='w-full flex justify-end'>
+                                    <button
+                                        className={`${styles.button} !w-[120px] !h-[40px] text-[18px] mt-5 ${questionCreationLoading && "cursor-not-allowed opacity-50"}`}
+                                        onClick={questionCreationLoading ? () => { } : handleQuestionSubmit}
+                                        disabled={questionCreationLoading}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            </>
+                        )}
                         <br />
                         <br />
 
@@ -361,9 +372,9 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                     </>
                 )}
 
-                {activeBar === 3 && (
+                {activeTab === "Reviews" && (
                     <>
-                        {!isReviewExists && (
+                        {user?.role === "student" && !isReviewExists && (
                             <>
                                 <div className="flex w-full">
                                     <Image
@@ -442,7 +453,7 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                                             </div>
 
                                             <div className="ml-2">
-                                                <h1 className="text-[18px] font-semibold">{item?.user?.name}</h1>
+                                                <h1 className="text-[18px] font-semibold">{item?.user?.name || "User"}</h1>
                                                 <Ratings rating={item.rating} />
                                                 <p className="mt-1">{item.comment}</p>
                                                 <small className="text-gray-500 dark:text-[#ffffff83]">
@@ -499,7 +510,7 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
 
                                                 <div className="pl-3">
                                                     <div className="flex items-center">
-                                                        <h5 className="text-[16px] font-semibold">{i.user?.name}</h5>
+                                                        <h5 className="text-[16px] font-semibold">{i.user?.name || "User"}</h5>
                                                         {i.user?.role === "teacher" && (
                                                             <VscVerifiedFilled className="text-[#50c750] ml-2 text-[16px]" />
                                                         )}
@@ -520,13 +531,13 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                     </>
                 )}
 
-                {activeBar === 4 && (
+                {activeTab === "Quiz" && (
                     <QuizListStudent
                         courseId={id}
                         user={user}
                     />
                 )}
-                {activeBar === 5 && (
+                {activeTab === "Feedback" && (
                     <FeedbackForm
                         courseId={id}
                         contentId={activeContent?._id}
@@ -534,7 +545,7 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                     />
                 )}
 
-                {activeBar === 6 && (
+                {activeTab === "Announcements" && (
                     <StudentAnnouncements
                         courseId={id}
                         user={user}
@@ -570,6 +581,7 @@ const CommentReply = ({
                             setQuestionId={setQuestionId}
                             handleAnswerSubmit={handleAnswerSubmit}
                             answerCreationLoading={answerCreationLoading}
+                            user={user}
                         />
                     ))
                 ) : (
@@ -587,6 +599,7 @@ const CommentItem = ({
     handleAnswerSubmit,
     setAnswer,
     answerCreationLoading,
+    user,
 }: any) => {
 
     const [replyActive, setReplyActive] = useState(false);
@@ -606,7 +619,7 @@ const CommentItem = ({
                     </div>
 
                     <div className="pl-3 dark:text-white text-black">
-                        <h1 className="text-[18px] font-semibold">{item?.user?.name}</h1>
+                        <h1 className="text-[18px] font-semibold">{item?.user?.name || "User"}</h1>
                         <p className="mt-1">{item?.question}</p>
                         <small className="text-gray-500 dark:text-[#ffffff83]">{!item.createdAt ? "" : format(item?.createdAt)}</small>
                     </div>
@@ -652,7 +665,7 @@ const CommentItem = ({
 
                                 <div className="pl-3">
                                     <div className="flex items-center">
-                                        <h5 className="text-[16px] font-semibold">{replyItem.user?.name}</h5>
+                                        <h5 className="text-[16px] font-semibold">{replyItem.user?.name || "User"}</h5>
                                         {replyItem.user?.role === "teacher" &&
                                             <VscVerifiedFilled className="text-[#50c750] ml-2 text-[16px]" />
                                         }
@@ -667,24 +680,26 @@ const CommentItem = ({
                             </div>
                         ))}
 
-                        <div className="w-full flex relative dark:text-white text-black mt-3">
-                            <input
-                                type="text"
-                                placeholder="Enter your answer..."
-                                value={answer}
-                                onChange={(e) => setAnswer(e.target.value)}
-                                className={`block 800px:ml-12 outline-none bg-transparent border-b border-[#00000027] dark:border-[#fff] dark:text-white text-black p-[5px] w-[95%] ${answer === "" || answerCreationLoading ? "cursor-not-allowed opacity-50" : ""}`}
-                            />
+                        {(user?.role === "student" || user?.role === "teacher") && (
+                            <div className="w-full flex relative dark:text-white text-black mt-3">
+                                <input
+                                    type="text"
+                                    placeholder="Enter your answer..."
+                                    value={answer}
+                                    onChange={(e) => setAnswer(e.target.value)}
+                                    className={`block 800px:ml-12 outline-none bg-transparent border-b border-[#00000027] dark:border-[#fff] dark:text-white text-black p-[5px] w-[95%] ${answer === "" || answerCreationLoading ? "cursor-not-allowed opacity-50" : ""}`}
+                                />
 
-                            <button
-                                type="submit"
-                                className="absolute right-0 bottom-1 text-[#2190ff]"
-                                onClick={handleAnswerSubmit}
-                                disabled={answer === "" || answerCreationLoading}
-                            >
-                                Submit
-                            </button>
-                        </div>
+                                <button
+                                    type="submit"
+                                    className="absolute right-0 bottom-1 text-[#2190ff]"
+                                    onClick={handleAnswerSubmit}
+                                    disabled={answer === "" || answerCreationLoading}
+                                >
+                                    Submit
+                                </button>
+                            </div>
+                        )}
                         <br />
                     </>
                 )}

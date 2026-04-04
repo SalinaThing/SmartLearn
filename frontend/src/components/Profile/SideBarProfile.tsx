@@ -7,6 +7,7 @@ import { AiOutlineLogout } from 'react-icons/ai';
 import { MdOutlineAdminPanelSettings, MdOutlineQuiz } from 'react-icons/md';
 import { BiBookOpen } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import { IoNotificationsOutline } from 'react-icons/io5';
 
 type Props = {
   user: any;
@@ -115,6 +116,19 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
         </h5>
       </Link>
     )}
+
+    {/* Notifications */}
+    <div 
+        className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+        active === 8 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
+          }`}
+        onClick={() => setActive(8)}
+      >
+        <IoNotificationsOutline size={20} className="text-black dark:text-white" />
+        <h5 className="pl-2 block font-Poppins dark:text-white text-black">
+          Notifications
+        </h5>
+    </div>
 
     {/* Logout */}
     <div 

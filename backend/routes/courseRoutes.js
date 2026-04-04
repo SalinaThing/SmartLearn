@@ -50,8 +50,9 @@ const videoUpload = multer({
     },
 });
 
-courseRouter.post("/create-course", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), uploadCourse);
-courseRouter.put("/edit-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), editCourse);
+courseRouter.post("/update-course-progress", updateAccessToken, isAuthenticated, updateCourseProgress);
+courseRouter.post("/create-course", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), uploadCourse);
+courseRouter.put("/edit-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), editCourse);
 
 courseRouter.get("/get-single-course/:id", getSingleCourse);
 courseRouter.get("/get-all-course", getAllCourse);
@@ -60,7 +61,7 @@ courseRouter.get("/get-course-by-user/:id", updateAccessToken, isAuthenticated, 
 courseRouter.put("/add-question", updateAccessToken, isAuthenticated, addQuestion);
 courseRouter.put("/add-answer", updateAccessToken, isAuthenticated, addAnswer);
 courseRouter.put("/add-review/:id", updateAccessToken, isAuthenticated, addReview);
-courseRouter.put("/add-reply-to-review", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), addReplyToReview);
+courseRouter.put("/add-reply-to-review", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), addReplyToReview);
 
 courseRouter.get("/get-teacher-courses", isAuthenticated, authorizeRoles("teacher", "admin"), getTeacherAllCourses);
 
@@ -76,8 +77,8 @@ courseRouter.get("/get-reviews-by-user", updateAccessToken, isAuthenticated, get
 courseRouter.put("/edit-review", updateAccessToken, isAuthenticated, editReview);
 courseRouter.put("/edit-question", updateAccessToken, isAuthenticated, editQuestion);
 
-courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), deleteCourse);
+courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteCourse);
 
-courseRouter.post("/update-course-progress", updateAccessToken, isAuthenticated, updateCourseProgress);
+
 
 export default courseRouter;

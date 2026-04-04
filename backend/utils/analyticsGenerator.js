@@ -3,6 +3,8 @@ export async function generateLast12MonthsAnalytics(model) {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + 1); // Set to the first day of the month
 
+  const promises = [];
+
   for (let i = 11; i >= 0; i--) {
     const endDate = new Date(
       currentDate.getFullYear(),
@@ -21,13 +23,20 @@ export async function generateLast12MonthsAnalytics(model) {
       month: "short",
       year: "numeric",
     });
-    const count = await model.countDocuments({
-      createdAt: {
-        $gte: startDate,
-        $lt: endDate,
-      },
-    });
-    last12Months.push({ monthYear, count });
+
+    promises.push(
+      model.countDocuments({
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+      }).then(count => ({ monthYear, count }))
+    );
   }
+
+  // Execute all 12 MongoDB queries concurrently to eliminate blocking network delays!
+  const results = await Promise.all(promises);
+  last12Months.push(...results);
+
   return last12Months;
 }

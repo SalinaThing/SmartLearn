@@ -1,4 +1,5 @@
 import Result from "../models/resultModel.js";
+import userModel from "../models/userModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import { io } from "../serverSocket.js";
@@ -26,6 +27,26 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
         };
 
         const created = await Result.create(payload);
+
+        // Award certificate if student scores 100%
+        if (Number(correct) === Number(totalQuestions)) {
+            try {
+                const certificateData = {
+                    title: `Certificate of Achievement for ${title}`,
+                    courseId,
+                    quizId,
+                    score: `${correct}/${totalQuestions}`,
+                    createdAt: new Date()
+                };
+                
+                await userModel.findByIdAndUpdate(req.user._id, {
+                    $push: { certificates: certificateData }
+                });
+            } catch (error) {
+                console.log("Certificate award error:", error);
+            }
+        }
+
         // Notify teachers
         try {
             await NotificationModel.create({
@@ -47,8 +68,8 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
             message: "Result created successfully",
             result: created
         });
-        
-      
+
+
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
@@ -59,7 +80,7 @@ export const listResults = catchAsyncErrors(async (req, res, next) => {
     try {
         const query = { user: req.user?._id };
         const { courseId } = req.query;
-         
+
         if (courseId) {
             query.courseId = courseId;
         }
@@ -70,7 +91,7 @@ export const listResults = catchAsyncErrors(async (req, res, next) => {
             results: items
         });
 
-    } 
+    }
     catch (err) {
         return next(new ErrorHandler(500, err.message));
     }

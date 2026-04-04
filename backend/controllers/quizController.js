@@ -3,6 +3,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import { io } from "../serverSocket.js";
 import NotificationModel from "../models/notificationModel.js";
+import userModel from "../models/userModel.js";
 
 // CREATE QUIZ
 export const createQuiz = catchAsyncErrors(async (req, res, next) => {
@@ -20,17 +21,18 @@ export const createQuiz = catchAsyncErrors(async (req, res, next) => {
             questions,
         });
 
-        // Notify students
+        // Notify all students
         try {
             await NotificationModel.create({
                 title: "New Quiz Available",
-                message: `A new quiz "${quiz.title}" has been added to your course.`,
+                message: `A new quiz "${quiz.title}" has been added to the platform.`,
                 role: 'student'
             });
-            // Emit socket event
+            
             io.to("student").emit("newNotification", {
-                title: "New Quiz Available",
-                message: `A new quiz "${quiz.title}" has been added to your course.`,
+                action: "Assessment New",
+                title: "New Quiz",
+                message: `New quiz "${quiz.title}" is now available`
             });
         } catch (error) {
             console.log("Quiz notification error:", error);
@@ -72,18 +74,23 @@ export const updateQuiz = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(404, "Quiz not found"));
         }
 
-        // Notify students
+        // Notify enrolled students
         try {
-            await NotificationModel.create({
-                title: "Quiz Updated",
-                message: `Quiz "${quiz.title}" has been updated with new questions.`,
-                role: 'student'
-            });
-            // Emit socket event
-            io.to("student").emit("newNotification", {
-                title: "Quiz Updated",
-                message: `Quiz "${quiz.title}" has been updated with new questions.`,
-            });
+            const enrolledUsers = await userModel.find({ "courses.courseId": quiz.courseId });
+            
+            for (const student of enrolledUsers) {
+                await NotificationModel.create({
+                    user: student._id,
+                    title: "Quiz Updated",
+                    message: `Quiz "${quiz.title}" in your course has been updated.`,
+                    role: 'student'
+                });
+                io.to(student._id.toString()).emit("newNotification", {
+                    action: "Assessment Updated",
+                    title: "Quiz Updated",
+                    message: `Quiz "${quiz.title}" has been updated`
+                });
+            }
         } catch (error) {
             console.log("Quiz update notification error:", error);
         }
@@ -106,6 +113,27 @@ export const deleteQuiz = catchAsyncErrors(async (req, res, next) => {
 
         if (!quiz) {
             return next(new ErrorHandler(404, "Quiz not found"));
+        }
+
+        // Notify enrolled students
+        try {
+             const enrolledUsers = await userModel.find({ "courses.courseId": quiz.courseId });
+             
+             for (const student of enrolledUsers) {
+                 await NotificationModel.create({
+                     user: student._id,
+                     title: "Quiz Removed",
+                     message: `Quiz "${quiz.title}" has been removed from your course.`,
+                     role: 'student'
+                 });
+                 io.to(student._id.toString()).emit("newNotification", {
+                     action: "Assessment Deleted",
+                     title: "Quiz Deleted",
+                     message: `Quiz "${quiz.title}" has been removed`
+                 });
+             }
+        } catch (error) {
+            console.log("Quiz delete notification error:", error);
         }
 
         res.status(200).json({

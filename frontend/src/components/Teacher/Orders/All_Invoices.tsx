@@ -235,6 +235,17 @@ const All_Invoices = ({ isDashboard }: Props) => {
                       ? "rgba(255, 255, 255, 0.05)!important"
                       : "rgba(0, 0, 0, 0.02)!important",
                   },
+                  "&.Mui-selected": {
+                    backgroundColor: theme === "dark"
+                      ? "rgba(255, 255, 255, 0.1) !important"
+                      : "rgba(0, 0, 0, 0.08) !important",
+                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                  },
+                  "&.Mui-selected:hover": {
+                    backgroundColor: theme === "dark"
+                      ? "rgba(255, 255, 255, 0.15) !important"
+                      : "rgba(0, 0, 0, 0.12) !important",
+                  },
                 },
                 "& .MuiTablePagination-root": {
                   color: theme === "dark" ? "#fff" : "#000",
@@ -251,20 +262,27 @@ const All_Invoices = ({ isDashboard }: Props) => {
                   fontWeight: 500,
                 },
                 "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
-                  borderBottom: "none",
+                  backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                  borderBottom: "1px solid #ffffff30",
                   color: theme === "dark" ? "#fff !important" : "#000 !important",
                   fontSize: "0.9rem",
                   fontWeight: 600,
                   borderRadius: "12px 12px 0 0",
+                },
+                "& .MuiDataGrid-topContainer, & .MuiDataGrid-filler, & .MuiDataGrid-columnHeader": {
+                  backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                  color: theme === "dark" ? "#fff !important" : "#000 !important",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  color: theme === "dark" ? "#fff !important" : "#000 !important",
                 },
                 "& .MuiDataGrid-virtualScroller": {
                   backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                 },
                 "& .MuiDataGrid-footerContainer": {
                   color: theme === "dark" ? "#fff !important" : "#000 !important",
-                  borderTop: "none",
-                  backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
+                  borderTop: "1px solid #ffffff30",
+                  backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#A4A9FC !important",
                   borderRadius: "0 0 12px 12px",
                 },
                 "& .MuiCheckbox-root": {

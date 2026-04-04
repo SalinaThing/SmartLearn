@@ -28,9 +28,9 @@ const schema = Yup.object().shape({
 
 const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
     const [show, setShow] = useState(false);
-    const [login, { isSuccess, error }] = useLoginUserMutation();
+    const [login, { data, isSuccess, error }] = useLoginUserMutation();
     const navigate = useNavigate();
-    const { user } = useUser();
+    const { user: hookUser } = useUser();
 
     const formik = useFormik({
         initialValues: {
@@ -48,19 +48,24 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
             (async () => {
                 toast.success("Login successfully!! Welcome back!");
                 setOpen(false);
-                // Wait until the authenticated user is loaded before navigating,
-                // otherwise Protected routes may redirect you back to "/".
+                
                 try {
+                // Wait until the authenticated user is loaded
                     await refetch();
                 } catch {
-                    // refetch errors are handled by the guards/toasts
+                    // handled by guards
                 }
+
                 const dashboardMap: Record<string, string> = {
                     admin: "/admin",
                     teacher: "/teacher",
                     student: "/student/dashboard",
                 };
-                const userRole = (user as any)?.role || "student";
+                
+                // Prioritize data from the login response to ensure correct redirection
+                const loggedInUser = data?.user || hookUser;
+                const userRole = (loggedInUser as any)?.role || "student";
+                
                 navigate(dashboardMap[userRole] || "/profile");
             })();
         }

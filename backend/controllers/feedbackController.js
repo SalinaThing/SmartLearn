@@ -31,15 +31,15 @@ export const submitFeedback = catchAsyncErrors(async (req, res, next) => {
             feedback,
         });
 
-        // Notify teachers
+        // Notify teachers and admins
         try {
             await NotificationModel.create({
                 title: "New Feedback Received",
                 message: `A student has given feedback for ${contentTitle || "a course"}.`,
-                role: 'teacher'
+                role: 'all' // Shows for both
             });
-            // Emit socket event
-            io.to("teacher").emit("newNotification", {
+            // Emit socket event to both
+            io.to("teacher").to("admin").emit("newNotification", {
                 title: "New Feedback Received",
                 message: `A student has given feedback for ${contentTitle || "a course"}.`,
             });
@@ -133,8 +133,8 @@ export const deleteFeedback = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(404, "Feedback not found"));
         }
 
-        if (req.user.role !== 'student' && req.user.role !== 'admin') {
-            return next(new ErrorHandler(403, "Only students or admins can delete feedback"));
+        if (req.user.role !== 'student') {
+            return next(new ErrorHandler(403, "Only students can delete feedback"));
         }
 
         if (req.user.role === 'student' && feedback.user.toString() !== req.user?._id.toString()) {

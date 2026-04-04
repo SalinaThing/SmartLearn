@@ -35,9 +35,11 @@ const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
         })
         .filter(Boolean);
 
-    const enrolledCourses = (allCoursesData?.courses || []).filter((course: any) =>
-        enrolledCourseIds.includes(course?._id)
-    );
+    const enrolledCourses = (user?.role === "admin" || user?.role === "teacher")
+        ? allCoursesData?.courses || []
+        : (allCoursesData?.courses || []).filter((course: any) =>
+            enrolledCourseIds.includes(course?._id)
+        );
 
     return (
         <div className={`w-[90%] 800px:w-[85%] m-auto ${embedded ? "mt-0" : "mt-[120px]"}`}>
@@ -57,7 +59,8 @@ const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
                             {enrolledCourses.map((course: any) => (
                                 <CourseQuizSummary 
                                     key={course._id} 
-                                    course={course} 
+                                    course={course}
+                                    user={user}
                                     onViewQuizzes={() => setActiveCourse(course)} 
                                 />
                             ))}
@@ -84,7 +87,7 @@ const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
     );
 };
 
-const CourseQuizSummary = ({ course, onViewQuizzes }: { course: any, onViewQuizzes: () => void }) => {
+const CourseQuizSummary = ({ course, onViewQuizzes, user }: { course: any, onViewQuizzes: () => void, user?: any }) => {
     const { data, isLoading } = useGetQuizzesByCourseQuery(course._id, { refetchOnMountOrArgChange: true });
 
     if (isLoading) return <div className="h-[250px] flex items-center justify-center p-4 border border-gray-200 dark:border-gray-800 rounded-lg animate-pulse">Loading...</div>;
@@ -117,14 +120,16 @@ const CourseQuizSummary = ({ course, onViewQuizzes }: { course: any, onViewQuizz
 
                 <div className="w-full flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800 mt-2">
                     <div className="flex items-center gap-2">
-                        <div className="px-3 py-1 bg-[#3ccbae] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
-                            Ready to Take
-                        </div>
+                        {user?.role !== "admin" && user?.role !== "teacher" && (
+                            <div className="px-3 py-1 bg-[#3ccbae] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
+                                Ready to Take
+                            </div>
+                        )}
                     </div>
                     <div 
                         className="flex items-center bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-lg text-blue-600 dark:text-blue-400 text-[13px] font-semibold hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
                     >
-                        View Now &rarr;
+                        {(user?.role === "admin" || user?.role === "teacher") ? "Get Access \u2192" : "View Now \u2192"}
                     </div>
                 </div>
             </div>

@@ -101,7 +101,7 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
             }
 
         }catch(err){
-            return next(new ErrorHandler(500, err.message));
+            console.log("Email could not be sent:", err.message);
         }
 
         user?.courses.push({ courseId: course?._id });
@@ -156,10 +156,12 @@ export const newPayment = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(500, "Khalti is not configured. Set KHALTI_SECRET_KEY."));
         }
 
-        const amount = req.body.amount;
+        const amount = Number(req.body.amount);
         const courseId = req.body.courseId;
-        if (amount == null || !courseId) {
-            return next(new ErrorHandler(400, "amount and courseId are required"));
+        
+        if (isNaN(amount) || amount <= 0 || !courseId) {
+            console.log("Payment initialization failure - Invalid parameters:", { amount: req.body.amount, courseId });
+            return next(new ErrorHandler(400, "Invalid amount or courseId."));
         }
 
         const appUrl =

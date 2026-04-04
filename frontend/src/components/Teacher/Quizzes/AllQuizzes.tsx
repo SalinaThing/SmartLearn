@@ -123,17 +123,44 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
                             "& .MuiDataGrid-row": {
                                 color: theme === "dark" ? "#fff" : "#000",
                                 borderBottom: theme === "dark" ? "1px solid #ffffff30!important" : "1px solid #ccc!important",
+                                transition: "all 0.2s ease",
+                                "&:hover": {
+                                    backgroundColor: theme === "dark"
+                                        ? "rgba(255, 255, 255, 0.05)!important"
+                                        : "rgba(0, 0, 0, 0.02)!important",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                },
+                                "&.Mui-selected": {
+                                    backgroundColor: theme === "dark"
+                                        ? "rgba(255, 255, 255, 0.1) !important"
+                                        : "rgba(0, 0, 0, 0.08) !important",
+                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                },
+                                "&.Mui-selected:hover": {
+                                    backgroundColor: theme === "dark"
+                                        ? "rgba(255, 255, 255, 0.15) !important"
+                                        : "rgba(0, 0, 0, 0.12) !important",
+                                },
                             },
                             "& .MuiDataGrid-columnHeaders": {
-                                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-                                color: theme === "dark" ? "#fff" : "#000",
+                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                borderBottom: "1px solid #ffffff30",
+                            },
+                            "& .MuiDataGrid-topContainer, & .MuiDataGrid-filler, & .MuiDataGrid-columnHeader": {
+                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
+                            },
+                            "& .MuiDataGrid-columnHeaderTitle": {
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
                             },
                             "& .MuiDataGrid-virtualScroller": {
-                                backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
+                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#f5f5f5 !important",
                             },
                             "& .MuiDataGrid-footerContainer": {
-                                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-                                color: theme === "dark" ? "#fff" : "#000",
+                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
+                                color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                borderTop: "1px solid #ffffff30",
                             },
                         }}
                     >

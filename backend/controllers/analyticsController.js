@@ -50,3 +50,23 @@ export const getOrderAnalytics = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler(500, err.message));
     }
 });
+
+// GET ALL ANALYTICS IN ONE REQUEST - eliminates 3 separate round trips
+export const getAllAnalytics = catchAsyncErrors(async (req, res, next) => {
+    try {
+        // Run all 3 analytics queries concurrently - single network round trip
+        const [users, courses, orders] = await Promise.all([
+            generateLast12MonthsAnalytics(userModel),
+            generateLast12MonthsAnalytics(CourseModel),
+            generateLast12MonthsAnalytics(OrderModel),
+        ]);
+        res.status(200).json({
+            success: true,
+            users,
+            courses,
+            orders,
+        });
+    } catch (err) {
+        return next(new ErrorHandler(500, err.message));
+    }
+});

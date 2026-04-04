@@ -9,6 +9,7 @@ import { useGetAllCoursesByUserQuery } from '@/redux/features/courses/coursesApi
 import CourseCard from '../Course/CourseCard';
 import AllQuizzesStudent from '../Quiz/AllQuizzesStudent';
 import { Link } from 'react-router-dom';
+import AllNotifications from '../Admin/Notifications/AllNotifications';
 
 type Props = {
   user: any;
@@ -100,6 +101,12 @@ const Profile: FC<Props> = ({ user }) => {
         {active === 4 && (
           <div className="text-black dark:text-white">
             <AllQuizzesStudent embedded />
+          </div>
+        )}
+        
+        {active === 8 && (
+          <div className="text-black dark:text-white">
+            <AllNotifications />
           </div>
         )}
       </div>

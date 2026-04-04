@@ -104,9 +104,9 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                                             return (
                                                 <button
                                                     onClick={() => handleStartQuiz(quiz)}
-                                                    className={`${styles.button} !w-[100px] !h-[35px] !text-[14px]`}
+                                                    className={`${styles.button} !w-[120px] !h-[35px] !text-[12px]`}
                                                 >
-                                                    Start Quiz
+                                                    {user?.role === "admin" ? "View Questions" : "Start Quiz"}
                                                 </button>
                                             );
                                         })()}
@@ -137,7 +137,8 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                                                     name={`question-${qIndex}`}
                                                     value={option}
                                                     checked={answers[qIndex] === option}
-                                                    onChange={() => handleAnswerChange(qIndex, option)}
+                                                    onChange={user?.role === "admin" ? () => {} : () => handleAnswerChange(qIndex, option)}
+                                                    disabled={user?.role === "admin"}
                                                     className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                                                 />
                                                 <span className="dark:text-white text-black">{option}</span>
@@ -146,11 +147,13 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                                     </div>
                                 </div>
                             ))}
-                            <div className="flex justify-center mt-10 mb-10">
-                                <button onClick={handleSubmit} className={`${styles.button} !w-[200px]`}>
-                                    Submit Quiz
-                                </button>
-                            </div>
+                            {user?.role !== "admin" && (
+                                <div className="flex justify-center mt-10 mb-10">
+                                    <button onClick={handleSubmit} className={`${styles.button} !w-[200px]`}>
+                                        Submit Quiz
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="text-center p-10 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-blue-500">

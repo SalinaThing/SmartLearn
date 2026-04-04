@@ -64,6 +64,14 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    certificates: [
+      {
+        courseId: String,
+        title: String,
+        url: String,
+        date: Date,
+      },
+    ],
   },
   {
     timestamps: true,

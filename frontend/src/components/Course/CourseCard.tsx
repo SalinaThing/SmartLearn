@@ -14,8 +14,8 @@ type Props = {
 const CourseCard: FC<Props> = ({ item, isProfile }) => {
     const { user } = useUser();
     
-    // Check if user is enrolled in this course
-    const isEnrolled = user?.courses?.some((c: any) => c.courseId === item?._id) || user?.role === "teacher";
+    // Check if user is enrolled in this course or is highly privileged
+    const isEnrolled = user?.courses?.some((c: any) => c.courseId === item?._id) || user?.role === "teacher" || user?.role === "admin";
     const targetPath = (isProfile || isEnrolled) ? `/course-access/${item?._id}` : `/course/${item?._id}`;
 
     return (
@@ -35,7 +35,7 @@ const CourseCard: FC<Props> = ({ item, isProfile }) => {
                     {item?.name || "Untitled Course"}
                 </h1>
 
- { (isEnrolled || isProfile) ? (
+ { ((isEnrolled || isProfile) && user?.role !== "teacher" && user?.role !== "admin") ? (
                     <div className="w-full flex items-center justify-between pt-3">
                         <div className="flex items-center gap-2">
                              <div className="px-3 py-1 bg-[#3ccbae] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">

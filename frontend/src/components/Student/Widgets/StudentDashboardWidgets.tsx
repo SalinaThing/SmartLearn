@@ -134,29 +134,23 @@ const StudentDashboardWidgets: FC<Props> = () => {
                                 <PiCertificateFill className="text-purple-600 text-3xl" />
                             </div>
                             <h3 className="text-3xl font-bold text-gray-800 dark:text-white">
-                                0
+                                {user?.certificates?.length || 0}
                             </h3>
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
                                 Certificates
                             </p>
                         </div>
-                        <CircularProgressWithLabel value={0} />
+                        <CircularProgressWithLabel value={(user?.certificates?.length || 0) > 0 ? 100 : 0} />
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Main Content: Enrolled Courses & Quizzes */}
-                <div className="lg:col-span-8 space-y-10">
+                {/* Main Content Area - Full width now that sidebar widgets are removed */}
+                <div className="lg:col-span-12 space-y-10">
                     <StudentEnrolledCourses />
                     <StudentAnnouncementsPreview />
                     <StudentQuizResults />
-                </div>
-
-                {/* Right Sidebar: Notifications & Feedback */}
-                <div className="lg:col-span-4 space-y-10">
-                    <StudentNotifications />
-                    <StudentFeedbackList />
                 </div>
             </div>
         </div>

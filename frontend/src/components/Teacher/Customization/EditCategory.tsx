@@ -79,25 +79,30 @@ const EditCategory = (props: Props) => {
                 isLoading ? (
                     <Loader />
                 ) : (
-                    <div className="mt-[120px] text-center">
-                        <h1 className={`${styles.title}`}>All Categories</h1>
+                    <div className="w-full">
+                        <h1 className="text-2xl font-bold font-Poppins mb-8 text-black dark:text-white">
+                            Manage <span className="text-[#3ccbae]">Categories</span>
+                        </h1>
 
-                        {categories &&
-                            categories.map((item: any, index: number) => {
-                                return (
-                                    <div className="p-3" key={index}>
-                                        <div className="flex items-center w-full justify-center">
+                        {/* 2-column responsive grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {categories &&
+                                categories.map((item: any, index: number) => {
+                                    return (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-2 bg-white dark:bg-[#1F2A40] border border-gray-200 dark:border-[#ffffff20] rounded-xl px-4 py-3 shadow-sm"
+                                        >
                                             <input
-                                                className={`${styles.input} !w-[unset] border-none !text-[20px]`}
+                                                className="flex-1 bg-transparent outline-none text-[16px] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                                 value={item.title}
                                                 onChange={(e) =>
                                                     handleCategoriesAdd(item._id, e.target.value)
                                                 }
                                                 placeholder="Enter category title..."
                                             />
-
                                             <AiOutlineDelete
-                                                className="dark:text-white text-black text-[18px] cursor-pointer"
+                                                className="dark:text-white text-black text-[18px] cursor-pointer flex-shrink-0 hover:text-red-500 transition-colors"
                                                 onClick={() =>
                                                     setCategories((prevCategory: any) =>
                                                         prevCategory.filter((i: any) => i._id !== item._id)
@@ -105,42 +110,40 @@ const EditCategory = (props: Props) => {
                                                 }
                                             />
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        <br />
-                        <br />
+                                    );
+                                })}
+                        </div>
 
-                        <div className="w-full flex justify-center">
+                        {/* Add new category */}
+                        <div className="w-full flex justify-center mt-6">
                             <IoMdAddCircleOutline
-                                className="dark:text-white text-black text-[25px] cursor-pointer"
+                                className="dark:text-white text-black text-[28px] cursor-pointer hover:text-[#3ccbae] transition-colors"
                                 onClick={newCategoriesHandler}
                             />
                         </div>
 
-                        <div
-                            className={`${styles.button} !w-[100px] !min-h-[40px] !h-[40px] dark:text-white text-black bg[#cccccc34]
-                                        ${areCategoriesUnchanged(data.layout.categories, categories) ||
+                        {/* Save button */}
+                        <div className="flex justify-end mt-6">
+                            <div
+                                className={`${styles.button} !w-[120px] !min-h-[40px] !h-[40px] dark:text-white text-black !rounded transition-all duration-200
+                                    ${areCategoriesUnchanged(data.layout.categories, categories) ||
                                     isAnyCategoryTitleEmpty(categories)
-                                    ? "!cursor-not-allowed"
-                                    : "!cursor-pointer !bg-[#42d383]"
+                                        ? "!cursor-not-allowed opacity-50 bg-gray-400"
+                                        : "!cursor-pointer !bg-[#42d383] hover:!bg-[#34b768]"
+                                    }`}
+                                onClick={
+                                    areCategoriesUnchanged(data.layout.categories, categories) ||
+                                        isAnyCategoryTitleEmpty(categories)
+                                        ? () => null
+                                        : editCategoriesHandler
                                 }
-                                        !rounded absolute bottom-12 right-12`
-                            }
-                            onClick={
-                                areCategoriesUnchanged(data.layout.categories, categories) ||
-                                    isAnyCategoryTitleEmpty(categories)
-                                    ? () => null
-                                    : editCategoriesHandler
-                            }
-                        >
-                            Save
+                            >
+                                Save
+                            </div>
                         </div>
                     </div>
-
                 )
             }
-
         </>
     )
 }

@@ -158,8 +158,11 @@ const EditFAQ = (props: Props) => {
                 isLoading ? (
                     <Loader />
                 ) : (
-                    <div className="w-[90%] 800px:w-[80%] m-auto mt-[120px]">
-                        <div className="mt-12">
+                    <div className="w-full max-w-4xl mx-auto">
+                        <h1 className="text-2xl font-bold font-Poppins mb-8 text-black dark:text-white">
+                            Manage <span className="text-[#3ccbae]">FAQ</span>
+                        </h1>
+                        <div className="mt-4">
                             <dl className="space-y-8">
                                 {questions.map((q: FAQItem) => {
                                     const itemId = getItemId(q);
@@ -229,17 +232,19 @@ const EditFAQ = (props: Props) => {
                             />
                         </div>
 
-                        <button
-                            type="button"
-                            disabled={isSaveDisabled}
-                            onClick={handleEdit}
-                            className={`${styles.button} w-[100px] min-h-[40px] h-[40px] absolute bottom-12 right-12 rounded transition-all duration-200 ${isSaveDisabled
-                                    ? "opacity-50 cursor-not-allowed bg-gray-400"
-                                    : "cursor-pointer bg-[#42d383] hover:bg-[#34b768]"
-                                }`}
-                        >
-                            Save
-                        </button>
+                        <div className="flex justify-end mt-8">
+                            <button
+                                type="button"
+                                disabled={isSaveDisabled}
+                                onClick={handleEdit}
+                                className={`${styles.button} !w-[120px] !min-h-[40px] !h-[40px] rounded transition-all duration-200 ${isSaveDisabled
+                                        ? "opacity-50 cursor-not-allowed bg-gray-400"
+                                        : "cursor-pointer bg-[#42d383] hover:bg-[#34b768]"
+                                    }`}
+                            >
+                                Save
+                            </button>
+                        </div>
                     </div>
                 )
             }

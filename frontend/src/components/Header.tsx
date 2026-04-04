@@ -67,9 +67,6 @@ const Header: FC<Props> = ({
           toast.success("Login Successfully");
         }
       }
-      if (sessionData === null && !isLoading && !isFetching && !user) {
-        logoutUser({});
-      }
     }
   }, [sessionData, user, socialAuth, isLoading, isFetching, isSuccess, refetch]);
 

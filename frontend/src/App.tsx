@@ -48,6 +48,12 @@ import AdminTeam from "./pages/admin/Team";
 import AdminUserAnalytics from "./pages/admin/UserAnalytics";
 import AdminOrderAnalytics from "./pages/admin/OrderAnalytics";
 import AdminCourseAnalytics from "./pages/admin/CourseAnalytics";
+import AdminNotifications from "./pages/admin/Notifications";
+
+// Teacher Notifications import
+import TeacherNotifications from "./pages/teacher/Notifications";
+
+import StudentNotifications from "./pages/student/Notifications";
 
 export default function App() {
   return (
@@ -65,9 +71,11 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/course/:id" element={<CourseDetail />} />
         <Route path="/course-access/:id" element={<CourseAccess />} />
+        <Route path="/notifications" element={<StudentNotifications />} />
 
         {/* Teacher Routes */}
         <Route path="/teacher" element={<TeacherDashboard />} />
+        <Route path="/teacher/notifications" element={<TeacherNotifications />} />
         <Route path="/teacher/create-course" element={<CreateCourse />} />
         <Route path="/teacher/edit-course/:id" element={<EditCourse />} />
         <Route path="/teacher/hero-layout" element={<HeroLayout />} />
@@ -85,6 +93,7 @@ export default function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<AdminAllUsers />} />
+        <Route path="/admin/notifications" element={<AdminNotifications />} />
         <Route path="/admin/courses" element={<AdminAllCourses />} />
         <Route path="/admin/invoices" element={<AdminInvoices />} />
         <Route path="/admin/faq" element={<AdminFaq />} />

@@ -5,7 +5,7 @@ import { submitFeedback, getAllFeedback, getStudentFeedback, updateFeedback, del
 const feedbackRouter = express.Router();
 
 feedbackRouter.post("/submit-feedback", isAuthenticated, authorizeRoles("student"), submitFeedback);
-feedbackRouter.get("/get-all-feedback", isAuthenticated, authorizeRoles("teacher"), getAllFeedback);
+feedbackRouter.get("/get-all-feedback", isAuthenticated, authorizeRoles("teacher", "admin"), getAllFeedback);
 feedbackRouter.get("/get-student-feedback", isAuthenticated, authorizeRoles("student"), getStudentFeedback);
 feedbackRouter.put("/update-feedback/:id", isAuthenticated, authorizeRoles("student"), updateFeedback);
 feedbackRouter.delete("/delete-feedback/:id", isAuthenticated, authorizeRoles("student"), deleteFeedback);

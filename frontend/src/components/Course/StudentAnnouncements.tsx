@@ -45,6 +45,7 @@ const StudentAnnouncements = ({ courseId, user }: Props) => {
     };
 
     const now = new Date();
+    const isTeacherOrAdmin = user?.role === "teacher" || user?.role === "admin";
     const announcements = data?.announcements || [];
     const visibleToStudents = announcements.filter((item: any) => {
         const start = item?.scheduledFor ? new Date(item.scheduledFor) : new Date(item.createdAt);
@@ -56,7 +57,7 @@ const StudentAnnouncements = ({ courseId, user }: Props) => {
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isTeacher) return;
+        if (user?.role !== "teacher") return;
 
         if (!title.trim() || !content.trim()) {
             toast.error("Title and content are required");
@@ -160,18 +161,19 @@ const StudentAnnouncements = ({ courseId, user }: Props) => {
         }
     }, [isDeleteSuccess, deleteError, refetch]);
 
+    const displayAnnouncements = isTeacherOrAdmin ? announcements : visibleToStudents;
+
     return (
         <div className="w-full">
             {isLoading ? (
                 <Loader />
             ) : (
                 <div className="w-full p-4">
-                    {isTeacher && (
+                    {user?.role === "teacher" && (
                         <div className="mb-8 p-4 bg-slate-500 bg-opacity-10 rounded-lg">
                             <h2 className="text-[18px] font-[600] dark:text-white text-black mb-4">
                                 Create announcement
                             </h2>
-
                             <form onSubmit={handleCreate} className="space-y-4">
                                 <div className="grid grid-cols-1 1100px:grid-cols-2 gap-4">
                                     <div>
@@ -231,10 +233,10 @@ const StudentAnnouncements = ({ courseId, user }: Props) => {
                         </div>
                     )}
 
-                    {(isTeacher ? announcements : visibleToStudents).length === 0 ? (
+                    {displayAnnouncements.length === 0 ? (
                         <p className="text-black dark:text-white text-center mt-10">No announcements yet.</p>
                     ) : (
-                        (isTeacher ? announcements : visibleToStudents).map((item: any) => (
+                        displayAnnouncements.map((item: any) => (
                             <div key={item._id} className="mb-6 p-4 bg-slate-500 bg-opacity-10 rounded-lg">
                                 {editingId === item._id ? (
                                     <div className="space-y-4">

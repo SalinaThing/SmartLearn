@@ -3,10 +3,16 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 
 export const courseAssistantChat = catchAsyncErrors(async (req, res, next) => {
-  const { message } = req.body || {};
+  const { message, pdfUrl } = req.body || {};
 
   if (!message || typeof message !== "string" || !message.trim()) {
     return next(new ErrorHandler(400, "Message is required"));
+  }
+
+  const normalizedPdfUrl =
+    typeof pdfUrl === "string" && pdfUrl.trim().length > 0 ? pdfUrl.trim() : null;
+  if (normalizedPdfUrl && normalizedPdfUrl.length > 2048) {
+    return next(new ErrorHandler(400, "pdfUrl is too long"));
   }
 
   const enrolledCourseIds = (req.user?.courses || [])
@@ -40,7 +46,9 @@ export const courseAssistantChat = catchAsyncErrors(async (req, res, next) => {
   } else if (lastUserPrompt.includes("quiz") || lastUserPrompt.includes("test")) {
     answer = "To test your knowledge, check out the **Quizzes** section in your Student Dashboard. Need help revising before you start?";
   } else if (lastUserPrompt.includes("pdf") || lastUserPrompt.includes("video")) {
-    answer = "Course materials like Video Lessons and PDFs are available directly in your Course Player. 📄🎥";
+    answer = normalizedPdfUrl
+      ? `Course materials are available in your Course Player. Here is the PDF link you provided: ${normalizedPdfUrl}`
+      : "Course materials like Video Lessons and PDFs are available directly in your Course Player. 📄🎥";
   } else if (lastUserPrompt.includes("progress") || lastUserPrompt.includes("history")) {
     answer = "You can track your learning journey directly in your Dashboard Analytics! 📈";
   } else if (lastUserPrompt.includes("tip")) {
@@ -82,13 +90,10 @@ export const courseAssistantChat = catchAsyncErrors(async (req, res, next) => {
     answer = "Why do programmers prefer dark mode? Because light attracts bugs! 🐛";
   } else if (lastUserPrompt.toLowerCase().includes("give a study plan") || lastUserPrompt.toLowerCase().includes("study plan")) {
     answer = "**Study Plan**: Start by setting clear daily goals, divide your subjects into manageable sections, allocate time for practice and revision, and track your progress weekly. Consistency is key! 📚✏️";
-    isDummyIntercept = true;
   } else if (lastUserPrompt.toLowerCase().includes("show my enrolled courses") || lastUserPrompt.toLowerCase().includes("my courses")) {
     answer = "**Your Enrolled Courses**: You are currently enrolled in: 1) Web Development Basics, 2) Introduction to Python, 3) AI & Machine Learning Fundamentals, 4) React & Node.js Fullstack. 🎓";
-    isDummyIntercept = true;
   } else if (lastUserPrompt.toLowerCase().includes("learning tips") || lastUserPrompt.toLowerCase().includes("tips for learning")) {
     answer = "**Learning Tips**: 1) Focus on one topic at a time. 2) Practice coding or exercises daily. 3) Take short breaks to avoid burnout. 4) Review past lessons weekly. 5) Use online resources & forums for extra help. 💡";
-    isDummyIntercept = true;
   } else {
     answer = `Hmm, I'm currently specialized in SmartLearn's courses and platform features. Could you rephrase your question about "${message}"? 🎓`;
   }
@@ -99,7 +104,8 @@ export const courseAssistantChat = catchAsyncErrors(async (req, res, next) => {
     mode: "smart-dummy",
     context: {
       enrolledCount: enrolledCourses.length,
-      userName
+      userName,
+      pdfUrl: normalizedPdfUrl
     }
   });
 });

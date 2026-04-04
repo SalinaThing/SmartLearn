@@ -201,7 +201,7 @@ const Hero: FC<Props> = ({ setOpen, setRoute }) => {
                   className="rounded-full ml-[-12px] border-2 border-white dark:border-gray-700 shadow-md"
                 />
                 
-                <p className="font-Josefin dark:text-[#edfff4] text-[#000000b3] 1000px:pl-3 text-[18px] font-[600] mt-4">
+                <div className="font-Josefin dark:text-[#edfff4] text-[#000000b3] 1000px:pl-3 text-[18px] font-[600] mt-4">
                         40k+ Online Courses & 500k+ Registered Students
 
                   <div 
@@ -210,7 +210,7 @@ const Hero: FC<Props> = ({ setOpen, setRoute }) => {
                   >
                       view courses
                   </div>
-                </p>
+                </div>
 
               </div>
             </div>
