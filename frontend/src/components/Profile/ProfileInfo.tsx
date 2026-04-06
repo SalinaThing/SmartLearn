@@ -2,6 +2,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import Image from '@/utils/Image'
 import { AiOutlineCamera } from 'react-icons/ai';
+import { VscVerifiedFilled } from 'react-icons/vsc';
 import { styles } from '@/styles/style';
 import { useEditProfileMutation, useUpdateAvatarMutation } from '@/redux/features/user/userApi';
 import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
@@ -73,6 +74,16 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
                         height={120}
                         className="w-[120px] h-[120px] cursor-pointer border-[3px] border-[#37a39a] rounded-full"
                     />
+                    {user.role === 'admin' && (
+                        <div className="absolute top-2 right-2 p-[2px] bg-white dark:bg-slate-900 rounded-full shadow-md">
+                            <VscVerifiedFilled className="text-red-500" size={20} title="Admin Account" />
+                        </div>
+                    )}
+                    {user.role === 'teacher' && (
+                        <div className="absolute top-2 right-2 p-[2px] bg-white dark:bg-slate-900 rounded-full shadow-md">
+                            <VscVerifiedFilled className="text-green-500" size={20} title="Teacher Account" />
+                        </div>
+                    )}
 
                     <input
                         type="file"

@@ -4,6 +4,7 @@ import React, { FC, useState, useEffect } from "react";
 import NavItems from "../utils/NavItems";
 import { ThemeSwitcher } from "../utils/ThemeSwitcher";
 import { HiOutlineMenuAlt3, HiOutlineUserCircle } from "react-icons/hi";
+import { VscVerifiedFilled } from "react-icons/vsc";
 import toast from "react-hot-toast";
 import CustomModal from "../utils/CustomModal";
 import Login from "./Auth/Login";
@@ -166,16 +167,28 @@ const Header: FC<Props> = ({
                       Dashboard
                     </Link>
                     <Link to={"/profile"}>
-                      <Image
-                        src={profileImage}
-                        alt=" "
-                        width={30}
-                        height={30}
-                        className="w-[30px] h-[30px] rounded-full cursor-pointer border-2"
-                        style={{
-                          borderColor: activeItem === 5 ? "#ffc107" : "transparent",
-                        }}
-                      />
+                      <div className="relative">
+                        <Image
+                          src={profileImage}
+                          alt=" "
+                          width={30}
+                          height={30}
+                          className="w-[30px] h-[30px] rounded-full cursor-pointer border-2"
+                          style={{
+                            borderColor: activeItem === 5 ? "#ffc107" : "transparent",
+                          }}
+                        />
+                        {user.role === 'admin' && (
+                          <div className="absolute bottom-0 right-0 p-[1px] bg-white dark:bg-slate-900 rounded-full">
+                            <VscVerifiedFilled className="text-red-500" size={12} title="Admin" />
+                          </div>
+                        )}
+                        {user.role === 'teacher' && (
+                          <div className="absolute bottom-0 right-0 p-[1px] bg-white dark:bg-slate-900 rounded-full">
+                            <VscVerifiedFilled className="text-green-500" size={12} title="Teacher" />
+                          </div>
+                        )}
+                      </div>
                     </Link>
                   </div>
 
@@ -219,16 +232,28 @@ const Header: FC<Props> = ({
               {
                 isAuthenticated ? (
                   <Link to={"/profile"} className="ml-5 my-2 inline-block">
-                    <Image
-                      src={profileImage}
-                      alt="Profile"
-                      width={40}
-                      height={40}
-                      className="w-[40px] h-[40px] rounded-full cursor-pointer border-2"
-                      style={{
-                        borderColor: activeItem === 5 ? "#ffc107" : "transparent",
-                      }}
-                    />
+                    <div className="relative inline-block">
+                      <Image
+                        src={profileImage}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                        className="w-[40px] h-[40px] rounded-full cursor-pointer border-2"
+                        style={{
+                          borderColor: activeItem === 5 ? "#ffc107" : "transparent",
+                        }}
+                      />
+                      {user.role === 'admin' && (
+                          <div className="absolute bottom-0 right-0 p-[2px] bg-white dark:bg-slate-900 rounded-full">
+                            <VscVerifiedFilled className="text-red-500" size={16} title="Admin" />
+                          </div>
+                      )}
+                      {user.role === 'teacher' && (
+                          <div className="absolute bottom-0 right-0 p-[2px] bg-white dark:bg-slate-900 rounded-full">
+                            <VscVerifiedFilled className="text-green-500" size={16} title="Teacher" />
+                          </div>
+                      )}
+                    </div>
                   </Link>
                 ) : (
                   <div className="flex flex-col gap-4 mt-6 px-5">

@@ -29,6 +29,7 @@ import { FC, useEffect, useState } from "react";
 import { JSX } from "@emotion/react/jsx-runtime";
 import { Box, IconButton, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
+import { VscVerifiedFilled } from "react-icons/vsc";
 
 const avatarDefault = "/assets/heroicon3.jpg";
 
@@ -176,13 +177,25 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
                         {!isCollapsed && (
                             <Box mb="25px" className="flex flex-col items-center">
                                 <Link to="/profile" className="mb-4">
-                                    <Image
-                                        alt="profile-user"
-                                        width={100}
-                                        height={100}
-                                        src={user?.avatar ? user.avatar.url : avatarDefault}
-                                        className="cursor-pointer rounded-full border-4 border-[#5b6fe6] shadow-lg object-cover"
-                                    />
+                                    <div className="relative">
+                                        <Image
+                                            alt="profile-user"
+                                            width={100}
+                                            height={100}
+                                            src={user?.avatar ? user.avatar.url : avatarDefault}
+                                            className="cursor-pointer rounded-full border-4 border-[#5b6fe6] shadow-lg object-cover"
+                                        />
+                                        {user?.role === 'admin' && (
+                                            <div className="absolute bottom-[5px] right-[5px] bg-white dark:bg-slate-900 rounded-full p-[2px] shadow-md">
+                                                <VscVerifiedFilled className="text-red-500" size={18} title="Admin Account" />
+                                            </div>
+                                        )}
+                                        {user?.role === 'teacher' && (
+                                            <div className="absolute bottom-[5px] right-[5px] bg-white dark:bg-slate-900 rounded-full p-[2px] shadow-md">
+                                                <VscVerifiedFilled className="text-green-500" size={18} title="Teacher Account" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </Link>
                                 <div className="text-center px-4">
                                     <h4 className="text-[20px] font-semibold mb-1 truncate max-w-[200px]" style={{ color: isLightMode ? "#000" : "#fff" }}>

@@ -4,6 +4,7 @@ import Image from '@/utils/Image'
 import avatarDefault from "../../assets/pro7.jpg"
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { AiOutlineLogout } from 'react-icons/ai';
+import { VscVerifiedFilled } from 'react-icons/vsc';
 import { MdOutlineAdminPanelSettings, MdOutlineQuiz } from 'react-icons/md';
 import { BiBookOpen } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
@@ -31,13 +32,25 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
           }`}
         onClick={() => setActive(1)}
       >
-      <Image
-        src={imageSrc}
-        alt=""
-        width={50}
-        height={50}
-        className="w-[50px] h-[50px] 800px:w-[50px] 600px:h-[30px] cursor-pointer rounded-full"
-      />
+      <div className="relative">
+        <Image
+          src={imageSrc}
+          alt=""
+          width={50}
+          height={50}
+          className="w-[50px] h-[50px] 800px:w-[50px] 600px:h-[30px] cursor-pointer rounded-full"
+        />
+        {user.role === 'admin' && (
+          <div className="absolute bottom-0 right-0 p-[1px] bg-white dark:bg-slate-800 rounded-full">
+            <VscVerifiedFilled className="text-red-500" size={14} title="Admin" />
+          </div>
+        )}
+        {user.role === 'teacher' && (
+          <div className="absolute bottom-0 right-0 p-[1px] bg-white dark:bg-slate-800 rounded-full">
+            <VscVerifiedFilled className="text-green-500" size={14} title="Teacher" />
+          </div>
+        )}
+      </div>
 
       <h5 className="pl-2 block font-Poppins dark:text-white text-black">
         My Account
