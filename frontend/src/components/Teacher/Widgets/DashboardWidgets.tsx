@@ -8,6 +8,7 @@ import All_Invoices from '../Orders/All_Invoices';
 import CourseAnalytics from '../Analytics/CourseAnalytics';
 import AllCourses from '../Course/AllCourses';
 import AllQuizzes from '../Quizzes/AllQuizzes';
+import AllResultsTeacher from '../Quizzes/AllResultsTeacher';
 import AllUsers from '../Users/AllUsers';
 import { useUser } from '@/hooks/useUser';
 
@@ -146,6 +147,14 @@ const DashboardWidgets: FC<Props> = ({ value }) => {
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Student Tracking</h2>
                         <div className="max-h-[500px] overflow-y-auto">
                             <AllUsers isTeam={false} />
+                        </div>
+                    </div>
+
+                    {/* Quiz Monitoring */}
+                    <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md overflow-hidden p-4">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Recent Quiz Attempts</h2>
+                        <div className="max-h-[500px] overflow-y-auto">
+                            <AllResultsTeacher />
                         </div>
                     </div>
                 </div>

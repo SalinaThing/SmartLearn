@@ -1,30 +1,63 @@
 import React, { FC } from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+import { Box } from '@mui/material';
 import { useGetResultsQuery } from '@/redux/features/quizzes/resultApi';
 import { Link } from 'react-router-dom';
 import Loader from '../../Loader/Loader';
-import { PiCheckCircleFill, PiXCircleFill, PiExamFill, PiArrowRightBold } from 'react-icons/pi';
-
-const performanceBadge = (perf: string) => {
-    const map: Record<string, string> = {
-        Excellent:   'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        Good:        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-        Average:     'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-        'Needs Work':'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    };
-    return map[perf] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
-};
+import { format } from "timeago.js";
+import { useTheme } from '@/utils/ThemeProvider';
+import { PiExamFill, PiArrowRightBold } from 'react-icons/pi';
 
 const StudentQuizResults: FC = () => {
-    // Uses the student-scoped endpoint (GET /api/v1/get-results)
+    const { theme } = useTheme();
     const { data, isLoading } = useGetResultsQuery('');
 
-    const results: any[] = data?.results ?? [];
+    const columns = [
+        { field: 'title', headerName: 'Quiz Title', flex: 0.8 },
+        { field: 'score', headerName: 'Score %', flex: 0.3,
+            renderCell: (params: any) => (
+                <span className="font-bold text-[#3ccbae]">{params.row.score}%</span>
+            )
+        },
+        { field: 'correct_wrong', headerName: 'Correct / Wrong', flex: 0.4,
+            renderCell: (params: any) => (
+                <span>
+                    <span className="text-green-500">{params.row.correct}</span>
+                    <span className="mx-1 text-gray-400">/</span>
+                    <span className="text-red-500">{params.row.wrong}</span>
+                </span>
+            )
+        },
+        { field: 'performance', headerName: 'Performance', flex: 0.4,
+            renderCell: (params: any) => {
+                const perf = params.row.performance;
+                const color = perf === 'Excellent' ? 'bg-green-500' : perf === 'Good' ? 'bg-blue-500' : 'bg-orange-500';
+                return (
+                    <span className={`${color} text-white px-3 py-1 rounded-full text-[10px] font-bold`}>
+                        {perf}
+                    </span>
+                )
+            }
+        },
+        { field: 'created_at', headerName: "Date", flex: 0.5 },
+    ];
 
-    if (isLoading) return <Loader />;
+    const rows: any = [];
+    data && data.results.forEach((item: any) => {
+        rows.push({
+            id: item._id,
+            title: item.title || "Quiz",
+            score: item.score,
+            correct: item.correct,
+            wrong: item.wrong,
+            performance: item.performance,
+            created_at: format(item.updatedAt || item.createdAt),
+        });
+    });
 
     return (
         <div className="w-full mt-8">
-            <div className="flex items-center justify-between mb-4">
+             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                     <PiExamFill className="text-[#3ccbae]" />
                     Recent Quiz Results
@@ -37,69 +70,33 @@ const StudentQuizResults: FC = () => {
                 </Link>
             </div>
 
-            <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 dark:bg-[#1a223f] border-b border-gray-200 dark:border-gray-700">
-                            <tr>
-                                <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quiz</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Score</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Correct / Wrong</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Performance</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Date</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {results.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                        <PiExamFill className="mx-auto text-4xl mb-2 text-gray-300 dark:text-gray-600" />
-                                        No quiz results yet. <Link to="/student/quizzes" className="text-[#3ccbae] hover:underline">Take a quiz!</Link>
-                                    </td>
-                                </tr>
-                            ) : (
-                                results.map((result: any) => {
-                                    const passed = result.score >= 50;
-                                    return (
-                                        <tr key={result._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                            <td className="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white max-w-[160px] truncate">
-                                                {result.title || 'Quiz'}
-                                            </td>
-                                            <td className="px-5 py-4 text-sm font-bold text-gray-700 dark:text-gray-200">
-                                                {result.score ?? 0}%
-                                            </td>
-                                            <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300 hidden sm:table-cell">
-                                                <span className="text-emerald-600 dark:text-emerald-400 font-medium">{result.correct ?? 0}</span>
-                                                <span className="text-gray-400 mx-1">/</span>
-                                                <span className="text-red-500 font-medium">{result.wrong ?? 0}</span>
-                                            </td>
-                                            <td className="px-5 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${performanceBadge(result.performance)}`}>
-                                                    {result.performance || 'N/A'}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell whitespace-nowrap">
-                                                {result.createdAt ? new Date(result.createdAt).toLocaleDateString() : '—'}
-                                            </td>
-                                            <td className="px-5 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    passed
-                                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                }`}>
-                                                    {passed ? <PiCheckCircleFill /> : <PiXCircleFill />}
-                                                    {passed ? 'Passed' : 'Failed'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <Box
+                    height="40vh"
+                    sx={{
+                        "& .MuiDataGrid-root": { border: "none", outline: "none" },
+                        "& .MuiDataGrid-row": {
+                            color: theme === "dark" ? "#fff" : "#000",
+                            borderBottom: theme === "dark" ? "1px solid #ffffff30!important" : "1px solid #ccc!important",
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                            backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                            color: theme === "dark" ? "#fff" : "#000",
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                            backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
+                            color: theme === "dark" ? "#fff" : "#000",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                            backgroundColor: theme === "dark" ? "#111c43" : "#F2F0F0",
+                        },
+                    }}
+                >
+                    <DataGrid rows={rows} columns={columns} />
+                </Box>
+            )}
         </div>
     );
 };

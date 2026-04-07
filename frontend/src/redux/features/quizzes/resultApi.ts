@@ -17,7 +17,10 @@ export const resultApi = apiSlice.injectEndpoints({
                 method: "GET",
                 credentials: "include" as const,
             }),
-            providesTags: ["Results"],
+            providesTags: (result: any) => 
+                result 
+                    ? [...result.results.map(({ _id }: any) => ({ type: "Results" as const, id: _id })), "Results"]
+                    : ["Results"],
         }),
         getAllResults: builder.query({
             query: () => ({

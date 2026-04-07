@@ -1,6 +1,6 @@
 import { Server as SocketIOServer } from "socket.io";
 
-let io;
+export let io;
 
 export const initSocketServer = (server) => {
     io = new SocketIOServer(server);
@@ -38,4 +38,4 @@ export const initSocketServer = (server) => {
     });
 };
 
-export { io };
+

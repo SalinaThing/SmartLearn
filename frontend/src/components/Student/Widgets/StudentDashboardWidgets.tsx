@@ -52,7 +52,7 @@ import { useGetResultsQuery } from "@/redux/features/quizzes/resultApi";
 
 const StudentDashboardWidgets: FC<Props> = () => {
     const { user } = useUser();
-    const { data: resultsData } = useGetResultsQuery('');
+    const { data: resultsData } = useGetResultsQuery('', { refetchOnMountOrArgChange: true });
 
     // Calculate real progress
     const courseProgress = user?.courses?.length > 0 ? 100 : 0;

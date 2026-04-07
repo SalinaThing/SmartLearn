@@ -6,6 +6,7 @@ import { redis } from "../config/redis.js";
 //Check if user is authenticated or not
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
+    console.log("DEBUG_AUTH: Accessing URL", req.originalUrl);
 
     // Check if token exists
     if (!accessToken) {

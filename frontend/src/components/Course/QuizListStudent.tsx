@@ -59,14 +59,23 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
         setIsSubmitted(true);
 
         try {
-            await createResult({
+            toast("Submitting quiz results...");
+            const result: any = await createResult({
                 courseId,
                 quizId: activeQuiz._id,
                 title: activeQuiz.title,
                 totalQuestions: activeQuiz.questions.length,
                 correct: correctCount,
             }).unwrap();
-            toast.success("Result saved successfully!");
+
+            if (result.certificateAwarded) {
+                toast.success("Congratulations! You earned a certificate.", {
+                    duration: 5000,
+                    icon: '🎓',
+                });
+            } else {
+                toast.success("Result saved successfully!");
+            }
             refetchResults();
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to save quiz result");
@@ -162,15 +171,20 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
                             )}
                         </div>
                     ) : (
-                        <div className="text-center p-10 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-blue-500">
-                            <h3 className="text-3xl font-bold dark:text-white text-black mb-4">Quiz Completed!</h3>
-                            <p className="text-xl dark:text-white text-black mb-6">
-                                Your Score: <span className="text-blue-500 text-4xl">{Math.round(score)}%</span>
-                            </p>
-                            <div className="mb-8 dark:text-gray-300 text-gray-700">
-                                You got {Math.round((score / 100) * activeQuiz.questions.length)} out of {activeQuiz.questions.length} questions correct.
+                        <div className="text-center p-10 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-[#3ccbae] shadow-2xl">
+                            <h3 className="text-4xl font-black dark:text-white text-black mb-2 tracking-tight">Quiz Completed!</h3>
+                            
+                            <div className="flex flex-col items-center justify-center gap-2 mb-10 py-6 border-y border-gray-200 dark:border-gray-700 mt-6">
+                                <span className="text-base font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Final Score</span>
+                                <span className="text-7xl font-black text-[#3ccbae] drop-shadow-sm">
+                                    {Math.round(score)}%
+                                </span>
                             </div>
-                            <button onClick={() => setActiveQuiz(null)} className={`${styles.button} !w-[200px]`}>
+
+                            <button 
+                                onClick={() => setActiveQuiz(null)} 
+                                className="w-full max-w-[280px] h-[55px] bg-[#3ccbae] hover:bg-[#2fb196] text-white rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-[#3ccbae]/40 transform hover:-translate-y-0.5 active:translate-y-0"
+                            >
                                 Back to Quizzes
                             </button>
                         </div>

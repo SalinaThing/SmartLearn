@@ -5,121 +5,143 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import { io } from "../serverSocket.js";
 import NotificationModel from "../models/notificationModel.js";
+import { redis } from "../config/redis.js";
+import mongoose from "mongoose";
 
 // CREATE RESULT
-export const createResult = catchAsyncErrors(async (req, res, next) => {
+export const createResult = async (req, res, next) => {
     try {
         const { title, courseId, quizId, totalQuestions, correct, wrong } = req.body;
-
-        if (!title || totalQuestions === undefined || correct === undefined) {
-            return next(new ErrorHandler(400, "Missing required fields"));
-        }
+        console.log("DEBUG_RESULT: Attempting to create result for", title);
 
         const userId = req.user?._id || req.user?.id;
         if (!userId) {
-            return next(new ErrorHandler(400, "User context not found"));
+            return res.status(401).json({ success: false, message: "Login required" });
         }
 
-        const computedWrong = wrong !== undefined ? Number(wrong) : Math.max(0, Number(totalQuestions) - Number(correct));
+        const numTotal = Number(totalQuestions) || 0;
+        const numCorrect = Number(correct) || 0;
+        const computedWrong = wrong !== undefined ? Number(wrong) : Math.max(0, numTotal - numCorrect);
+
+        // Normalize ID
+        const normalizedUserId = String(userId);
 
         const payload = {
-            title: String(title).trim(),
-            totalQuestions: Number(totalQuestions),
-            correct: Number(correct),
+            title: String(title || "Quiz").trim(),
+            totalQuestions: numTotal,
+            correct: numCorrect,
             wrong: computedWrong,
-            user: userId
+            user: normalizedUserId, // We will use string for maximum compatibility
+            courseId: (courseId && String(courseId).length === 24) ? courseId : undefined,
+            quizId: (quizId && String(quizId).length === 24) ? quizId : undefined
         };
 
-        // Explicitly check if IDs are valid ObjectIds to avoid Cast errors
-        if (courseId && courseId.length === 24) payload.courseId = courseId;
-        if (quizId && quizId.length === 24) payload.quizId = quizId;
+        // 1. DIRECT DATABASE INSERTION (Bypassing Mongoose strictness)
+        const dbResult = await Result.collection.insertOne({
+            ...payload,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+        
+        console.log("DEBUG_RESULT: Direct collection insert successful with ID", dbResult.insertedId);
 
-        const created = await Result.create(payload);
-
-        // Update quiz attempt count
-        if (quizId && quizId.length === 24) {
-            await QuizModel.findByIdAndUpdate(quizId, {
-                $inc: { attemptsCount: 1 }
-            });
-        }
-
-        // Award certificate if student scores 70% or higher
-        const calculatedScore = (Number(correct) / Number(totalQuestions)) * 100;
-        if (calculatedScore >= 70) {
+        if (quizId && String(quizId).length === 24) {
             try {
-                const currentUser = await userModel.findById(userId);
-                if (currentUser) {
-                    const quizIdStr = quizId ? String(quizId) : "";
-                    const alreadyHasCertificate = currentUser.certificates?.some(c => String(c.quizId) === quizIdStr);
-
-                    if (!alreadyHasCertificate) {
-                        const certificateData = {
-                            title: `Certificate of Achievement for ${title}`,
-                            courseId: payload.courseId || null,
-                            quizId: quizIdStr,
-                            score: `${correct}/${totalQuestions}`,
-                            date: new Date()
-                        };
-                        
-                        await userModel.findByIdAndUpdate(userId, {
-                            $push: { certificates: certificateData }
-                        });
-                    }
-                }
-            } catch (error) {
-                console.log("Certificate award error:", error);
-            }
+                await QuizModel.findByIdAndUpdate(quizId, { $inc: { attemptsCount: 1 } });
+            } catch (e) { console.log("Quiz update error", e.message); }
         }
 
-        // Notify teachers
+        // Handle certificate and notifications...
+        const calculatedScore = numTotal > 0 ? (numCorrect / numTotal) * 100 : 0;
+        let certificateAwarded = false;
+        
+        if (calculatedScore >= 70) {
+           try {
+              const currentUser = await userModel.findById(userId);
+              if (currentUser) {
+                  const quizIdStr = quizId ? String(quizId) : "";
+                  const alreadyHasCertificate = currentUser.certificates?.some(c => String(c.quizId || "") === quizIdStr);
+
+                  if (!alreadyHasCertificate) {
+                      const certificateData = {
+                          title: `Certificate of Achievement for ${title}`,
+                          courseId: payload.courseId || String(courseId),
+                          quizId: quizIdStr,
+                          score: `${numCorrect}/${numTotal}`,
+                          date: new Date()
+                      };
+                      const updatedUser = await userModel.findByIdAndUpdate(userId, 
+                          { $push: { certificates: certificateData } }, { new: true }
+                      );
+                      if (updatedUser) {
+                          await redis.set(String(userId), JSON.stringify(updatedUser), "EX", 604800);
+                          certificateAwarded = true;
+                      }
+                  }
+              }
+           } catch (e) { console.log("Cert error:", e.message); }
+        }
+
         try {
-            await NotificationModel.create({
-                title: "Quiz Attempted",
-                message: `${req.user.name} has completed the quiz "${title}" with a score of ${correct}/${totalQuestions}.`,
-                role: 'teacher'
-            });
-            io.to("teacher").emit("newNotification", {
-                title: "Quiz Attempted",
-                message: `${req.user.name} has completed the quiz "${title}" with a score of ${correct}/${totalQuestions}.`,
-            });
-        } catch (error) {
-            console.log("Result notification error:", error);
-        }
+           if (io) {
+              await NotificationModel.create({
+                 title: "Quiz Attempted",
+                 message: `${req.user?.name || "Student"} scored ${numCorrect}/${numTotal}.`,
+                 role: 'teacher'
+              });
+              io.to("teacher").emit("newNotification", { title: "Quiz Attempt" });
+           }
+        } catch (e) { console.log("Notify error:", e.message); }
 
-        res.status(201).json({
-            success: true,
-            message: "Result created successfully",
-            result: created
+        return res.status(201).json({
+            success: true, 
+            message: certificateAwarded ? "Congratulations! Certificate earned." : "Result saved successfully!",
+            result: { ...payload, _id: dbResult.insertedId }
         });
 
     } catch (err) {
-        console.error("CREATE_RESULT_ERROR:", err);
-        return next(new ErrorHandler(500, err.message));
+        console.error("DEBUG_RESULT_CRASH:", err);
+        return res.status(500).json({ success: false, message: err.message });
     }
-});
+};
 
 // LIST RESULTS FOR A USER
-export const listResults = catchAsyncErrors(async (req, res, next) => {
+export const listResults = async (req, res, next) => {
     try {
-        const userId = req.user?._id || req.user?.id;
-        const query = { user: userId };
-        const { courseId } = req.query;
-
-        if (courseId) {
-            query.courseId = courseId;
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Login required" });
         }
 
-        const items = await Result.find(query).sort({ createdAt: -1 });
-        res.status(200).json({
-            success: true,
-            results: items
-        });
+        const normalizedId = String(userId);
+        const { courseId } = req.query;
 
+        console.log(`DEBUG_LIST: Fetching for user ${normalizedId}, courseId: [${courseId}]`);
+
+        // 2. Direct collection find to match the direct insert
+        const items = await Result.collection.find({
+            $or: [
+                { user: normalizedId },
+                { user: userId },
+                { user: mongoose.Types.ObjectId.isValid(normalizedId) ? new mongoose.Types.ObjectId(normalizedId) : normalizedId }
+            ]
+        }).sort({ createdAt: -1 }).toArray();
+
+        console.log(`DEBUG_LIST: Found ${items.length} raw records`);
+
+        let results = items;
+        if (courseId && String(courseId).length === 24) {
+            results = items.filter(i => String(i.courseId) === String(courseId));
+        }
+
+        return res.status(200).json({
+            success: true,
+            results
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
     }
-    catch (err) {
-        return next(new ErrorHandler(500, err.message));
-    }
-});
+};
 
 // GET ALL RESULTS (Teacher only - for monitoring)
 export const getAllResults = catchAsyncErrors(async (req, res, next) => {
