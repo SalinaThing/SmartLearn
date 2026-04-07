@@ -8,7 +8,7 @@ export const apiSlice = createApi({
             import.meta.env.VITE_API_URL || "http://localhost:7000/api/v1",
         credentials: "include",
     }),
-    tagTypes: ["Layout", "Notifications", "Results"],
+    tagTypes: ["Layout", "Notifications", "Results", "User"],
     endpoints: (builder) => ({
         refreshToken: builder.query({
             query: (data) => ({
@@ -24,6 +24,7 @@ export const apiSlice = createApi({
                 method: "GET",
                 credentials: "include" as const,
             }),
+            providesTags: ["User"],
 
             async onQueryStarted(arg, { queryFulfilled, dispatch }) {
                 try {

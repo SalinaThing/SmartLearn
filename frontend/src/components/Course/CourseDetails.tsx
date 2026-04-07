@@ -33,7 +33,7 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
         (user && user?.courses?.find((item: any) => {
             const courseId = item._id || item.courseId || item;
             return courseId === data._id;
-        })) || user?.role === "teacher" || user?.role === "admin";
+        })) || user?.role === "teacher" || user?.role === "admin" || data?.isPremium === false;
 
     const handleOrder = (e: any) => {
         if(user){
@@ -274,10 +274,10 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
                                     </Link>
                                 ) : (
                                     <button
-                                        className={`${styles.button} w-full !bg-gradient-to-r !from-red-500 !to-red-600 hover:shadow-lg transition-all`}
+                                        className={`${styles.button} w-full !bg-gradient-to-r ${data.isPremium === false ? '!from-emerald-500 !to-green-600' : '!from-red-500 !to-red-600'} hover:shadow-lg transition-all`}
                                         onClick={handleOrder}
                                     >
-                                        Buy Now - Rs. {data.price}
+                                        {data.isPremium === false ? "Enroll for Free" : `Buy Now - Rs. ${data.price}`}
                                     </button>
                                 )}
                             </div>

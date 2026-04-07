@@ -30,6 +30,7 @@ import { JSX } from "@emotion/react/jsx-runtime";
 import { Box, IconButton, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { VscVerifiedFilled } from "react-icons/vsc";
+import toast from "react-hot-toast";
 
 const avatarDefault = "/assets/heroicon3.jpg";
 
@@ -59,7 +60,7 @@ const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected, setOpen, 
             icon={icon}
             style={{
                 color: selected === title 
-                    ? "#6870fa" 
+                    ? "#39c1f3" 
                     : isLightMode ? "#000" : "#ffffffa6",
             }}
         >
@@ -81,6 +82,7 @@ type Props = {
 const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsCollapsed }) => {
     const { user } = useUser();
     const [logoutUser] = useLogoutUserMutation();
+    const navigate = useNavigate();
     const [selected, setSelected] = useState("Dashboard");
     const [mounted, setMounted] = useState(false);
     const { theme } = useTheme();
@@ -98,10 +100,17 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
     if (!mounted) return null;
 
     const logoutHandler = async () => {
-        await logoutUser({}).unwrap();
-        signOut({ redirect: false }).then(() => {
-            window.location.href = "/";
-        });
+        const roleString = "Teacher";
+        try {
+            await logoutUser({}).unwrap();
+            toast.success(`Logout with ${roleString} successfully`);
+        } catch (err) {
+            console.error("Logout Error:", err);
+        } finally {
+            signOut({ redirect: false }).then(() => {
+                navigate("/");
+            });
+        }
     };
 
     const isLightMode = theme === "light";
@@ -123,7 +132,7 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
                         color: ${isLightMode ? "#000 !important" : "#ffffffa6 !important"};
                     }
                     .pro-menu-item.active {
-                        color: #6870fa !important;
+                        color: #39c1f3 !important;
                     }
                 `}
             </style>
@@ -183,7 +192,7 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
                                             width={100}
                                             height={100}
                                             src={user?.avatar ? user.avatar.url : avatarDefault}
-                                            className="cursor-pointer rounded-full border-4 border-[#5b6fe6] shadow-lg object-cover"
+                                            className="cursor-pointer rounded-full border-4 border-[#39c1f3] shadow-lg object-cover"
                                         />
                                         {user?.role === 'admin' && (
                                             <div className="absolute bottom-[5px] right-[5px] bg-white dark:bg-slate-900 rounded-full p-[2px] shadow-md">
@@ -215,7 +224,7 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
                                     padding: "5px 35px 5px 20px !important",
                                 },
                                 "& .pro-inner-item:hover": {
-                                    color: "#868dfb !important",
+                                    color: "#39c1f3 !important",
                                     backgroundColor: "transparent !important",
                                 },
                                 "& .pro-icon-wrapper": {
@@ -257,9 +266,18 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
                                     Extras
                                 </p>
                             )}
-                            <div className="mb-10" onClick={logoutHandler}>
-                                <Item title="LogoutUser" to="/" icon={<ExitToAppIcon />} selected={selected} setSelected={setSelected} isLightMode={isLightMode} />
-                            </div>
+                            <MenuItem
+                                icon={<ExitToAppIcon style={{ color: isLightMode ? "#000" : "#fff" }} />}
+                                onClick={logoutHandler}
+                                style={{
+                                    marginTop: "10px",
+                                    marginBottom: "40px"
+                                }}
+                            >
+                                <Typography className="!text-[16px] !font-Poppins">
+                                    Logout
+                                </Typography>
+                            </MenuItem>
                         </Box>
                     </Menu>
                 </ProSidebar>

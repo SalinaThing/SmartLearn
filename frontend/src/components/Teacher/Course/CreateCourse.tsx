@@ -42,6 +42,7 @@ const CreateCourse = (props: Props) => {
         level: "",
         demoUrl: "",
         thumbnail: "",
+        isPremium: true,
     });
 
     const [benefits, setBenefits] = useState([{ title: "" }]);
@@ -89,12 +90,13 @@ const CreateCourse = (props: Props) => {
             name: courseInfo.name,
             description: courseInfo.description,
             categories: courseInfo.categories,
-            price: courseInfo.price === "" ? 0 : Number(courseInfo.price),
+            price: courseInfo.isPremium === false ? 0 : (courseInfo.price === "" ? 0 : Number(courseInfo.price)),
             estimatedPrice: courseInfo.estimatedPrice === "" ? 0 : Number(courseInfo.estimatedPrice),
             tags: courseInfo.tags,
             level: courseInfo.level,
             demoUrl: courseInfo.demoUrl,
             thumbnail: courseInfo.thumbnail,
+            isPremium: courseInfo.isPremium,
             benefits: formattedBenefits,
             prerequisites: formattedPrerequisites,
             courseData: formattedCourseContentData,
@@ -142,7 +144,7 @@ const CreateCourse = (props: Props) => {
         <div className="w-full flex min-h-screen">
 
             {/* Course Information */}
-            <div className="w-full 1100px:w-[80%] 1100px:pr-[22%]">
+            <div className="w-full 1100px:w-[80%] 1100px:pr-[10%]">
                 {
                     active === 0 && (
                         <CourseInformation

@@ -55,6 +55,7 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
         { field: 'id', headerName: 'ID', flex: 0.5 },
         { field: 'title', headerName: 'Quiz Title', flex: 1 },
         { field: 'questions', headerName: 'Questions', flex: 0.3 },
+        { field: 'attempts', headerName: 'Attempts', flex: 0.3 },
         { field: 'created_at', headerName: "Created At", flex: 0.5 },
         {
             field: 'edit', headerName: "Edit", flex: 0.2,
@@ -93,6 +94,7 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
             id: item._id,
             title: item.title,
             questions: item.questions.length,
+            attempts: item.attemptsCount || 0,
             created_at: format(item.createdAt),
             item: item,
         });

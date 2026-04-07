@@ -220,11 +220,13 @@ export const getCourseByUser = catchAsyncErrors(async (req, res, next) => {
         const courseId = req.params.id;
         const courseExists = userCourseList?.find((course) => course.courseId === courseId);
 
-        if (!courseExists && req.user.role !== "admin" && req.user.role !== "teacher") {
+        const course = await CourseModel.findById(courseId);
+        if (!course) return next(new ErrorHandler(404, "Course not found"));
+
+        if (!courseExists && req.user.role !== "admin" && req.user.role !== "teacher" && course.isPremium) {
             return next(new ErrorHandler(403, "You have not purchased this course"));
         }
 
-        const course = await CourseModel.findById(courseId);
         res.status(200).json({ success: true, content: course?.courseData || [] });
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
@@ -321,10 +323,11 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
         const userCourseList = req.user.courses;
         const courseId = req.params.id;
         const isAdmin = req.user.role === "admin";
-        const courseExists = userCourseList.find((course) => course.courseId === courseId);
-        if (!courseExists && !isAdmin) return next(new ErrorHandler(400, "You are not eligible to access this course"));
-
         const course = await CourseModel.findById(courseId);
+        if (!course) return next(new ErrorHandler(404, "Course not found"));
+
+        const courseExists = userCourseList.find((course) => course.courseId === courseId);
+        if (!courseExists && !isAdmin && course.isPremium) return next(new ErrorHandler(400, "You are not eligible to access this course"));
         const { review, rating } = req.body;
         const newReview = {
             user: req.user,
@@ -527,9 +530,31 @@ export const updateCourseProgress = catchAsyncErrors(async (req, res, next) => {
 
         const courseIndex = user.courses.findIndex((course) => course.courseId === courseId);
         
-        // Admin/Teachers skip purchase check for progress viewing
-        if (courseIndex === -1 && req.user.role !== "admin" && req.user.role !== "teacher") {
-            return next(new ErrorHandler(404, "Course not found"));
+        // If not enrolled, check if it's a free course
+        if (courseIndex === -1) {
+            const course = await CourseModel.findById(courseId);
+            if (!course) return next(new ErrorHandler(404, "Course not found"));
+
+            if (course.isPremium === false && req.user.role === "student") {
+                // Auto-enroll student into free course
+                user.courses.push({ courseId: courseId, completedLessons: [] });
+                await user.save();
+                // update courseIndex after adding
+                const newCourseIndex = user.courses.length - 1;
+                // Continue with progress update
+                const courseProgress = user.courses[newCourseIndex];
+                if (!courseProgress.completedLessons) courseProgress.completedLessons = [];
+                if (!courseProgress.completedLessons.includes(contentId)) {
+                    courseProgress.completedLessons.push(contentId);
+                }
+                await user.save();
+                await redis.set(req.user._id, JSON.stringify(user));
+                return res.status(200).json({ success: true, courseProgress });
+            }
+
+            if (req.user.role !== "admin" && req.user.role !== "teacher") {
+                return next(new ErrorHandler(404, "Course not found"));
+            }
         }
 
         if (courseIndex !== -1) {

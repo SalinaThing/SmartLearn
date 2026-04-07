@@ -6,6 +6,7 @@ import CourseContentMedia from './CourseContentMedia';
 import Header from '../Header';
 import CourseContentList from './CourseContentList';
 import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
     id: string;
@@ -13,9 +14,16 @@ type Props = {
 
 const CourseContent = ({ id }: Props) => {
     const { data: userData } = useLoadUserQuery(undefined, {});
-    const { data, isLoading, refetch } = useGetCourseContentsQuery(id);
+    const { data, isLoading, error, refetch } = useGetCourseContentsQuery(id);
     const [updateCourseProgress] = useUpdateCourseProgressMutation();
+    const navigate = useNavigate();
     const [activeVideo, setActiveVideo] = useState(0);
+    
+    useEffect(() => {
+        if (error) {
+            navigate("/");
+        }
+    }, [error, navigate]);
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState("Login");
 

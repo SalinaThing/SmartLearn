@@ -330,7 +330,7 @@ const All_Invoices = ({ isDashboard }: Props) => {
       {selectedOrder && !isDashboard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white dark:bg-[#111C43] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-t-2xl">
+            <div className="sticky top-0 bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] p-6 rounded-t-2xl">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-white">Order Details</h2>
                 <button

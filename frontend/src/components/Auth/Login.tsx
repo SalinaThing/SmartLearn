@@ -46,11 +46,16 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
     useEffect(() => {
         if (isSuccess) {
             (async () => {
-                toast.success("Login successfully!! Welcome back!");
+                // Prioritize data from the login response to ensure correct redirection
+                const loggedInUser = data?.user || hookUser;
+                const userRole = (loggedInUser as any)?.role || "student";
+                const displayRole = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+
+                toast.success(`Login with ${displayRole} successfully`);
                 setOpen(false);
-                
+
                 try {
-                // Wait until the authenticated user is loaded
+                    // Wait until the authenticated user is loaded
                     await refetch();
                 } catch {
                     // handled by guards
@@ -61,11 +66,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
                     teacher: "/teacher",
                     student: "/student/dashboard",
                 };
-                
-                // Prioritize data from the login response to ensure correct redirection
-                const loggedInUser = data?.user || hookUser;
-                const userRole = (loggedInUser as any)?.role || "student";
-                
+
                 navigate(dashboardMap[userRole] || "/profile");
             })();
         }

@@ -101,6 +101,23 @@ const SideBarProfile:FC <Props> = ({user, active, avatar, setActive, logoutHandl
       )
     }
 
+    {/* Admin Dashboard Link */}
+    {
+      user?.role?.toLowerCase() === 'admin' && (
+        <Link
+          className={`w-full flex items-center px-3 py-4 cursor-pointer ${
+            active === 9 ? "dark:bg-slate-800 bg-white" : "bg-transparent"
+              }`}
+            to={"/admin"}
+          >
+          <MdOutlineAdminPanelSettings size={20} className="text-[#39c1f3]" />
+          <h5 className="pl-2 block font-Poppins dark:text-white text-black">
+            Admin Dashboard
+          </h5>
+        </Link>
+      )
+    }
+
     {user?.role?.toLowerCase() === "student" && (
       <div 
         className={`w-full flex items-center px-3 py-4 cursor-pointer ${

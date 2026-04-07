@@ -58,14 +58,20 @@ const QuizListStudent = ({ courseId, user }: { courseId: string; user: any }) =>
         setScore(finalScore);
         setIsSubmitted(true);
 
-        await createResult({
-            courseId,
-            quizId: activeQuiz._id,
-            title: activeQuiz.title,
-            totalQuestions: activeQuiz.questions.length,
-            correct: correctCount,
-        });
-        refetchResults();
+        try {
+            await createResult({
+                courseId,
+                quizId: activeQuiz._id,
+                title: activeQuiz.title,
+                totalQuestions: activeQuiz.questions.length,
+                correct: correctCount,
+            }).unwrap();
+            toast.success("Result saved successfully!");
+            refetchResults();
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to save quiz result");
+            console.error("Result submission error:", err);
+        }
     };
 
     if (isLoading) return <Loader />;

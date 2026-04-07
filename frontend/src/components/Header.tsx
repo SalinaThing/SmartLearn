@@ -64,16 +64,16 @@ const Header: FC<Props> = ({
         }
       }
       if (sessionData === null) {
-        if (isSuccess) {
-          toast.success("Login Successfully");
-        }
+        // Handled by other useEffect
       }
     }
   }, [sessionData, user, socialAuth, isLoading, isFetching, isSuccess, refetch]);
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success("Login successfully!!");
+      const role = user?.role || "student";
+      const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+      toast.success(`Login with ${displayRole} successfully`);
     }
     if (error) {
       if ('data' in error) {
@@ -84,7 +84,7 @@ const Header: FC<Props> = ({
         toast.error(fetchError?.error || "Failed to connect to server");
       }
     }
-  }, [isSuccess, error]);
+  }, [isSuccess, error, user]);
 
 
   //Proper scroll handling
@@ -195,7 +195,7 @@ const Header: FC<Props> = ({
                 ) : (
                   <div className="hidden 800px:flex items-center gap-4 ml-4">
                     <button
-                      className="text-[15px] px-5 py-2 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
+                      className="text-[15px] min-w-[120px] px-8 py-2 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
                       onClick={() => {
                         setOpen(true);
                         setRoute("Login");
@@ -204,7 +204,7 @@ const Header: FC<Props> = ({
                       Login
                     </button>
                     <button
-                      className="text-[15px] px-5 py-2 font-Poppins font-[500] text-white bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] hover:from-[#2a9fd8] hover:to-[#1f8bc0] rounded-lg transition duration-300 shadow-sm hover:shadow-md"
+                      className="text-[15px] min-w-[120px] px-8 py-2 font-Poppins font-[500] text-white bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] hover:from-[#2a9fd8] hover:to-[#1f8bc0] rounded-lg transition duration-300 shadow-sm hover:shadow-md"
                       onClick={() => {
                         setOpen(true);
                         setRoute("SignUp");
@@ -258,7 +258,7 @@ const Header: FC<Props> = ({
                 ) : (
                   <div className="flex flex-col gap-4 mt-6 px-5">
                     <button
-                      className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
+                      className="w-full min-h-[45px] text-[16px] py-2.5 font-Poppins font-[500] text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300"
                       onClick={() => {
                         setOpen(true);
                         setRoute("Login");
@@ -267,7 +267,7 @@ const Header: FC<Props> = ({
                       Login
                     </button>
                     <button
-                      className="w-full text-[16px] py-2.5 font-Poppins font-[500] text-white bg-[#39c1f3] hover:bg-[#2a9fd8] rounded-lg transition duration-300 shadow-sm"
+                      className="w-full min-h-[45px] text-[16px] py-2.5 font-Poppins font-[500] text-white bg-[#39c1f3] hover:bg-[#2a9fd8] rounded-lg transition duration-300 shadow-sm"
                       onClick={() => {
                         setOpen(true);
                         setRoute("SignUp");

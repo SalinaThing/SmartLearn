@@ -43,59 +43,51 @@ const Hero: FC<Props> = ({ setOpen, setRoute }) => {
 
   return (
     <>
-      <div className="w-full 1000px:flex items-center">
-        <div className="absolute top-[100px] 1000px:top-[unset] 1500px:h-[700px] 1100px:h-[600px] h-[50vh] w-[50vh] her0_animation rounded" />
-
-        {/* Left Section - Smaller Banner */}
+      <div className="w-full 1000px:flex items-center min-h-[90vh]">
+        {/* Left Section - Hero Image with Floating animation (RE-ADDED) */}
         <div className="1000px:w-[40%] flex 1000px:min-h-screen items-center justify-end pt-[70px] 1000px:pt-[0] z-10">
           <Image
             src={HeroImage}
             alt=""
             width={380}
             height={380}
-            className="object-contain 1100px:max-w-[90%] w-[90%] 1500px:max-w-[85%] h-[auto] z-[10]"
+            className="object-contain 1100px:max-w-[90%] w-[90%] 1500px:max-w-[85%] h-[auto] z-[10] animate-float drop-shadow-2xl"
           />
         </div>
 
-        {/* Right Section - Text Section */}
-        <div className="1000px:w-[60%] flex flex-col items-center 1000px:mt-[0px] text-center 1000px:text-left mt-[150px]">
+        {/* Right Section - Text Section with Fade-In-Up (RE-ADDED) */}
+        <div className="1000px:w-[60%] flex flex-col items-center 1000px:mt-[0px] text-center 1000px:text-left mt-[150px] animate-fade-in-up">
           <h2 className="dark:text-white text-gray-800 text-[28px] 1100px:text-[70px] font-[600] font-Josefin pb-2 mb-2 1000px:leading-[75px] 1500px:w-[80%]">
-            Improve Your Online Learning Experience Better Instantly
+            Improve Your <span className="text-gradient">Online Learning</span> Experience Better Instantly
           </h2>
 
           <p className="dark:text-gray-300 text-gray-600 
                 font-Josefin font-[600] 
-                text-[18px] 1500px:!w-[55%] 1100px:!w-[80%] mt-0">
+                text-[18px] 1500px:!w-[55%] 1100px:!w-[80%] mt-2 opacity-90">
             We have 40k+ Online courses & 500k+ Online registered student. Find your desired Courses from them.
           </p>
 
           {/* Action Buttons - Clean Design */}
-          <div className="1500px:w-[60%] 1100px:w-[85%] w-full mb-5">
+          <div className="1500px:w-[60%] 1100px:w-[85%] w-full mb-8">
             <div className="flex flex-wrap items-center justify-center 1000px:justify-start gap-3">
                <div
                 onClick={() => handleProtectedNavigation("/courses")}
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover-glow transition-all duration-300 cursor-pointer"
               >
                 Start learning free →
               </div>
               
               <div
                 onClick={() => handleProtectedNavigation("/courses")}
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover-glow transition-all duration-300 cursor-pointer"
               >
                 Browse courses
               </div>
               <div
                 onClick={() => handleProtectedNavigation("/courses")}
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
+                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover-glow transition-all duration-300 cursor-pointer"
               >
                 Premium courses
-              </div>
-              <div
-                onClick={() => handleProtectedNavigation("/quiz")}
-                className="px-6 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer"
-              >
-                Quiz
               </div>
             </div>
           </div>

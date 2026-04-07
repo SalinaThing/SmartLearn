@@ -14,13 +14,13 @@ type Props = {
 const CourseCard: FC<Props> = ({ item, isProfile }) => {
     const { user } = useUser();
     
-    // Check if user is enrolled in this course or is highly privileged
-    const isEnrolled = user?.courses?.some((c: any) => c.courseId === item?._id) || user?.role === "teacher" || user?.role === "admin";
+    // Check if user is enrolled in this course or shifted to free access
+    const isEnrolled = user?.courses?.some((c: any) => c.courseId === item?._id) || user?.role === "teacher" || user?.role === "admin" || (user && item?.isPremium === false);
     const targetPath = (isProfile || isEnrolled) ? `/course-access/${item?._id}` : `/course/${item?._id}`;
 
     return (
         <Link to={targetPath}>
-            <div className="w-full min-h-[35vh] dark:bg-slate-500 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015] dark:shadow-slate-700 rounded-lg p-3 shadow-sm dark:shadow-inner hover:shadow-lg transition-shadow duration-300">
+            <div className="w-full min-h-[35vh] dark:bg-slate-500 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015] dark:shadow-slate-700 rounded-lg p-3 shadow-sm dark:shadow-inner hover-glow duration-300">
                 <Image
                     src={item?.thumbnail?.url || "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
                     width={400}

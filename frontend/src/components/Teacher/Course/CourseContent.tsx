@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { AiOutlineDelete, AiOutlinePlusCircle } from 'react-icons/ai';
 import { BsLink45Deg, BsPencil } from 'react-icons/bs';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
-import { useUploadPdfMutation, useUploadVideoMutation } from '@/redux/features/courses/coursesApi';
+import { useUploadVideoMutation } from '@/redux/features/courses/coursesApi';
 
 type Props = {
   active: number;
@@ -26,8 +26,6 @@ const CourseContent : FC <Props> = ({
 
   const [isCollapsed, setIsCollapsed] = useState(Array(courseContentData.length).fill(false));
   const [activeSection, setActiveSection] = useState(1);
-  const [uploadPdf] = useUploadPdfMutation();
-  const [uploadingPdfIndex, setUploadingPdfIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setIsCollapsed((prev) => {
@@ -61,29 +59,6 @@ const CourseContent : FC <Props> = ({
         setCourseContentData(updatedData);
   }
 
-  const handlePdfUpload = async (e: any, index: number) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.type !== 'application/pdf') {
-      toast.error('Please select a PDF file');
-      return;
-    }
-    const formData = new FormData();
-    formData.append('pdf', file);
-    setUploadingPdfIndex(index);
-    try {
-      const result = await uploadPdf(formData).unwrap();
-      const updatedData = [...courseContentData];
-      updatedData[index].pdfUrl = result.url;
-      updatedData[index].pdfName = result.originalName;
-      setCourseContentData(updatedData);
-      toast.success('PDF uploaded!');
-    } catch (err: any) {
-      toast.error(err?.data?.message || 'PDF upload failed');
-    } finally {
-      setUploadingPdfIndex(null);
-    }
-  };
 
   const newContentHandler = (item:any) => {
     if(item.title ==="" || item.description ==="" || item.videoUrl === ""){
@@ -148,7 +123,7 @@ const CourseContent : FC <Props> = ({
     }
   }
   return (
-    <div className="w-[80%] m-auto mt-24 p-3">
+    <div className="w-[90%] m-auto mt-24 p-3">
       <form onSubmit={handleSubmit}>
         {courseContentData?.map((item: any, index: number) => {
 
@@ -281,68 +256,36 @@ const CourseContent : FC <Props> = ({
                         />
                     </div>
 
-                    {/* PDF Upload */}
+                    {/* PDF URL */}
                     <div className="mb-4">
-                      <label className={styles.label}>Attach PDF Reference (Optional)</label>
-                      <div className="mt-2">
-                        {item.pdfUrl ? (
-                          <div className="flex items-center gap-3 p-4 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/50 rounded-lg shadow-sm">
-                            <span className="text-2xl drop-shadow-sm">📄</span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-blue-700 dark:text-blue-400 font-semibold tracking-wide truncate">
-                                {item.pdfName || 'PDF Document Attached'}
-                              </p>
-                              <a href={item.pdfUrl} target="_blank" rel="noopener noreferrer"
-                                className="text-xs text-blue-500 hover:text-blue-600 dark:hover:text-blue-300 hover:underline font-medium mt-0.5 inline-block">
-                                Preview Document
-                              </a>
-                            </div>
-                            <button
-                              type="button"
-                              className="px-4 py-1.5 text-xs font-medium bg-red-500 hover:bg-red-600 active:scale-95 text-white rounded-md shadow-sm transition-all duration-200"
-                              onClick={() => {
-                                const updatedData = [...courseContentData];
-                                updatedData[index].pdfUrl = '';
-                                updatedData[index].pdfName = '';
-                                setCourseContentData(updatedData);
-                              }}
-                            >
-                              Remove PDF
-                            </button>
-                          </div>
-                        ) : (
-                          <label
-                            htmlFor={`pdf-upload-${index}`}
-                            className={`flex flex-col items-center justify-center gap-3 p-6 border-2 border-dashed ${
-                              uploadingPdfIndex === index
-                                ? 'border-blue-400 bg-blue-50/50 dark:bg-blue-900/20'
-                                : 'border-gray-300 dark:border-gray-600/50 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/30'
-                            } rounded-xl cursor-pointer transition-all duration-300 group`}
-                          >
-                            {uploadingPdfIndex === index ? (
-                              <div className="flex flex-col items-center gap-3">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                                <span className="text-blue-500 dark:text-blue-400 font-medium tracking-wide">Uploading PDF...</span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center gap-2">
-                                <span className="text-3xl group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">📄</span>
-                                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Click to attach a PDF document</span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">Max size: 1GB</span>
-                              </div>
-                            )}
-                          </label>
-                        )}
-                        <input
-                          id={`pdf-upload-${index}`}
-                          type="file"
-                          accept="application/pdf"
-                          className="hidden"
-                          onChange={(e) => handlePdfUpload(e, index)}
-                          disabled={uploadingPdfIndex === index}
+                      <label className={styles.label}>PDF URL (Optional)</label>
+                      <input 
+                          type="text"
+                          placeholder="Enter PDF URL (Google Drive, Cloudinary, etc.)"
+                          className={`${styles.input} mt-2`}
+                          value={item.pdfUrl}
+                          onChange={(e) => {
+                            const updatedData = [...courseContentData];
+                            updatedData[index].pdfUrl = e.target.value;
+                            setCourseContentData(updatedData);
+                          }}
                         />
-                      </div>
                     </div>
+                    {/* PDF Name */}
+                    <div className="mb-4">
+                        <label className={styles.label}>PDF Name (Display Purpose)</label>
+                        <input 
+                            type="text"
+                            placeholder="e.g., Week 1 Resources"
+                            className={`${styles.input} mt-2`}
+                            value={item.pdfName}
+                            onChange={(e) => {
+                              const updatedData = [...courseContentData];
+                              updatedData[index].pdfName = e.target.value;
+                              setCourseContentData(updatedData);
+                            }}
+                          />
+                      </div>
 
                     {/* Video Description */}
                     <div className="mb-3">
@@ -395,14 +338,14 @@ const CourseContent : FC <Props> = ({
 
       <div className="w-full flex items-center justify-between">
         <div 
-            className="w-full 800px: w-[180px] flex items-center justify-center h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 cursor-pointer"
+            className="w-full 800px: w-[180px] flex items-center justify-center h-[40px] bg-[#39c1f3] text-center text-[#fff] rounded mt-8 cursor-pointer"
             onClick={() => prevButton()}
         >
           Prev
         </div>
 
         <div 
-            className="w-full 800px: w-[180px] flex items-center justify-center h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 cursor-pointer"
+            className="w-full 800px: w-[180px] flex items-center justify-center h-[40px] bg-[#39c1f3] text-center text-[#fff] rounded mt-8 cursor-pointer"
             onClick={() => handleOptions()}
         >
           Next

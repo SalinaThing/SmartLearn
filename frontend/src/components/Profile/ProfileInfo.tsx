@@ -72,7 +72,7 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
                         alt=""
                         width={120}
                         height={120}
-                        className="w-[120px] h-[120px] cursor-pointer border-[3px] border-[#37a39a] rounded-full"
+                        className="w-[120px] h-[120px] cursor-pointer border-[3px] border-[#39c1f3] rounded-full"
                     />
                     {user.role === 'admin' && (
                         <div className="absolute top-2 right-2 p-[2px] bg-white dark:bg-slate-900 rounded-full shadow-md">
@@ -136,7 +136,7 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
                         </div>
 
                         <input
-                            className={`w-full 800px:w-[50px] h-[40px] border border-[#37a39a] text-center dark:text-[#fff] text-black rounded-[3px] mt-8 cursor-pointer`}
+                            className={`w-full 800px:w-[50px] h-[40px] border border-[#39c1f3] text-center dark:text-[#fff] text-black rounded-[3px] mt-8 cursor-pointer`}
                             type="submit"
                             required
                             value="Update"

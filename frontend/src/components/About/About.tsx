@@ -105,7 +105,7 @@ const About = ({ setOpen, setRoute }: Props) => {
                 {/* Hero Section */}
                 <div className="text-center mb-12">
                     <h1 className={`${styles.title} 800px:!text-[55px]`}>
-                        What is <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SmartLearn?</span>
+                        What is <span className="text-gradient">SmartLearn?</span>
                     </h1>
                     <p className="text-[18px] font-Poppins max-w-3xl mx-auto mt-4 text-gray-600 dark:text-gray-300">
                         SmartLearn is a comprehensive learning management system that bridges the gap between teachers and students,
@@ -129,7 +129,7 @@ const About = ({ setOpen, setRoute }: Props) => {
                 </div>
 
                 {/* Main Description */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-8 mb-12">
+                <div className="bg-gradient-to-r from-[#39c1f310] to-[#2a9fd820] dark:from-[#39c1f310] dark:to-[#2a9fd820] rounded-2xl p-8 mb-12">
                     <p className="text-[18px] font-Poppins leading-relaxed text-center">
                         SmartLearn is a cutting-edge learning management system designed to empower both students and teachers. 
                         Our platform provides a seamless experience for course management, interactive quizzes, and real-time feedback.
@@ -147,7 +147,7 @@ const About = ({ setOpen, setRoute }: Props) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     {features.map((feature, index) => (
                         <div key={index} className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <div className="flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl text-white group-hover:scale-110 transition-transform duration-300">
+                            <div className="flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] rounded-2xl text-white group-hover:scale-110 transition-transform duration-300">
                                 {feature.icon}
                             </div>
                             <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{feature.title}</h3>
@@ -167,7 +167,7 @@ const About = ({ setOpen, setRoute }: Props) => {
                 {/* Teacher vs Student Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                     {/* Teacher Card */}
-                    <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-2xl p-8">
+                    <div className="bg-gradient-to-br from-[#39c1f3]/10 to-[#2a9fd8]/10 dark:from-[#39c1f3]/20 dark:to-[#2a9fd8]/20 rounded-2xl p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-3 bg-blue-500 rounded-xl text-white">
                                 <FaChalkboardTeacher className="text-2xl" />
@@ -210,7 +210,7 @@ const About = ({ setOpen, setRoute }: Props) => {
                     <div className="flex flex-wrap justify-center gap-4">
                         <button 
                             onClick={() => handleSignUpTrigger("/teacher")}
-                            className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                            className="px-8 py-3 bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
                         >
                             Get Started as Teacher
                         </button>

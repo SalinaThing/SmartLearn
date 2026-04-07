@@ -9,7 +9,7 @@ export const resultApi = apiSlice.injectEndpoints({
                 body: data,
                 credentials: "include" as const,
             }),
-            invalidatesTags: ["Results"],
+            invalidatesTags: ["Results", "User"],
         }),
         getResults: builder.query({
             query: (courseId) => ({

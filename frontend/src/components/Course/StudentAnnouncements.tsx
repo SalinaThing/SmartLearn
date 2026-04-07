@@ -312,7 +312,7 @@ const StudentAnnouncements = ({ courseId, user }: Props) => {
                                                 <button
                                                     type="button"
                                                     onClick={() => startEditing(item)}
-                                                    className={`${styles.button} !w-[unset] !min-h-[40px] !py-[unset] bg-[#37a39a]`}
+                                                    className={`${styles.button} !w-[unset] !min-h-[40px] !py-[unset] bg-[#39c1f3]`}
                                                 >
                                                     Edit
                                                 </button>

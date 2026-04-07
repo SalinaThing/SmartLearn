@@ -10,13 +10,7 @@ export default function CourseAccessPage() {
 
     const {isLoading, error, data}= useLoadUserQuery(undefined, {});
 
-    useEffect(()=>{
-      if(data?.user && id){
-        const isPurchased = data.user.courses?.find((item:any) => item.courseId === id || item._id === id);
-        if(!isPurchased && data.user.role !== "admin" && data.user.role !== "teacher"){
-          navigate("/", { replace: true });
-        }
-      }
+    useEffect(() => {
       if(error){
         navigate("/", { replace: true });
       }

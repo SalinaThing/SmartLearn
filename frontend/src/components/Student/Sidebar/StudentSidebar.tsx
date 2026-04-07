@@ -19,6 +19,7 @@ import {
     FeedbackIcon,
     NotificationsIcon,
 } from "../../Teacher/Sidebar/Icon";
+import toast from "react-hot-toast";
 import { useUser } from "@/hooks/useUser";
 import Image from "@/utils/Image";
 import { useTheme } from "@/utils/ThemeProvider";
@@ -79,6 +80,7 @@ type Props = {
 const StudentSidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsCollapsed }) => {
     const { user } = useUser();
     const [logoutUser] = useLogoutUserMutation();
+    const navigate = useNavigate();
     const [selected, setSelected] = useState("Dashboard");
     const [mounted, setMounted] = useState(false);
     const { theme } = useTheme();
@@ -95,10 +97,17 @@ const StudentSidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, set
     if (!mounted) return null;
 
     const logoutHandler = async () => {
-        await logoutUser({}).unwrap();
-        signOut({ redirect: false }).then(() => {
-            window.location.href = "/";
-        });
+        const roleString = "Student";
+        try {
+            await logoutUser({}).unwrap();
+            toast.success(`Logout with ${roleString} successfully`);
+        } catch (err) {
+            console.error("Logout Error:", err);
+        } finally {
+            signOut({ redirect: false }).then(() => {
+                navigate("/");
+            });
+        }
     };
 
     const isLightMode = theme === "light";
@@ -235,9 +244,18 @@ const StudentSidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, set
                                         Extras
                                     </p>
                                 )}
-                                <div className="mb-10" onClick={logoutHandler}>
-                                    <Item title="LogoutUser" to="/" icon={<ExitToAppIcon />} selected={selected} setSelected={setSelected} isLightMode={isLightMode} />
-                                </div>
+                                <MenuItem
+                                    icon={<ExitToAppIcon style={{ color: isLightMode ? "#000" : "#fff" }} />}
+                                    onClick={logoutHandler}
+                                    style={{
+                                        marginTop: "10px",
+                                        marginBottom: "40px"
+                                    }}
+                                >
+                                    <Typography className="!text-[16px] !font-Poppins">
+                                        Logout
+                                    </Typography>
+                                </MenuItem>
                             </Box>
                         </Menu>
                     </ProSidebar>

@@ -83,7 +83,7 @@ const SmartChat = () => {
                     isMinimized ? 'h-14 w-64' : 'h-[550px] w-[350px] sm:w-[400px]'
                 }`}>
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex items-center justify-between text-white shadow-lg sticky top-0 z-10">
+                    <div className="bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] p-4 flex items-center justify-between text-white shadow-lg sticky top-0 z-10">
                         <div className="flex items-center gap-2">
                             <div className="relative">
                                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md">
@@ -153,7 +153,7 @@ const SmartChat = () => {
                                         <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-tl-none border border-gray-100 dark:border-gray-700 shadow-sm">
                                             <div className="flex gap-1.5 Items-center">
                                                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-duration:0.8s]" />
-                                                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce [animation-duration:0.8s] [animation-delay:0.2s]" />
+                                                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-duration:0.8s] [animation-delay:0.2s]" />
                                                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-duration:0.8s] [animation-delay:0.4s]" />
                                             </div>
                                         </div>
@@ -203,17 +203,17 @@ const SmartChat = () => {
             {/* Toggle Button */}
             {!isOpen && (
                 <div className="relative group">
-                    <div className="absolute -top-14 right-0 bg-white dark:bg-gray-800 px-4 py-2.5 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 text-[12px] font-bold text-[#A855F7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <div className="absolute -top-14 right-0 bg-white dark:bg-gray-800 px-4 py-2.5 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 text-[12px] font-bold text-[#39c1f3] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                         Chat with us 👋
                     </div>
                     <button
                         onClick={handleOpenChat}
-                        className="w-[64px] h-[64px] bg-[#A855F7] rounded-full shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center text-white overflow-hidden relative"
+                        className="w-[64px] h-[64px] bg-[#39c1f3] rounded-full shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center text-white overflow-hidden relative"
                     >
                         <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" />
                         <svg viewBox="0 0 24 24" width="36" height="36" className="relative z-10 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C13.8546 22 15.5925 21.4948 16.9839 20.6358L21.5 22L20.0827 17.7288C21.313 16.1479 22 14.1565 22 12C22 6.47715 17.5228 2 12 2Z" fill="white"/>
-                            <path d="M8 13.5C8 13.5 9.5 15.5 12 15.5C14.5 15.5 16 13.5 16 13.5" stroke="#A855F7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8 13.5C8 13.5 9.5 15.5 12 15.5C14.5 15.5 16 13.5 16 13.5" stroke="#39c1f3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                     </button>
                 </div>

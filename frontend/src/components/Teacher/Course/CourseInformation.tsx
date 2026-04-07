@@ -71,7 +71,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
     }
 
     return (
-        <div className="w-[80%] m-auto mt-24">
+        <div className="w-[90%] m-auto mt-24">
             <form onSubmit={handleSubmit} className={styles.label}>
                 <div>
                     <label htmlFor=""> Course Name</label>
@@ -226,6 +226,31 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
                     </div>
                 </div>
                 <br />
+                <div className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="flex-1">
+                        <label className={`${styles.label} !text-lg font-bold`}>
+                            Is this a Premium Course?
+                        </label>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                             Uncheck this to make the course <span className="font-bold text-green-600 dark:text-green-400">Free</span> for all students.
+                        </p>
+                    </div>
+                    <div className="flex items-center">
+                        <input
+                            type="checkbox"
+                            id="isPremium"
+                            checked={courseInfo.isPremium}
+                            onChange={(e: any) =>
+                                setCourseInfo({ ...courseInfo, isPremium: e.target.checked })
+                            }
+                            className="w-6 h-6 cursor-pointer accent-[#39c1f3] rounded"
+                        />
+                        <label htmlFor="isPremium" className={`${styles.label} ml-2 cursor-pointer`}>
+                            {courseInfo.isPremium ? "Premium" : "Free"}
+                        </label>
+                    </div>
+                </div>
+                <br />
                 <div className="w-full">
                     <input
                         type="file"
@@ -263,7 +288,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
                     <input
                         type="submit"
                         value="Next"
-                        className="w-full 800px:w-[180px] h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 cursor-pointer"
+                        className="w-full 800px:w-[180px] h-[40px] bg-[#39c1f3] text-center text-[#fff] rounded mt-8 cursor-pointer"
                     />
                 </div>
                 <br />

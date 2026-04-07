@@ -67,9 +67,14 @@ const userSchema = new mongoose.Schema(
     certificates: [
       {
         courseId: String,
+        quizId: String,
         title: String,
         url: String,
-        date: Date,
+        score: String,
+        date: {
+          type: Date,
+          default: Date.now
+        },
       },
     ],
   },

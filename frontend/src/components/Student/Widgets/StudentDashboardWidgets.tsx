@@ -47,14 +47,17 @@ const CircularProgressWithLabel: FC<{ value: number }> = ({ value }) => {
     );
 }
 import StudentAnnouncementsPreview from "../Dashboard/StudentAnnouncementsPreview";
+import { useGetResultsQuery } from "@/redux/features/quizzes/resultApi";
 
 
 const StudentDashboardWidgets: FC<Props> = () => {
     const { user } = useUser();
+    const { data: resultsData } = useGetResultsQuery('');
 
-    // Calculate some dummy/real progress
+    // Calculate real progress
     const courseProgress = user?.courses?.length > 0 ? 100 : 0;
-    const quizProgress = 0; // Placeholder
+    const completedQuizzes = resultsData?.results?.length || 0;
+    const quizProgress = (completedQuizzes > 0) ? 100 : 0;
 
     return (
         <div className="space-y-10">
@@ -96,10 +99,10 @@ const StudentDashboardWidgets: FC<Props> = () => {
                                 <PiExamFill className="text-[#3ccbae] text-3xl" />
                             </div>
                             <h3 className="text-3xl font-bold text-gray-800 dark:text-white">
-                                Attend
+                                {completedQuizzes}
                             </h3>
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
-                                Available Quizzes
+                                Quizzes Completed
                             </p>
                         </div>
                         <CircularProgressWithLabel value={quizProgress} />
@@ -127,11 +130,11 @@ const StudentDashboardWidgets: FC<Props> = () => {
                 </Link>
 
                 {/* Certificates Card */}
-                <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-b-4 border-purple-500">
+                <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-b-4 border-blue-500">
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
-                            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center mb-4">
-                                <PiCertificateFill className="text-purple-600 text-3xl" />
+                            <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center mb-4">
+                                <PiCertificateFill className="text-blue-600 dark:text-blue-400 text-3xl" />
                             </div>
                             <h3 className="text-3xl font-bold text-gray-800 dark:text-white">
                                 {user?.certificates?.length || 0}

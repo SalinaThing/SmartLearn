@@ -1,5 +1,6 @@
 import Result from "../models/resultModel.js";
 import userModel from "../models/userModel.js";
+import QuizModel from "../models/quizModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import { io } from "../serverSocket.js";
@@ -14,34 +15,57 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler(400, "Missing required fields"));
         }
 
+        const userId = req.user?._id || req.user?.id;
+        if (!userId) {
+            return next(new ErrorHandler(400, "User context not found"));
+        }
+
         const computedWrong = wrong !== undefined ? Number(wrong) : Math.max(0, Number(totalQuestions) - Number(correct));
 
         const payload = {
             title: String(title).trim(),
-            courseId,
-            quizId,
             totalQuestions: Number(totalQuestions),
             correct: Number(correct),
             wrong: computedWrong,
-            user: req.user?._id
+            user: userId
         };
+
+        // Explicitly check if IDs are valid ObjectIds to avoid Cast errors
+        if (courseId && courseId.length === 24) payload.courseId = courseId;
+        if (quizId && quizId.length === 24) payload.quizId = quizId;
 
         const created = await Result.create(payload);
 
-        // Award certificate if student scores 100%
-        if (Number(correct) === Number(totalQuestions)) {
+        // Update quiz attempt count
+        if (quizId && quizId.length === 24) {
+            await QuizModel.findByIdAndUpdate(quizId, {
+                $inc: { attemptsCount: 1 }
+            });
+        }
+
+        // Award certificate if student scores 70% or higher
+        const calculatedScore = (Number(correct) / Number(totalQuestions)) * 100;
+        if (calculatedScore >= 70) {
             try {
-                const certificateData = {
-                    title: `Certificate of Achievement for ${title}`,
-                    courseId,
-                    quizId,
-                    score: `${correct}/${totalQuestions}`,
-                    createdAt: new Date()
-                };
-                
-                await userModel.findByIdAndUpdate(req.user._id, {
-                    $push: { certificates: certificateData }
-                });
+                const currentUser = await userModel.findById(userId);
+                if (currentUser) {
+                    const quizIdStr = quizId ? String(quizId) : "";
+                    const alreadyHasCertificate = currentUser.certificates?.some(c => String(c.quizId) === quizIdStr);
+
+                    if (!alreadyHasCertificate) {
+                        const certificateData = {
+                            title: `Certificate of Achievement for ${title}`,
+                            courseId: payload.courseId || null,
+                            quizId: quizIdStr,
+                            score: `${correct}/${totalQuestions}`,
+                            date: new Date()
+                        };
+                        
+                        await userModel.findByIdAndUpdate(userId, {
+                            $push: { certificates: certificateData }
+                        });
+                    }
+                }
             } catch (error) {
                 console.log("Certificate award error:", error);
             }
@@ -54,7 +78,6 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
                 message: `${req.user.name} has completed the quiz "${title}" with a score of ${correct}/${totalQuestions}.`,
                 role: 'teacher'
             });
-            // Emit socket event
             io.to("teacher").emit("newNotification", {
                 title: "Quiz Attempted",
                 message: `${req.user.name} has completed the quiz "${title}" with a score of ${correct}/${totalQuestions}.`,
@@ -69,8 +92,8 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
             result: created
         });
 
-
     } catch (err) {
+        console.error("CREATE_RESULT_ERROR:", err);
         return next(new ErrorHandler(500, err.message));
     }
 });
@@ -78,7 +101,8 @@ export const createResult = catchAsyncErrors(async (req, res, next) => {
 // LIST RESULTS FOR A USER
 export const listResults = catchAsyncErrors(async (req, res, next) => {
     try {
-        const query = { user: req.user?._id };
+        const userId = req.user?._id || req.user?.id;
+        const query = { user: userId };
         const { courseId } = req.query;
 
         if (courseId) {
