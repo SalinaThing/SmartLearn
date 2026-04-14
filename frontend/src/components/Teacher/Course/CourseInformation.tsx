@@ -177,7 +177,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
                         >
                             <option value="">Select Category</option>
                             {categories.map((item: any) => (
-                                <option value={item._id} key={item._id}>
+                                <option value={item.title} key={item._id}>
                                     {item.title}
                                 </option>
                             ))}
@@ -193,18 +193,19 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
                         <label className={`${styles.label}`}>
                             Course Level
                         </label>
-                        <input
-                            type="text"
-                            name=""
+                        <select
                             required
                             value={courseInfo.level}
                             onChange={(e: any) =>
                                 setCourseInfo({ ...courseInfo, level: e.target.value })
                             }
-                            id="level"
-                            placeholder="Beginner/Intermediate/Expert"
                             className={`${styles.input}`}
-                        />
+                        >
+                            <option value="">Select Level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
                     </div>
 
                     <div className="w-[50%]">

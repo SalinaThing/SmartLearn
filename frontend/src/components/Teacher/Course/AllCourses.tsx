@@ -30,6 +30,25 @@ const AllCourses = (props: Props) => {
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.5 },
         { field: 'title', headerName: 'Course Title', flex: 1 },
+        {
+            field: 'type',
+            headerName: 'Type',
+            flex: 0.3,
+            renderCell: (params: any) => {
+                const isPremium = params.row.isPremium;
+                const price = params.row.price;
+                const isActuallyFree = !isPremium || price === 0;
+
+                return (
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${!isActuallyFree
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+                            : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                        }`}>
+                        {!isActuallyFree ? "Premium" : "Free"}
+                    </span>
+                );
+            }
+        },
         { field: 'ratings', headerName: 'Ratings', flex: 0.5 },
         { field: 'purchased', headerName: 'Purchased', flex: 0.5 },
         { field: 'created_at', headerName: "Created At", flex: 0.5 },
@@ -91,6 +110,8 @@ const AllCourses = (props: Props) => {
                     ratings: item.ratings,
                     purchased: item.purchased,
                     created_at: format(item.createdAt),
+                    isPremium: item.isPremium,
+                    price: item.price,
                 })
             }
             );
@@ -172,7 +193,10 @@ const AllCourses = (props: Props) => {
                                 },
 
                                 "& .MuiTablePagination-root": {
-                                    color: theme === "dark" ? "#fff" : "#000",
+                                    color: "#fff !important",
+                                },
+                                "& .MuiTablePagination-selectIcon": {
+                                    color: "#fff !important",
                                 },
 
                                 "& .MuiDataGrid-cell": {
@@ -201,9 +225,9 @@ const AllCourses = (props: Props) => {
                                 },
 
                                 "& .MuiDataGrid-footerContainer": {
-                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#A4A9FC !important",
-                                    borderTop: "1px solid #ffffff30",
-                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                    background: "linear-gradient(to right, #39c1f3, #2a9fd8) !important",
+                                    borderTop: "none",
+                                    color: "#fff !important",
                                 },
 
                                 "& .MuiCheckbox-root": {
@@ -232,7 +256,7 @@ const AllCourses = (props: Props) => {
                                 aria-labelledby="modal-modal-title"
                                 aria-describedby="modal-modal-description"
                             >
-                                <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2">
+                                <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[450px] bg-white dark:bg-slate-900 rounded-[8px] shadow p-4 outline-none">
 
                                     <h1 className={`${styles.title}`}>
                                         Are you sure you want to delete this course?

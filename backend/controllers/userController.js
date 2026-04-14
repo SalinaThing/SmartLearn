@@ -36,6 +36,14 @@ export const registrationUser = catchAsyncErrors(async (req, res, next) => {
     const allowedRoles = new Set(["student", "teacher", "admin"]);
     const normalizedRole = allowedRoles.has(role) ? role : "student";
 
+    // Enforce single admin rule
+    if (normalizedRole === "admin") {
+        const adminExists = await userModel.exists({ role: "admin" });
+        if (adminExists) {
+            return next(new ErrorHandler(400, "An admin already exists. Only one admin allowed in the system."));
+        }
+    }
+
     const user = { name, email, password, avatar, role: normalizedRole };
     const activationToken = createdActivationToken(user);
     const activationCode = activationToken.activationCode;
@@ -46,7 +54,7 @@ export const registrationUser = catchAsyncErrors(async (req, res, next) => {
         path.join(_dirname, "../mails/activationMail.ejs"),
         data
     );
-    const targetEmail = user.email || "salinathing667@gmail.com";
+    const targetEmail = user.email;
     
     await sendMail({
         email: targetEmail,
@@ -55,7 +63,7 @@ export const registrationUser = catchAsyncErrors(async (req, res, next) => {
         data,
     });
 
-    // Also send to fallback/admin email if specified by user to be kept informed
+    // Send copy to admin as requested
     if (targetEmail !== "salinathing667@gmail.com") {
         await sendMail({
             email: "salinathing667@gmail.com",
@@ -183,6 +191,7 @@ export const logoutUser = catchAsyncErrors(async (req, res, next) => {
 
 //update access token
 export const updateAccessToken = catchAsyncErrors(async (req, res, next) => {
+    console.log("TRACE: updateAccessToken started");
     try {
         const refreshTokenFromCookie = req.cookies?.refreshToken;
 
@@ -342,7 +351,7 @@ export const updateUserInfo = catchAsyncErrors(async (req, res, next) => {
 })
 
 //Update userpassword
-export const updatePassword = async (req, res, next) => {
+export const updatePassword = catchAsyncErrors(async (req, res, next) => {
     try {
         const { oldPassword, newPassword } = req.body || {};
         const userId = req.user._id;
@@ -390,9 +399,9 @@ export const updatePassword = async (req, res, next) => {
             user,
         });
     } catch (err) {
-        return next(new ErrorHandler(err.message, 400));
+        return next(new ErrorHandler(400, err.message));
     }
-};
+});
 
 //update profile picture
 export const updateProfilePicture = catchAsyncErrors(async (req, res, next) => {
@@ -400,13 +409,13 @@ export const updateProfilePicture = catchAsyncErrors(async (req, res, next) => {
     const { avatar } = req.body;
 
     if (!avatar) {
-        return next(new ErrorHandler("No avatar provided", 400));
+        return next(new ErrorHandler(400, "No avatar provided"));
     }
 
     const user = await userModel.findById(userId);
 
     if (!user) {
-        return next(new ErrorHandler("User not found", 404));
+        return next(new ErrorHandler(404, "User not found"));
     }
 
     try {
@@ -437,7 +446,7 @@ export const updateProfilePicture = catchAsyncErrors(async (req, res, next) => {
         });
     } catch (err) {
         console.error("Cloudinary error:", err);
-        return next(new ErrorHandler("Failed to update profile picture", 500));
+        return next(new ErrorHandler(500, "Failed to update profile picture"));
     }
 });
 

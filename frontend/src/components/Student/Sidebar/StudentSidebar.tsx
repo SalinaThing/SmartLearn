@@ -11,7 +11,6 @@ import {
     GroupsIcon,
     OndemandVideoIcon,
     WebIcon,
-    QuizIcon,
     WysiwygIcon,
     ManageHistoryIcon,
     SettingsIcon,
@@ -229,7 +228,6 @@ const StudentSidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, set
                                     </p>
                                 )}
                                 <Item title="Enrolled Courses" to="/student/courses" icon={<OndemandVideoIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
-                                <Item title="My Quizzes" to="/student/quizzes" icon={<QuizIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
                                 <Item title="Notifications" to="/notifications" icon={<NotificationsIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
 
                                 {!isCollapsed && (

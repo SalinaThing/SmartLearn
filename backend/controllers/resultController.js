@@ -1,6 +1,7 @@
 import Result from "../models/resultModel.js";
 import userModel from "../models/userModel.js";
 import QuizModel from "../models/quizModel.js";
+import CourseModel from "../models/courseModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorHandler.js";
 import { io } from "../serverSocket.js";
@@ -19,6 +20,10 @@ export const createResult = async (req, res, next) => {
             return res.status(401).json({ success: false, message: "Login required" });
         }
 
+        if (req.user?.role !== "student") {
+            return res.status(403).json({ success: false, message: "Only students can attempt quizzes" });
+        }
+
         const numTotal = Number(totalQuestions) || 0;
         const numCorrect = Number(correct) || 0;
         const computedWrong = wrong !== undefined ? Number(wrong) : Math.max(0, numTotal - numCorrect);
@@ -26,11 +31,19 @@ export const createResult = async (req, res, next) => {
         // Normalize ID
         const normalizedUserId = String(userId);
 
+        const calculatedScore = numTotal > 0 ? Math.round((numCorrect / numTotal) * 100) : 0;
+        let calculatedPerformance = 'Needs Work';
+        if (calculatedScore >= 85) calculatedPerformance = 'Excellent';
+        else if (calculatedScore >= 70) calculatedPerformance = 'Good';
+        else if (calculatedScore >= 50) calculatedPerformance = 'Average';
+
         const payload = {
             title: String(title || "Quiz").trim(),
             totalQuestions: numTotal,
             correct: numCorrect,
             wrong: computedWrong,
+            score: calculatedScore,
+            performance: calculatedPerformance,
             user: normalizedUserId, // We will use string for maximum compatibility
             courseId: (courseId && String(courseId).length === 24) ? courseId : undefined,
             quizId: (quizId && String(quizId).length === 24) ? quizId : undefined
@@ -42,7 +55,7 @@ export const createResult = async (req, res, next) => {
             createdAt: new Date(),
             updatedAt: new Date()
         });
-        
+
         console.log("DEBUG_RESULT: Direct collection insert successful with ID", dbResult.insertedId);
 
         if (quizId && String(quizId).length === 24) {
@@ -52,50 +65,61 @@ export const createResult = async (req, res, next) => {
         }
 
         // Handle certificate and notifications...
-        const calculatedScore = numTotal > 0 ? (numCorrect / numTotal) * 100 : 0;
         let certificateAwarded = false;
-        
-        if (calculatedScore >= 70) {
-           try {
-              const currentUser = await userModel.findById(userId);
-              if (currentUser) {
-                  const quizIdStr = quizId ? String(quizId) : "";
-                  const alreadyHasCertificate = currentUser.certificates?.some(c => String(c.quizId || "") === quizIdStr);
 
-                  if (!alreadyHasCertificate) {
-                      const certificateData = {
-                          title: `Certificate of Achievement for ${title}`,
-                          courseId: payload.courseId || String(courseId),
-                          quizId: quizIdStr,
-                          score: `${numCorrect}/${numTotal}`,
-                          date: new Date()
-                      };
-                      const updatedUser = await userModel.findByIdAndUpdate(userId, 
-                          { $push: { certificates: certificateData } }, { new: true }
-                      );
-                      if (updatedUser) {
-                          await redis.set(String(userId), JSON.stringify(updatedUser), "EX", 604800);
-                          certificateAwarded = true;
-                      }
-                  }
-              }
-           } catch (e) { console.log("Cert error:", e.message); }
+        if (calculatedScore >= 70) {
+            try {
+                // Only award certificates for premium (paid) courses
+                let isPremiumCourse = false;
+                if (courseId) {
+                    const course = await CourseModel.findById(courseId);
+                    if (course && (course.price > 0 || course.isPremium)) {
+                        isPremiumCourse = true;
+                    }
+                }
+
+                if (isPremiumCourse) {
+                    const currentUser = await userModel.findById(userId);
+                    if (currentUser) {
+                        const quizIdStr = quizId ? String(quizId) : "";
+                        const alreadyHasCertificate = currentUser.certificates?.some(c => String(c.quizId || "") === quizIdStr);
+
+                        if (!alreadyHasCertificate) {
+                            const certificateData = {
+                                title: `Certificate of Achievement for ${title}`,
+                                courseId: payload.courseId || String(courseId),
+                                quizId: quizIdStr,
+                                score: `${numCorrect}/${numTotal}`,
+                                date: new Date()
+                            };
+                            const updatedUser = await userModel.findByIdAndUpdate(userId,
+                                { $push: { certificates: certificateData } }, { new: true }
+                            );
+                            if (updatedUser) {
+                                await redis.set(String(userId), JSON.stringify(updatedUser), "EX", 604800);
+                                certificateAwarded = true;
+                            }
+                        }
+                    }
+                }
+            } catch (e) { console.log("Cert error:", e.message); }
         }
 
         try {
-           if (io) {
-              await NotificationModel.create({
-                 title: "Quiz Attempted",
-                 message: `${req.user?.name || "Student"} scored ${numCorrect}/${numTotal}.`,
-                 role: 'teacher'
-              });
-              io.to("teacher").emit("newNotification", { title: "Quiz Attempt" });
-           }
+            if (io) {
+                await NotificationModel.create({
+                    title: "Quiz Attempted",
+                    message: `${req.user?.name || "Student"} scored ${numCorrect}/${numTotal}.`,
+                    role: 'teacher'
+                });
+                io.to("teacher").emit("newNotification", { title: "Quiz Attempt" });
+            }
         } catch (e) { console.log("Notify error:", e.message); }
 
         return res.status(201).json({
-            success: true, 
+            success: true,
             message: certificateAwarded ? "Congratulations! Certificate earned." : "Result saved successfully!",
+            certificateAwarded,
             result: { ...payload, _id: dbResult.insertedId }
         });
 

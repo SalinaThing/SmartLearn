@@ -4,7 +4,7 @@ import { createResult, listResults, getAllResults } from "../controllers/resultC
 
 const resultRouter = express.Router();
 
-resultRouter.post('/create-result', isAuthenticated, createResult);
+resultRouter.post('/create-result', isAuthenticated, authorizeRoles("student"), createResult);
 resultRouter.get('/get-results', isAuthenticated, listResults);
 resultRouter.get('/get-all-results', isAuthenticated, authorizeRoles("teacher", "admin"), getAllResults);
 

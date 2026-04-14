@@ -3,6 +3,7 @@ import { format } from "timeago.js";
 import { useGetAllNotificationsQuery, useUpdateNotificationStatusMutation } from "@/redux/features/notifications/notificationApi";
 import Loader from "../../Loader/Loader";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
     isDashboard?: boolean;
@@ -11,6 +12,7 @@ type Props = {
 const AllNotifications: FC<Props> = ({ isDashboard }) => {
     const { data, refetch, isLoading } = useGetAllNotificationsQuery(undefined, { refetchOnMountOrArgChange: true });
     const [updateNotification, { isSuccess, error }] = useUpdateNotificationStatusMutation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isSuccess) {
@@ -25,6 +27,15 @@ const AllNotifications: FC<Props> = ({ isDashboard }) => {
 
     const handleStatusChange = async (id: string) => {
         await updateNotification(id);
+    };
+
+    const handleNotificationClick = async (item: any) => {
+        if (item.status === "unread") {
+            await updateNotification(item._id);
+        }
+        if (item.path) {
+            navigate(item.path);
+        }
     };
 
     return (
@@ -43,13 +54,14 @@ const AllNotifications: FC<Props> = ({ isDashboard }) => {
                             data?.notifications?.map((item: any, index: number) => (
                                 <div
                                     key={index}
-                                    className={`p-4 rounded-lg shadow-sm border ${item.status === "unread"
+                                    onClick={() => handleNotificationClick(item)}
+                                    className={`p-4 rounded-lg shadow-sm border cursor-pointer group ${item.status === "unread"
                                             ? "bg-blue-50 dark:bg-[#111C43] border-blue-200 dark:border-blue-800"
                                             : "bg-white dark:bg-slate-800 border-gray-100 dark:border-gray-700"
-                                        } transition-all duration-300`}
+                                        } hover:shadow-md transition-all duration-300`}
                                 >
                                     <div className="flex items-center justify-between mb-2">
-                                        <h5 className={`text-[18px] font-Poppins font-[500] ${item.status === "unread" ? "text-blue-600 dark:text-[#3ccbae]" : "text-black dark:text-white"}`}>
+                                        <h5 className={`text-[18px] font-Poppins font-[500] ${item.status === "unread" ? "text-[#39c1f3] dark:text-[#39c1f3]" : "text-black dark:text-white"}`}>
                                             {item.title}
                                         </h5>
                                         {item.status === "unread" && (

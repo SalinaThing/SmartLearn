@@ -63,7 +63,7 @@ courseRouter.put("/add-answer", updateAccessToken, isAuthenticated, addAnswer);
 courseRouter.put("/add-review/:id", updateAccessToken, isAuthenticated, addReview);
 courseRouter.put("/add-reply-to-review", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), addReplyToReview);
 
-courseRouter.get("/get-teacher-courses", isAuthenticated, authorizeRoles("teacher", "admin"), getTeacherAllCourses);
+courseRouter.get("/get-teacher-courses", updateAccessToken, isAuthenticated, authorizeRoles("teacher", "admin"), getTeacherAllCourses);
 
 courseRouter.post("/log-course-view", updateAccessToken, isAuthenticated, logCourseView);
 courseRouter.post("/log-search-query", updateAccessToken, isAuthenticated, logSearchQuery);
@@ -77,7 +77,7 @@ courseRouter.get("/get-reviews-by-user", updateAccessToken, isAuthenticated, get
 courseRouter.put("/edit-review", updateAccessToken, isAuthenticated, editReview);
 courseRouter.put("/edit-question", updateAccessToken, isAuthenticated, editQuestion);
 
-courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("teacher"), deleteCourse);
+courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("admin", "teacher"), deleteCourse);
 
 
 

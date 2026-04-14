@@ -11,6 +11,7 @@ export const getNotifications = catchAsyncErrors(async (req, res, next) => {
             notifications = await NotificationModel.find({
                 $or: [
                     { user: req.user?._id },
+                    { role: 'admin' },
                     { role: 'teacher' },
                     { role: 'all' }
                 ]
@@ -56,6 +57,7 @@ export const updateNotificationStatus = catchAsyncErrors(async (req, res, next) 
             notifications = await NotificationModel.find({
                 $or: [
                     { user: req.user?._id },
+                    { role: 'admin' },
                     { role: 'teacher' },
                     { role: 'all' }
                 ]
@@ -78,11 +80,4 @@ export const updateNotificationStatus = catchAsyncErrors(async (req, res, next) 
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
-});
-
-//delete notification - for teachers only 
-cron.schedule('0 0 * * *', async () => {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); 
-    await NotificationModel.deleteMany({ status: 'read', createdAt: { $lt: thirtyDaysAgo } }); //delete read notifications older than 30 days
-    console.log('Deleted read notifications');
 });

@@ -14,8 +14,9 @@ type Props = {
 const CourseCard: FC<Props> = ({ item, isProfile }) => {
     const { user } = useUser();
     
-    // Check if user is enrolled in this course or shifted to free access
-    const isEnrolled = user?.courses?.some((c: any) => c.courseId === item?._id) || user?.role === "teacher" || user?.role === "admin" || (user && item?.isPremium === false);
+    // Check if user is enrolled in this course
+    const isActuallyEnrolled = user?.courses?.some((c: any) => c.courseId === item?._id) || user?.role === "teacher" || user?.role === "admin";
+    const isEnrolled = isActuallyEnrolled;
     const targetPath = (isProfile || isEnrolled) ? `/course-access/${item?._id}` : `/course/${item?._id}`;
 
     return (
@@ -38,12 +39,12 @@ const CourseCard: FC<Props> = ({ item, isProfile }) => {
  { ((isEnrolled || isProfile) && user?.role !== "teacher" && user?.role !== "admin") ? (
                     <div className="w-full flex items-center justify-between pt-3">
                         <div className="flex items-center gap-2">
-                             <div className="px-3 py-1 bg-[#3ccbae] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
-                                Enrolled
+                            <div className="px-3 py-1 bg-[#39c1f3] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
+                                {item.price === 0 && !isActuallyEnrolled ? "Start Free Course" : "Enrolled"}
                              </div>
                         </div>
                         <div className="flex items-center bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-lg text-blue-600 dark:text-blue-400 text-[13px] font-semibold">
-                            Study Now &rarr;
+                            {item.price === 0 && !isActuallyEnrolled ? "Access Now" : "Study Now"} &rarr;
                         </div>
                     </div>
                 ) : (

@@ -33,11 +33,21 @@ export const submitFeedback = catchAsyncErrors(async (req, res, next) => {
 
         // Notify teachers and admins
         try {
+            // Admin Notification
             await NotificationModel.create({
                 title: "New Feedback Received",
                 message: `A student has given feedback for ${contentTitle || "a course"}.`,
-                role: 'all' // Shows for both
+                role: 'admin',
+                path: '/admin/feedback'
             });
+            // Teacher Notification
+            await NotificationModel.create({
+                title: "New Feedback Received",
+                message: `A student has given feedback for ${contentTitle || "a course"}.`,
+                role: 'teacher',
+                path: '/teacher/feedback'
+            });
+
             // Emit socket event to both
             io.to("teacher").to("admin").emit("newNotification", {
                 title: "New Feedback Received",
@@ -61,7 +71,11 @@ export const getAllFeedback = catchAsyncErrors(async (req, res, next) => {
         const feedback = rawFeedback.map(f => {
             const doc = f.toObject();
             if (req.user.role === 'teacher') {
-                doc.user.name = "Student"; // Hide student name from teacher
+                if (doc.user) {
+                    doc.user.name = "Student"; // Hide student name from teacher
+                } else {
+                    doc.user = { name: "Student" };
+                }
             }
             return doc;
         });
@@ -119,6 +133,31 @@ export const updateFeedback = catchAsyncErrors(async (req, res, next) => {
             success: true,
             feedback,
         });
+
+        // Notify teachers and admins
+        try {
+            // Admin Notification
+            await NotificationModel.create({
+                title: "Feedback Updated",
+                message: `A student has updated their feedback for ${feedback.contentTitle || "a course"}.`,
+                role: 'admin',
+                path: '/admin/feedback'
+            });
+            // Teacher Notification
+            await NotificationModel.create({
+                title: "Feedback Updated",
+                message: `A student has updated their feedback for ${feedback.contentTitle || "a course"}.`,
+                role: 'teacher',
+                path: '/teacher/feedback'
+            });
+
+            io.to("teacher").to("admin").emit("newNotification", {
+                title: "Feedback Updated",
+                message: `A student has updated their feedback for ${feedback.contentTitle || "a course"}.`,
+            });
+        } catch (error) {
+            console.log("Feedback update notification error:", error);
+        }
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
@@ -147,6 +186,31 @@ export const deleteFeedback = catchAsyncErrors(async (req, res, next) => {
             success: true,
             message: "Feedback deleted successfully",
         });
+
+        // Notify teachers and admins
+        try {
+            // Admin Notification
+            await NotificationModel.create({
+                title: "Feedback Deleted",
+                message: `A student has deleted their feedback for ${feedback.contentTitle || "a course"}.`,
+                role: 'admin',
+                path: '/admin/feedback'
+            });
+            // Teacher Notification
+            await NotificationModel.create({
+                title: "Feedback Deleted",
+                message: `A student has deleted their feedback for ${feedback.contentTitle || "a course"}.`,
+                role: 'teacher',
+                path: '/teacher/feedback'
+            });
+
+            io.to("teacher").to("admin").emit("newNotification", {
+                title: "Feedback Deleted",
+                message: `A student has deleted their feedback for ${feedback.contentTitle || "a course"}.`,
+            });
+        } catch (error) {
+            console.log("Feedback delete notification error:", error);
+        }
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }

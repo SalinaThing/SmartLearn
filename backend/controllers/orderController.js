@@ -41,11 +41,11 @@ async function verifyKhaltiPayment(pidx) {
 }
 
 export const createOrder = catchAsyncErrors(async (req, res, next) => {
-    try{
+    try {
         const { courseId, payment_info } = req.body || {};
 
-        if(payment_info){
-            if("pidx" in payment_info){
+        if (payment_info) {
+            if ("pidx" in payment_info) {
                 const ok = await verifyKhaltiPayment(payment_info.pidx);
                 if (!ok) {
                     return next(new ErrorHandler(400, "Payment not authorized!"));
@@ -63,9 +63,13 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
         }
 
         const course = await CourseModel.findById(courseId);
-
         if (!course) {
             return next(new ErrorHandler(404, "Course not found"));
+        }
+
+        // Only allow direct enrollment if price is 0 and no payment_info is provided
+        if (course.price > 0 && !payment_info) {
+            return next(new ErrorHandler(400, "Payment information is required for premium courses"));
         }
 
         const data = {
@@ -73,34 +77,43 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
             userId: user?._id,
             payment_info,
         };
-        
+
         //Send email notification (non-blocking)
         const mailData = {
             order: {
-                _id: course._id.toString().slice(0,6),
+                _id: course._id.toString().slice(0, 6),
                 name: course.name,
                 price: course.price.toFixed(2),
-                date: new Date().toLocaleDateString('en-US', {  
+                date: new Date().toLocaleDateString('en-US', {
                     year: 'numeric',
-                    month: 'long', 
-                    day: 'numeric' 
-                } ),
+                    month: 'long',
+                    day: 'numeric'
+                }),
             }
         };
 
-        const html = await ejs.renderFile(path.join(__dirname, "../mails/orderConfirmationMail.ejs"), {order:mailData});
-        try{
-            if(user){
+        const html = await ejs.renderFile(path.join(__dirname, "../mails/orderConfirmationMail.ejs"), { order: mailData });
+        try {
+            if (user) {
                 await sendEmail({
                     email: user.email,
                     subject: "Order Confirmation",
                     template: "orderConfirmationMail.ejs",
                     data: mailData,
-                    html,
                 });
+
+                // Send copy to admin as requested
+                if (user.email !== "salinathing667@gmail.com") {
+                    await sendEmail({
+                        email: "salinathing667@gmail.com",
+                        subject: "New Course Purchase",
+                        template: "orderConfirmationMail.ejs",
+                        data: mailData,
+                    });
+                }
             }
 
-        }catch(err){
+        } catch (err) {
             console.log("Email could not be sent:", err.message);
         }
 
@@ -121,12 +134,12 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
             message: `You have a new order from ${course?.name}`,
         });
 
-        course.purchased = course?.purchased+1;
-        
+        course.purchased = course?.purchased + 1;
+
         await course.save();
 
         newOrder(data, res, next);
-    }catch (err) {
+    } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
 });
@@ -135,12 +148,12 @@ export const createOrder = catchAsyncErrors(async (req, res, next) => {
 export const getAllOrders = catchAsyncErrors(async (req, res, next) => {
     try {
         getAllOrdersService(res);
-       
+
     } catch (err) {
         return next(new ErrorHandler(500, err.message));
     }
 });
- 
+
 //send Khalti public key (same route name as before)
 export const sendStripePublishableKey = catchAsyncErrors(async (req, res) => {
     res.status(200).json({
@@ -158,7 +171,7 @@ export const newPayment = catchAsyncErrors(async (req, res, next) => {
 
         const amount = Number(req.body.amount);
         const courseId = req.body.courseId;
-        
+
         if (isNaN(amount) || amount <= 0 || !courseId) {
             console.log("Payment initialization failure - Invalid parameters:", { amount: req.body.amount, courseId });
             return next(new ErrorHandler(400, "Invalid amount or courseId."));
@@ -196,7 +209,7 @@ export const newPayment = catchAsyncErrors(async (req, res, next) => {
 
         const payload = response.data;
         res.status(201).json({
-            success:true,
+            success: true,
             client_secret: payload.pidx,
             payment_url: payload.payment_url,
         })

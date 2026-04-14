@@ -49,6 +49,7 @@ import AdminUserAnalytics from "./pages/admin/UserAnalytics";
 import AdminOrderAnalytics from "./pages/admin/OrderAnalytics";
 import AdminCourseAnalytics from "./pages/admin/CourseAnalytics";
 import AdminNotifications from "./pages/admin/Notifications";
+import AdminFeedback from "./pages/admin/Feedback";
 
 // Teacher Notifications import
 import TeacherNotifications from "./pages/teacher/Notifications";
@@ -83,7 +84,7 @@ export default function App() {
         <Route path="/teacher/order-analytics" element={<OrderAnalytics />} />
         <Route path="/teacher/user-analytics" element={<UserAnalytics />} />
         <Route path="/teacher/course-analytics" element={<CourseAnalytics />} />
-        <Route path="/teacher/team" element={<Team />} />
+
         <Route path="/teacher/all-users" element={<AllUsers />} />
         <Route path="/teacher/allcourses" element={<AllCourses />} />
         <Route path="/teacher/quizzes" element={<Quizzes />} />
@@ -102,6 +103,7 @@ export default function App() {
         <Route path="/admin/user-analytics" element={<AdminUserAnalytics />} />
         <Route path="/admin/order-analytics" element={<AdminOrderAnalytics />} />
         <Route path="/admin/course-analytics" element={<AdminCourseAnalytics />} />
+        <Route path="/admin/feedback" element={<AdminFeedback />} />
 
         {/* Student Routes */}
         <Route path="/student/dashboard" element={<StudentDashboard />} />

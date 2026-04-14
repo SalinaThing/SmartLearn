@@ -12,6 +12,7 @@ const AllFeedback = () => {
 
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.3 },
+        { field: 'userName', headerName: 'Student Name', flex: 0.5 },
         { field: 'lectureTitle', headerName: 'Lecture Title', flex: 1.0 },
         { field: 'courseName', headerName: 'Course Name', flex: 0.8 },
         { field: 'rating', headerName: 'Rating', flex: 0.3 },
@@ -23,6 +24,7 @@ const AllFeedback = () => {
     data && data.feedback.forEach((item: any) => {
         rows.push({
             id: item._id,
+            userName: item.user?.name || "Student",
             lectureTitle: item.contentTitle || "General",
             courseName: item.courseId?.name || "General",
             rating: item.rating,
@@ -56,9 +58,16 @@ const AllFeedback = () => {
                             "& .MuiDataGrid-virtualScroller": {
                                 backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                             },
+                            "& .MuiTablePagination-root": {
+                                color: "#fff !important",
+                            },
+                            "& .MuiTablePagination-selectIcon": {
+                                color: "#fff !important",
+                            },
                             "& .MuiDataGrid-footerContainer": {
-                                backgroundColor: theme === "dark" ? "#2D3A4E !important" : "#A4A9FC !important",
-                                color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                background: "linear-gradient(to right, #39c1f3, #2a9fd8) !important",
+                                color: "#fff !important",
+                                borderTop: "none",
                             },
                         }}
                     >

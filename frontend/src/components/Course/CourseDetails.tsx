@@ -11,6 +11,16 @@ import CheckOutForm from "../Payment/CheckOutForm";
 import { useUser } from '@/hooks/useUser';
 import Image from '@/utils/Image';
 import { VscVerifiedFilled } from 'react-icons/vsc';
+import { useCreateOrderMutation } from '@/redux/features/orders/orderApi';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { io } from "socket.io-client";
+
+const ENDPOINT = import.meta.env.VITE_SOCKET_SERVER_URI || "";
+
+const socketId = io(ENDPOINT, {
+    transports: ["websocket"],
+});
 
 type Props = {
     data:any;
@@ -22,23 +32,54 @@ type Props = {
 
 const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:openAuthModal}: Props) => {
     const { user } = useUser();
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
+    const [createOrder, { isSuccess: orderSuccess, error: orderError }] = useCreateOrderMutation();
+
+    useEffect(() => {
+        if (orderSuccess) {
+            toast.success("Enrolled successfully!");
+            socketId.emit("notification", {
+                title: "New Enrollment",
+                message: `You have a new enrollment in ${data.name}`,
+                userId: user?._id,
+            });
+            setTimeout(() => {
+                navigate(`/course-access/${data._id}`);
+            }, 1500);
+        }
+        if (orderError) {
+            if ("data" in (orderError as any)) {
+                toast.error((orderError as any).data.message);
+            }
+        }
+    }, [orderSuccess, orderError, navigate, data, user]);
 
     const discountPercentage =
         ((data?.estimatedPrice - data.price) / data?.estimatedPrice) * 100;
 
     const discountPercentagePrice = discountPercentage.toFixed(0);
 
-    const isPurchased =
+    const isAlreadyEnrolled =
         (user && user?.courses?.find((item: any) => {
             const courseId = item._id || item.courseId || item;
             return courseId === data._id;
-        })) || user?.role === "teacher" || user?.role === "admin" || data?.isPremium === false;
+        })) || user?.role === "teacher" || user?.role === "admin";
 
-    const handleOrder = (e: any) => {
+    // A course is marked as "purchased" (accessible) if enrolled OR if it's free
+    const isPurchased = isAlreadyEnrolled || data.price === 0;
+
+    const handleOrder = async (e: any) => {
         if(user){
             if (data.price > 0) {
                 setOpen(true);
+            } else {
+                // For free courses, enroll if not already enrolled, then navigate
+                if (!isAlreadyEnrolled) {
+                   await createOrder({ courseId: data._id, payment_info: null });
+                } else {
+                    navigate(`/course-access/${data._id}`);
+                }
             }
         }else{
             setRoute("Login");
@@ -266,18 +307,18 @@ const CourseDetails = ({data, stripePromise, clientSecret, setRoute, setOpen:ope
                                 </div>
 
                                 {isPurchased ? (
-                                    <Link
-                                        className={`${styles.button} w-full text-center !bg-gradient-to-r !from-emerald-500 !to-green-600 hover:shadow-lg transition-all`}
-                                        to={`/course-access/${data._id}`}
+                                    <div
+                                        className={`${styles.button} w-full text-center !bg-gradient-to-r !from-emerald-500 !to-green-600 hover:shadow-lg transition-all cursor-pointer`}
+                                        onClick={data.price === 0 ? handleOrder : () => navigate(`/course-access/${data._id}`)}
                                     >
-                                        Enter to Course
-                                    </Link>
+                                        {data.price === 0 && !isAlreadyEnrolled ? "Start Free Course" : "Enter to Course"}
+                                    </div>
                                 ) : (
                                     <button
-                                        className={`${styles.button} w-full !bg-gradient-to-r ${data.isPremium === false ? '!from-emerald-500 !to-green-600' : '!from-red-500 !to-red-600'} hover:shadow-lg transition-all`}
+                                        className={`${styles.button} w-full !bg-gradient-to-r ${data.price === 0 ? '!from-emerald-500 !to-green-600' : '!from-red-500 !to-red-600'} hover:shadow-lg transition-all`}
                                         onClick={handleOrder}
                                     >
-                                        {data.isPremium === false ? "Enroll for Free" : `Buy Now - Rs. ${data.price}`}
+                                        {data.price === 0 ? "Start Free Course" : `Buy Now - Rs. ${data.price}`}
                                     </button>
                                 )}
                             </div>

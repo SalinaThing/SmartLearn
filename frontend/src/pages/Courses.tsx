@@ -15,38 +15,45 @@ type Props = {}
 const page = (props: Props) => {
     const [searchParams] = useSearchParams();
     const initialSearch = searchParams?.get('title') || "";
-    
+
     const [route, setRoute] = useState("Login");
     const [open, setOpen] = useState(false);
-    
+
     const [search, setSearch] = useState(initialSearch);
     const [category, setCategory] = useState("All");
     const [level, setLevel] = useState("All");
     const [sort, setSort] = useState("newest");
-    
+
     const { data: categoriesData } = useGetHeroDataQuery("Categories", {});
     const categories = categoriesData?.layout.categories;
 
-    const { data, isLoading } = useGetAllCoursesByUserQuery({
+    const { data, isLoading, isFetching } = useGetAllCoursesByUserQuery({
         search,
         category: category !== "All" ? category : "",
         level: level !== "All" ? level : "",
         sort
     });
-    
+
     const courses = data?.courses || [];
 
     const { user } = useSelector((state: any) => state.auth);
 
     const { data: suggestedData } = useGetSuggestedCoursesQuery({}, {
-        skip: !user || search.length > 0 || category !== "All" // Fetch suggestions only if logged in and casually browsing
+        skip: !user || user.role !== "student" || search.length > 0 || category !== "All"
     });
     const suggestedCourses = suggestedData?.courses || [];
 
     const [logSearchQuery] = useLogSearchQueryMutation();
 
     useEffect(() => {
-        if(user && search.trim().length > 2) {
+        const title = searchParams.get('title');
+        if (title !== null && title !== search) {
+            setSearch(title);
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
+        if (user && search.trim().length > 2) {
             const timer = setTimeout(() => {
                 logSearchQuery({ keyword: search.trim() });
             }, 1000);
@@ -84,7 +91,7 @@ const page = (props: Props) => {
 
                         {/* Top Bar for Filters */}
                         <div className="w-full mt-8 mb-8 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-center gap-4">
-                            
+
                             {/* Search Input */}
                             <div className="w-full md:flex-1">
                                 <input
@@ -133,7 +140,7 @@ const page = (props: Props) => {
                                     <option value="price_asc">Price: Low to High</option>
                                     <option value="price_desc">Price: High to Low</option>
                                 </select>
-                                
+
                                 <button
                                     onClick={handleClearFilters}
                                     className="whitespace-nowrap px-4 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
@@ -162,7 +169,7 @@ const page = (props: Props) => {
                         ) : (
                             <>
                                 {/* Suggested Courses Section */}
-                                {!search && category === "All" && suggestedCourses.length > 0 && (
+                                {!search && category === "All" && suggestedCourses.length > 0 && user?.role === "student" && (
                                     <div className="mb-12 border-b border-gray-200 dark:border-gray-800 pb-10">
                                         <div className="flex items-center gap-3 mb-6">
                                             <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
@@ -184,17 +191,15 @@ const page = (props: Props) => {
 
                                 {/* All Courses Header */}
                                 {(search || category !== "All" || suggestedCourses.length > 0) && (
-                                     <h2 className="text-2xl font-bold dark:text-white text-gray-900 font-Poppins mb-6">
-                                         {search ? "Search Results" : "All Courses"}
-                                     </h2>
+                                    <h2 className="text-2xl font-bold dark:text-white text-gray-900 font-Poppins mb-6">
+                                        {search ? "Search Results" : "All Courses"}
+                                    </h2>
                                 )}
 
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-0">
-                                    {courses &&
-                                        courses.map((item: any, index: number) => {
-                                            return <CourseCard item={item} key={index} />
-                                        })
-                                    }
+                                    {courses && courses.map((item: any, index: number) => (
+                                        <CourseCard item={item} key={index} />
+                                    ))}
                                 </div>
                             </>
                         )}

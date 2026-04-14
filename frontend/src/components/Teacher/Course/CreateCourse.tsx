@@ -42,7 +42,7 @@ const CreateCourse = (props: Props) => {
         level: "",
         demoUrl: "",
         thumbnail: "",
-        isPremium: true,
+        isPremium: false,
     });
 
     const [benefits, setBenefits] = useState([{ title: "" }]);

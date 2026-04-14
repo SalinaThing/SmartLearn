@@ -47,7 +47,7 @@ const AllQuizzesStudent = ({ embedded = false }: { embedded?: boolean }) => {
                 <>
                     <h1 className="text-[25px] font-Poppins font-bold mb-6">
                         <span className="text-black dark:text-white">Your</span>
-                        <span className="text-[#3ccbae] ml-2">Quizzes</span>
+                        <span className="text-[#39c1f3] ml-2">Quizzes</span>
                     </h1>
                     {enrolledCourses.length === 0 ? (
                         <div className="text-center mt-10">
@@ -121,7 +121,7 @@ const CourseQuizSummary = ({ course, onViewQuizzes, user }: { course: any, onVie
                 <div className="w-full flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800 mt-2">
                     <div className="flex items-center gap-2">
                         {user?.role !== "admin" && user?.role !== "teacher" && (
-                            <div className="px-3 py-1 bg-[#3ccbae] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
+                            <div className="px-3 py-1 bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] text-white text-[12px] font-bold rounded-full uppercase tracking-wider">
                                 Ready to Take
                             </div>
                         )}

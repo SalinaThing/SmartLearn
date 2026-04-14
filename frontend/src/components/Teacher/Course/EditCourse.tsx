@@ -51,7 +51,7 @@ const EditCourse:FC <Props> = ({id}) => {
         level:"",
         demoUrl:"",
         thumbnail:"",
-        isPremium: true,
+        isPremium: false,
     });
 
     const [benefits, setBenefits] =useState([{title:""}]);

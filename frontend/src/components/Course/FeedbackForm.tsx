@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useSubmitFeedbackMutation } from '@/redux/features/feedback/feedbackApi';
+import { useSubmitFeedbackMutation, useGetStudentFeedbackQuery } from '@/redux/features/feedback/feedbackApi';
+import StudentFeedbackList from '../Student/Dashboard/StudentFeedbackList';
 import { useGetAllCoursesByUserQuery } from '@/redux/features/courses/coursesApi';
 import { useUser } from '@/hooks/useUser';
 import { styles } from '@/styles/style';
@@ -21,11 +22,15 @@ const FeedbackForm = ({
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState("");
     const [submitFeedback, { isLoading, isSuccess, error }] = useSubmitFeedbackMutation();
+    const { data: feedbackData } = useGetStudentFeedbackQuery({});
 
-    // Filter to only enrolled courses
+    // Filter to only enrolled courses that DO NOT have feedback yet
+    const submittedCourseIds = new Set(feedbackData?.feedback?.map((f: any) => String(f.courseId?._id || f.courseId)));
     const enrolledCourses = coursesData?.courses?.filter((c: any) => 
-        user?.courses?.some((uc: any) => uc.courseId === c._id)
+        user?.courses?.some((uc: any) => String(uc.courseId) === String(c._id)) && !submittedCourseIds.has(String(c._id))
     ) || [];
+
+    const existingFeedback = initialCourseId ? feedbackData?.feedback?.find((f: any) => String(f.courseId?._id || f.courseId) === String(initialCourseId)) : null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,6 +64,19 @@ const FeedbackForm = ({
         }
     }, [isSuccess, error, initialCourseId]);
 
+    if (initialCourseId && existingFeedback) {
+        return (
+            <div className="w-full">
+                <div className="mb-4 text-center">
+                    <h2 className="text-xl font-bold dark:text-white text-black bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg text-blue-600 dark:text-blue-400">
+                        You have already provided feedback for this course.
+                    </h2>
+                </div>
+                <StudentFeedbackList courseFilterId={initialCourseId} />
+            </div>
+        );
+    }
+
     return (
         <div className="p-4 max-w-2xl m-auto">
             <h2 className="text-2xl font-bold mb-6 dark:text-white text-black">Share Your Feedback</h2>
@@ -76,6 +94,11 @@ const FeedbackForm = ({
                                 <option key={c._id} value={c._id}>{c.name}</option>
                             ))}
                         </select>
+                    </div>
+                )}
+                {!initialCourseId && enrolledCourses.length === 0 && (
+                    <div className="mb-6 bg-green-100 dark:bg-green-900/30 p-4 rounded-lg text-center text-green-700 dark:text-green-400 font-medium">
+                        You have already provided feedback for all your enrolled courses!
                     </div>
                 )}
 

@@ -21,7 +21,7 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
     const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [quizId, setQuizId] = useState("");
-    const [selectedCourse, setSelectedCourse] = useState("");
+    const [selectedCourse, setSelectedCourse] = useState("all");
 
     const { data: coursesData } = useGetAllCoursesQuery({});
     const { isLoading, data, refetch, error } = useGetQuizzesByCourseQuery(selectedCourse, { skip: !selectedCourse });
@@ -30,11 +30,8 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
     const [resultsModalOpen, setResultsModalOpen] = useState(false);
     const [viewingQuizId, setViewingQuizId] = useState("");
 
-    useEffect(() => {
-        if (coursesData && coursesData.courses.length > 0 && !selectedCourse) {
-            setSelectedCourse(coursesData.courses[0]._id);
-        }
-    }, [coursesData]);
+    // Removed default course selection logic since "all" is now default
+    // useEffect(() => { ... })
 
     useEffect(() => {
         if (isSuccess) {
@@ -61,7 +58,7 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
             field: 'edit', headerName: "Edit", flex: 0.2,
             renderCell: (params: any) => (
                 <FiEdit2
-                    className="dark:text-white text-black cursor-pointer"
+                    className="dark:text-white text-black cursor-pointer transition-colors hover:text-[#39c1f3] dark:hover:text-[#39c1f3]"
                     size={20}
                     onClick={() => {
                         setQuizData(params.row.item);
@@ -73,16 +70,16 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
         {
             field: 'results', headerName: "Results", flex: 0.2,
             renderCell: (params: any) => (
-                <Button onClick={() => { setViewingQuizId(params.row.id); setResultsModalOpen(true); }}>
-                    <FiEdit2 className="dark:text-white text-black cursor-pointer" size={20} />
+                <Button onClick={() => { setViewingQuizId(params.row.id); setResultsModalOpen(true); }} className="!min-w-0 transition-colors hover:bg-transparent">
+                    <FiEdit2 className="dark:text-white text-black cursor-pointer transition-colors hover:text-[#39c1f3] dark:hover:text-[#39c1f3]" size={20} />
                 </Button>
             )
         },
         {
             field: 'delete', headerName: "Delete", flex: 0.2,
             renderCell: (params: any) => (
-                <Button onClick={() => { setQuizId(params.row.id); setOpen(true); }}>
-                    <AiOutlineDelete className="dark:text-white text-black" size={20} />
+                <Button onClick={() => { setQuizId(params.row.id); setOpen(true); }} className="!min-w-0 transition-colors hover:bg-transparent">
+                    <AiOutlineDelete className="dark:text-white text-black transition-colors hover:text-red-500" size={20} />
                 </Button>
             )
         }
@@ -101,7 +98,7 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
     });
 
     return (
-        <div className="mt-[120px]">
+        <div className="mt-2 text-black dark:text-white">
             {isLoading ? (
                 <Loader />
             ) : (
@@ -112,13 +109,14 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
                             onChange={(e) => setSelectedCourse(e.target.value)}
                             className={`${styles.input} !w-[250px]`}
                         >
+                            <option value="all">All Courses</option>
                             {coursesData?.courses.map((course: any) => (
                                 <option key={course._id} value={course._id}>{course.name}</option>
                             ))}
                         </select>
                     </div>
                     <Box
-                        m="40px 0 0 0"
+                        m="10px 0 0 0"
                         height="80vh"
                         sx={{
                             "& .MuiDataGrid-root": { border: "none", outline: "none" },
@@ -145,24 +143,35 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
                                 },
                             },
                             "& .MuiDataGrid-columnHeaders": {
-                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
-                                color: theme === "dark" ? "#fff !important" : "#000 !important",
-                                borderBottom: "1px solid #ffffff30",
+                                background: "linear-gradient(to right, #39c1f3, #2a9fd8) !important",
+                                color: "#fff !important",
+                                borderBottom: "none",
                             },
                             "& .MuiDataGrid-topContainer, & .MuiDataGrid-filler, & .MuiDataGrid-columnHeader": {
-                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
-                                color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                background: "transparent !important",
+                                color: "#fff !important",
                             },
                             "& .MuiDataGrid-columnHeaderTitle": {
-                                color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                color: "#fff !important",
+                                fontWeight: "600",
                             },
                             "& .MuiDataGrid-virtualScroller": {
-                                backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#f5f5f5 !important",
+                                backgroundColor: theme === "dark" ? "#111C43 !important" : "#f5f5f5 !important",
                             },
                             "& .MuiDataGrid-footerContainer": {
                                 backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#F3F4F6 !important",
                                 color: theme === "dark" ? "#fff !important" : "#000 !important",
                                 borderTop: "1px solid #ffffff30",
+                            },
+                            // Custom Brand Coloring
+                            "& .MuiCheckbox-root": {
+                                color: theme === "dark" ? "#39c1f3 !important" : "#39c1f3 !important",
+                            },
+                            "& .MuiCheckbox-root.Mui-checked": {
+                                color: "#39c1f3 !important",
+                            },
+                            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                                color: "#39c1f3 !important",
                             },
                         }}
                     >
@@ -188,20 +197,23 @@ const AllQuizzes = ({ setRoute, setQuizData }: Props) => {
                                 <div className="mt-4 flex flex-col gap-3">
                                     {(allResultsData?.results || [])
                                         .filter((r: any) => r.quizId === viewingQuizId)
-                                        .map((result: any, i: number) => (
-                                            <div key={i} className="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg">
-                                                <div>
-                                                    <p className="dark:text-white font-medium">{result.user?.name || "Unknown Student"}</p>
-                                                    <p className="text-xs text-gray-500">{result.user?.email || "N/A"}</p>
+                                        .map((result: any, i: number) => {
+                                            const actualScore = result.totalQuestions ? Math.round((result.correct / result.totalQuestions) * 100) : 0;
+                                            return (
+                                                <div key={i} className="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg">
+                                                    <div>
+                                                        <p className="dark:text-white font-medium">{result.user?.name || "Unknown Student"}</p>
+                                                        <p className="text-xs text-gray-500">{result.user?.email || "N/A"}</p>
+                                                    </div>
+                                                    <div className="flex flex-col items-end">
+                                                        <span className={`font-bold ${actualScore >= 50 ? 'text-green-500' : 'text-red-500'}`}>
+                                                            {actualScore}%
+                                                        </span>
+                                                        <span className="text-xs text-gray-500">{result.correct} / {result.totalQuestions} correct</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col items-end">
-                                                    <span className={`font-bold ${Math.round(result.score) >= 50 ? 'text-green-500' : 'text-red-500'}`}>
-                                                        {Math.round(result.score)}%
-                                                    </span>
-                                                    <span className="text-xs text-gray-500">{result.correct} / {result.totalQuestions} correct</span>
-                                                </div>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     }
                                     {(allResultsData?.results || []).filter((r: any) => r.quizId === viewingQuizId).length === 0 && (
                                         <p className="text-center mt-6 dark:text-gray-400 text-gray-600">No students have taken this quiz yet.</p>

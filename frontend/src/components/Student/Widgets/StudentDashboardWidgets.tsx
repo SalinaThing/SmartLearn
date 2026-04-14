@@ -46,7 +46,8 @@ const CircularProgressWithLabel: FC<{ value: number }> = ({ value }) => {
         </Box>
     );
 }
-import StudentAnnouncementsPreview from "../Dashboard/StudentAnnouncementsPreview";
+
+
 import { useGetResultsQuery } from "@/redux/features/quizzes/resultApi";
 
 
@@ -92,11 +93,11 @@ const StudentDashboardWidgets: FC<Props> = () => {
                 </Link>
 
                 {/* Quizzes Completed Card */}
-                <Link to="/student/quizzes" className="bg-white dark:bg-[#111C43] rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-b-4 border-[#3ccbae] block">
+                <Link to="/student/quizzes" className="bg-white dark:bg-[#111C43] rounded-xl shadow-lg p-6 hover:shadow-xl transition-all border-b-4 border-[#39c1f3] block">
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
                             <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center mb-4">
-                                <PiExamFill className="text-[#3ccbae] text-3xl" />
+                                <PiExamFill className="text-[#39c1f3] text-3xl" />
                             </div>
                             <h3 className="text-3xl font-bold text-gray-800 dark:text-white">
                                 {completedQuizzes}
@@ -152,7 +153,6 @@ const StudentDashboardWidgets: FC<Props> = () => {
                 {/* Main Content Area - Full width now that sidebar widgets are removed */}
                 <div className="lg:col-span-12 space-y-10">
                     <StudentEnrolledCourses />
-                    <StudentAnnouncementsPreview />
                     <StudentQuizResults />
                 </div>
             </div>

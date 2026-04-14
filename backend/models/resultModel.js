@@ -52,6 +52,8 @@ const ResultSchema = new mongoose.Schema({
 },
   { timestamps: true 
   });
+// Automatically delete documents after 6 months (15,552,000 seconds)
+ResultSchema.index({ createdAt: 1 }, { expireAfterSeconds: 15552000 });
 
 // COMPUTE SCORE AND PERFORMANCE BEFORE SAVING
 ResultSchema.pre('save', function (next) {

@@ -48,72 +48,13 @@ const QuizzesPage = () => {
         <StudentLayout title="My Quizzes" description="Attend quizzes and track your performance" activeItem={14}>
             <div className="w-[95%] m-auto mt-10 space-y-12">
 
-                {/* ─── Section: Available Quizzes ─── */}
-                <div>
-                    <h1 className={`${styles.title} !text-left`}>Available Quizzes</h1>
-
-                    <div className="mb-8 mt-4">
-                        <label className={styles.label}>Select Enrolled Course</label>
-                        <select
-                            value={selectedCourse}
-                            onChange={(e) => setSelectedCourse(e.target.value)}
-                            className={`${styles.input} !w-full md:!w-[400px] mt-2`}
-                        >
-                            <option value="">Select a course</option>
-                            {enrolledCourses.map((course: any) => (
-                                <option key={course._id} value={course._id}>{course.name}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {quizzesLoading || coursesLoading ? (
-                        <Loader />
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {quizzesData?.quizzes?.length > 0 ? (
-                                quizzesData.quizzes.map((quiz: any) => {
-                                    const isAttended = attendedQuizIds.has(String(quiz._id));
-                                    return (
-                                        <div key={quiz._id} className="bg-white dark:bg-[#111C43] p-6 rounded-xl shadow-md border-t-4 border-[#3ccbae] hover:shadow-lg transition-all relative">
-                                            {isAttended && (
-                                                <span className="absolute top-3 right-3 text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 px-2 py-0.5 rounded-full font-semibold">
-                                                    Attended
-                                                </span>
-                                            )}
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-[#3ccbae] rounded-lg">
-                                                    <PiExamFill size={24} />
-                                                </div>
-                                                <h3 className="text-lg font-bold text-gray-800 dark:text-white line-clamp-1">{quiz.title}</h3>
-                                            </div>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                                                Questions: {quiz.questions?.length || 0}
-                                            </p>
-                                            <Link
-                                                to={`/quiz?courseId=${selectedCourse}&quizId=${quiz._id}`}
-                                                className="block w-full text-center py-2 bg-[#3ccbae] text-white rounded-lg hover:bg-[#2bb298] transition-colors font-semibold"
-                                            >
-                                                {isAttended ? 'Retake Quiz' : 'Attend Quiz'}
-                                            </Link>
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <div className="col-span-full py-10 text-center bg-white dark:bg-[#111C43] rounded-xl shadow-md text-gray-500 dark:text-gray-400">
-                                    {selectedCourse ? 'No quizzes found for this course.' : 'Please select a course to see quizzes.'}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
                 {/* ─── Section: Attended Quizzes & Results ─── */}
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <PiTrophyFill className="text-amber-500" />
                         Attended Quizzes &amp; Results
                         {results.length > 0 && (
-                            <span className="ml-2 text-sm bg-[#3ccbae]/10 text-[#3ccbae] px-2.5 py-0.5 rounded-full font-semibold">
+                            <span className="ml-2 text-sm bg-[#39c1f3]/10 text-[#39c1f3] px-2.5 py-0.5 rounded-full font-semibold">
                                 {results.length} attempt{results.length !== 1 ? 's' : ''}
                             </span>
                         )}
@@ -147,14 +88,21 @@ const QuizzesPage = () => {
                                             </tr>
                                         ) : (
                                             results.map((result: any) => {
-                                                const passed = (result.score ?? 0) >= 50;
+                                                const actualScore = result.totalQuestions ? Math.round((result.correct / result.totalQuestions) * 100) : 0;
+                                                const passed = actualScore >= 50;
+                                                
+                                                let actualPerf = 'Needs Work';
+                                                if (actualScore >= 85) actualPerf = 'Excellent';
+                                                else if (actualScore >= 70) actualPerf = 'Good';
+                                                else if (actualScore >= 50) actualPerf = 'Average';
+
                                                 return (
                                                     <tr key={result._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                                         <td className="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white max-w-[180px] truncate">
                                                             {result.title || 'Quiz'}
                                                         </td>
                                                         <td className="px-5 py-4 text-sm font-bold text-gray-700 dark:text-gray-200">
-                                                            {result.score ?? 0}%
+                                                            {actualScore}%
                                                         </td>
                                                         <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300 hidden sm:table-cell">
                                                             <span className="text-emerald-600 dark:text-emerald-400 font-medium">{result.correct ?? 0}</span>
@@ -162,8 +110,8 @@ const QuizzesPage = () => {
                                                             <span className="text-red-500 font-medium">{result.wrong ?? 0}</span>
                                                         </td>
                                                         <td className="px-5 py-4 whitespace-nowrap">
-                                                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${performanceBadge(result.performance)}`}>
-                                                                {result.performance || 'N/A'}
+                                                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${performanceBadge(actualPerf)}`}>
+                                                                {actualPerf}
                                                             </span>
                                                         </td>
                                                         <td className="px-5 py-4 whitespace-nowrap">

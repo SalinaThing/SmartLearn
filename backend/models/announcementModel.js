@@ -34,6 +34,8 @@ const announcementSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// No pre-save hook needed as logic is handled in controller
+
 const Announcement = mongoose.model("Announcement", announcementSchema);
 
 export default Announcement;

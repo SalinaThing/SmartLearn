@@ -14,8 +14,8 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  commentReplies:[Object], // Fixed from [object] to [Object]
-});
+  commentReplies:[Object], 
+}, { timestamps: true });
 
 // Link Schema
 const linkSchema = new mongoose.Schema({

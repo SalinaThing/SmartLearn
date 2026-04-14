@@ -18,6 +18,7 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FeedbackIcon from "@mui/icons-material/QuestionAnswer";
 import StarIcon from "@mui/icons-material/StarOutline";
 import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
+import AnnouncementIcon from "@mui/icons-material/CampaignOutlined";
 
 export {
   HomeOutlinedIcon,
@@ -39,4 +40,5 @@ export {
   FeedbackIcon,
   StarIcon,
   NotificationsIcon,
+  AnnouncementIcon,
 };

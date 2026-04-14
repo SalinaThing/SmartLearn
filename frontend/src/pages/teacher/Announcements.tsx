@@ -7,10 +7,11 @@ import { useGetAllCoursesQuery } from "@/redux/features/courses/coursesApi";
 import { useUser } from "@/hooks/useUser";
 import { styles } from "@/styles/style";
 import StudentAnnouncements from "@/components/Course/StudentAnnouncements";
+import CreateAnnouncement from "@/components/Teacher/Announcements/CreateAnnouncement";
 
 const Announcements = () => {
   const { user } = useUser();
-  const { data: coursesData } = useGetAllCoursesQuery({});
+  const { data: coursesData, isLoading: coursesLoading } = useGetAllCoursesQuery({});
   const [selectedCourse, setSelectedCourse] = useState("");
 
   useEffect(() => {
@@ -34,26 +35,40 @@ const Announcements = () => {
           <DashboardHeader />
 
           <div className="w-[95%] m-auto mt-6">
-            <div className="mb-5">
-              <label className={styles.label}>Select Course</label>
-              <select
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
-                className={styles.input}
-              >
-                <option value="">Select a course</option>
-                {coursesData?.courses?.map((course: any) => (
-                  <option key={course._id} value={course._id}>
-                    {course.name}
-                  </option>
-                ))}
-              </select>
+            <h1 className={`${styles.title} !text-left mb-6`}>Manage Announcements</h1>
+            
+            <div className="bg-white dark:bg-[#111c43] p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+               <div className="mb-2">
+                    <label className="text-[14px] font-medium text-gray-700 dark:text-gray-300">Select Course</label>
+                    <select
+                      value={selectedCourse}
+                      onChange={(e) => setSelectedCourse(e.target.value)}
+                      className={`${styles.input} !mt-1`}
+                    >
+                      <option value="">Select a course to manage</option>
+                      {coursesData?.courses?.map((course: any) => (
+                        <option key={course._id} value={course._id}>
+                          {course.name}
+                        </option>
+                      ))}
+                    </select>
+                </div>
             </div>
 
-            {selectedCourse ? (
-              <StudentAnnouncements courseId={selectedCourse} user={user} />
+            {coursesLoading ? (
+              <p className="text-black dark:text-white text-center mt-10">Loading courses...</p>
+            ) : !coursesData?.courses?.length ? (
+              <p className="text-black dark:text-white text-center mt-10">
+                You have no courses yet. Please <a href="/teacher/create-course" className="text-[#39c1f3] underline">create a course</a> first.
+              </p>
             ) : (
-              <p className="text-black dark:text-white">Please select a course to manage announcements.</p>
+              selectedCourse ? (
+                <div className="space-y-8">
+                   <StudentAnnouncements courseId={selectedCourse} user={user} />
+                </div>
+              ) : (
+                <p className="text-black dark:text-white text-center py-10">Please select a course to manage announcements.</p>
+              )
             )}
           </div>
         </div>
@@ -63,3 +78,4 @@ const Announcements = () => {
 };
 
 export default Announcements;
+

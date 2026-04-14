@@ -5,7 +5,7 @@ import { styles } from '@/styles/style';
 import toast from 'react-hot-toast';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 
-const StudentFeedbackList: FC = () => {
+const StudentFeedbackList: FC<{ courseFilterId?: string }> = ({ courseFilterId }) => {
     const { data, isLoading, refetch } = useGetStudentFeedbackQuery({});
     const [updateFeedback, { isSuccess, error }] = useUpdateFeedbackMutation();
     const [deleteFeedback, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteFeedbackMutation();
@@ -13,7 +13,10 @@ const StudentFeedbackList: FC = () => {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
 
-    const feedbacks = data?.feedback || [];
+    let feedbacks = data?.feedback || [];
+    if (courseFilterId) {
+        feedbacks = feedbacks.filter((item: any) => String(item.courseId?._id || item.courseId) === String(courseFilterId));
+    }
 
     useEffect(() => {
         if (isSuccess) {
@@ -62,10 +65,12 @@ const StudentFeedbackList: FC = () => {
 
     return (
         <div className="w-full mt-8">
-            <h1 className="text-[25px] font-Poppins font-bold mb-6">
-                <span className="text-black dark:text-white">My</span>
-                <span className="text-[#3ccbae] ml-2">Feedback</span>
-            </h1>
+            {!courseFilterId && (
+                <h1 className="text-[25px] font-Poppins font-bold mb-6">
+                    <span className="text-black dark:text-white">My</span>
+                    <span className="text-[#3ccbae] ml-2">Feedback</span>
+                </h1>
+            )}
             <div className="space-y-4">
                 {feedbacks.length === 0 ? (
                     <div className="bg-white dark:bg-[#111C43] rounded-xl p-8 text-center shadow-md text-gray-500 dark:text-gray-400">
@@ -73,7 +78,7 @@ const StudentFeedbackList: FC = () => {
                     </div>
                 ) : (
                     feedbacks.map((item: any) => (
-                        <div key={item._id} className="bg-white dark:bg-[#111C43] rounded-xl p-5 shadow-md border-l-4 border-[#3ccbae]">
+                        <div key={item._id} className="bg-white dark:bg-[#111C43] rounded-xl p-5 shadow-md border-l-4 border-[#39c1f3]">
                             {editingId === item._id ? (
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
@@ -100,7 +105,7 @@ const StudentFeedbackList: FC = () => {
                                         rows={3}
                                     />
                                     <div className="flex gap-2">
-                                        <button onClick={handleUpdate} className="px-4 py-1.5 bg-[#3ccbae] text-white rounded text-sm">Save</button>
+                                        <button onClick={handleUpdate} className="px-4 py-1.5 bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] hover:from-[#2a9fd8] hover:to-[#1f8bc0] text-white rounded text-sm">Save</button>
                                         <button onClick={() => setEditingId(null)} className="px-4 py-1.5 bg-gray-500 text-white rounded text-sm">Cancel</button>
                                     </div>
                                 </div>

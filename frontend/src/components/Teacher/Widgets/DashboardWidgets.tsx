@@ -11,6 +11,7 @@ import AllQuizzes from '../Quizzes/AllQuizzes';
 import AllResultsTeacher from '../Quizzes/AllResultsTeacher';
 import AllUsers from '../Users/AllUsers';
 import { useUser } from '@/hooks/useUser';
+import CreateAnnouncement from '../Announcements/CreateAnnouncement';
 
 type Props = {
     open?: boolean;

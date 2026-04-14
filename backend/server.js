@@ -18,6 +18,7 @@ import announcementRouter from './routes/announcementRoutes.js';
 import chatRouter from './routes/chatRoutes.js';
 import http from "http";
 import { initSocketServer } from './serverSocket.js';
+import { initCronJobs } from './utils/cronJobs.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -66,4 +67,7 @@ server.listen(process.env.PORT, ()=>{
     
     //db
     connectDB();
+
+    // Initialize scheduled cron jobs
+    initCronJobs();
 });

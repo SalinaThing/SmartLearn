@@ -21,6 +21,9 @@ const notificationSchema = new mongoose.Schema({
     role:{
         type: String,
         default: "all",
+    },
+    path:{
+        type: String,
     }
 }, { timestamps: true });
 

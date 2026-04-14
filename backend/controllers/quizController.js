@@ -47,11 +47,22 @@ export const createQuiz = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
-// GET ALL QUIZZES FOR A COURSE
+// GET ALL QUIZZES FOR A COURSE OR ALL COURSES FOR TEACHER
 export const getQuizzesByCourse = catchAsyncErrors(async (req, res, next) => {
     try {
         const { courseId } = req.params;
-        const quizzes = await QuizModel.find({ courseId });
+        let query = {};
+
+        if (courseId && courseId !== "all") {
+             query.courseId = courseId;
+        } else if (req.user && req.user.role === "teacher") {
+             const CourseModel = (await import("../models/courseModel.js")).default;
+             const teacherCourses = await CourseModel.find({ teacher: req.user._id }).select("_id");
+             const courseIds = teacherCourses.map((c) => c._id);
+             query.courseId = { $in: courseIds };
+        }
+
+        const quizzes = await QuizModel.find(query).sort({createdAt: -1});
 
         res.status(200).json({
             success: true,

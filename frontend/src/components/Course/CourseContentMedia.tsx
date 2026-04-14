@@ -183,21 +183,38 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
             {mediaUrl ? (
                 isPdfContent ? (
                     <div className="w-full">
-                        <div className="w-full rounded border border-[#ffffff1f] overflow-hidden bg-black/10">
+                        <div className="w-full rounded border border-[#ffffff1f] overflow-hidden bg-black/10 relative">
                             <iframe
                                 title={activeContent?.title || "PDF"}
-                                src={mediaUrl}
+                                src={mediaUrl.includes('drive.google.com') && !mediaUrl.includes('preview') 
+                                    ? mediaUrl.replace('/view', '/preview') 
+                                    : mediaUrl}
                                 className="w-full h-[70vh]"
-                            />
+                            >
+                                <p className="dark:text-white text-black p-10 text-center">
+                                    Your browser doesn't support PDF embedding. 
+                                    <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline ml-1">
+                                        Click here to view PDF
+                                    </a>
+                                </p>
+                            </iframe>
                         </div>
-                        <div className="mt-3 flex items-center justify-end">
+                        <div className="mt-4 flex items-center justify-center gap-4">
                             <a
                                 href={mediaUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`${styles.button} text-white !w-[unset] !min-h-[40px] !py-[unset]`}
+                                className={`flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-Poppins py-2 px-6 rounded-lg transition-all shadow-md group`}
                             >
-                                Open PDF
+                                <span className="text-xl group-hover:scale-110 transition-transform">📄</span>
+                                Open PDF in New Tab
+                            </a>
+                            <a
+                                href={mediaUrl}
+                                download
+                                className="flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-black dark:text-white font-Poppins py-2 px-6 rounded-lg transition-all"
+                            >
+                                Download
                             </a>
                         </div>
                     </div>
@@ -252,7 +269,7 @@ const CourseContentMedia = ({ data, user, id, activeVideo, setActiveVideo, refet
                 <div className="flex flex-wrap gap-4">
                     {tabs
                         .filter(text => {
-                            if (user?.role === "admin" && (text === "Feedback" || text === "Announcements")) return false;
+                            if (user?.role === "admin" && text === "Feedback") return false;
                             if (user?.role === "teacher" && text === "Feedback") return false;
                             return true;
                         })

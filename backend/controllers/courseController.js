@@ -92,15 +92,28 @@ export const uploadCourse = catchAsyncErrors(async (req, res, next) => {
                 user: student._id,
                 title: "New Course Available",
                 message: `A new course "${course.name}" has been created! Check it out.`,
-                role: 'student'
+                role: 'student',
+                path: `/course/${course._id}`
             });
         }
+        
+        // Notify admin about the new course creation
+        const admins = await userModel.find({ role: "admin" });
+        for (const admin of admins) {
+            await NotificationModel.create({
+                user: admin._id,
+                title: "New Course Created",
+                message: `Teacher ${req.user?.name || "Someone"} has created a new course "${course.name}".`,
+                role: 'admin',
+                path: `/course/${course._id}`
+            });
+        }
+
         io.emit("newNotification", { 
             action: "New Course Created", 
             title: "New Course", 
             message: `A new course "${course.name}" is now available!` 
         });
-
         res.status(201).json({
             success: true,
             course,
@@ -153,6 +166,22 @@ export const editCourse = catchAsyncErrors(async (req, res, next) => {
                 message: `Your enrolled course "${course.name}" has been updated`
             });
         }
+        
+        // Notify admin about the course update
+        const admins = await userModel.find({ role: "admin" });
+        for (const admin of admins) {
+            await NotificationModel.create({
+                user: admin._id,
+                title: "Course Updated",
+                message: `Teacher ${req.user?.name || "Someone"} has updated the course "${course.name}".`,
+                role: 'admin'
+            });
+            io.to(admin._id.toString()).emit("newNotification", {
+                action: "Course Updated",
+                title: "Course Updated",
+                message: `A course "${course.name}" has been updated.`
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -189,9 +218,15 @@ export const getAllCourse = catchAsyncErrors(async (req, res, next) => {
     try {
         const { search, category, level, minPrice, maxPrice, sort } = req.query;
         let query = {};
-        if (search) query.name = { $regex: search, $options: "i" };
-        if (category && category !== "All") query.categories = category;
-        if (level && level !== "All") query.level = level;
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: "i" } },
+                { tags: { $regex: search, $options: "i" } },
+                { categories: { $regex: search, $options: "i" } }
+            ];
+        }
+        if (category && category !== "All") query.categories = { $regex: `^${category.trim()}$`, $options: "i" };
+        if (level && level !== "All") query.level = { $regex: `^${level.trim()}$`, $options: "i" };
         if (minPrice !== undefined || maxPrice !== undefined) {
             query.price = {};
             if (minPrice) query.price.$gte = Number(minPrice);
@@ -223,8 +258,10 @@ export const getCourseByUser = catchAsyncErrors(async (req, res, next) => {
         const course = await CourseModel.findById(courseId);
         if (!course) return next(new ErrorHandler(404, "Course not found"));
 
-        if (!courseExists && req.user.role !== "admin" && req.user.role !== "teacher" && course.isPremium) {
-            return next(new ErrorHandler(403, "You have not purchased this course"));
+        if (!courseExists && req.user.role !== "admin" && req.user.role !== "teacher" && course.isPremium && course.price > 0) {
+            // Allow access to only first 5 lessons as preview for premium courses
+            const previewContent = course?.courseData?.slice(0, 5) || [];
+            return res.status(200).json({ success: true, content: previewContent, isPreview: true });
         }
 
         res.status(200).json({ success: true, content: course?.courseData || [] });
@@ -251,13 +288,16 @@ export const addQuestion = catchAsyncErrors(async (req, res, next) => {
         courseContent.questions.push(newQuestion);
 
         await NotificationModel.create({
-            user: req.user._id,
+            user: course.teacher,
             title: "New Question",
-            message: `You have a new question in ${courseContent.title}`,
-            role: 'teacher' 
+            message: `You have a new question from ${req.user.name} in ${courseContent.title}`,
+            role: 'teacher',
+            path: `/course-access/${courseId}`
         });
 
+        course.markModified("courseData");
         await course.save();
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
 
         // Real-time notification for teacher AND admin
         io.to("teacher").to("admin").emit("newNotification", {
@@ -284,7 +324,11 @@ export const addAnswer = catchAsyncErrors(async (req, res, next) => {
         const question = courseContent.questions.find((item) => item._id.equals(questionId));
         if (!question) return next(new ErrorHandler(404, "Invalid question id"));
 
-        const newAnswer = { user: req.user, answer };
+        const newAnswer = { 
+            user: req.user, 
+            answer,
+            createdAt: new Date(),
+        };
         question.questionReplies.push(newAnswer);
 
         // Notify the student who asked the question
@@ -293,7 +337,8 @@ export const addAnswer = catchAsyncErrors(async (req, res, next) => {
                 user: question.user._id,
                 title: "New Question Reply",
                 message: `You have a new reply to your question in ${courseContent.title}`,
-                role: 'student'
+                role: 'student',
+                path: `/course-access/${courseId}`
             });
             // Emit to the specific student via their ID room
             io.to(question.user._id.toString()).emit("newNotification", {
@@ -303,13 +348,43 @@ export const addAnswer = catchAsyncErrors(async (req, res, next) => {
             });
         }
 
+        course.markModified("courseData");
         await course.save();
+        await redis.set(courseId, JSON.stringify(course), "EX", 604800);
 
         if (req.user.role === 'teacher' || req.user.role === 'admin') {
-            // Already handled above if the teacher is the one replying
+            // Notify admin that a teacher has replied
+            await NotificationModel.create({
+                 title: "Question Answered",
+                 message: `Teacher ${req.user.name} answered a question in ${course.name}`,
+                 role: 'admin',
+                 path: `/course-access/${courseId}`
+            });
+            io.to("admin").emit("newNotification", { 
+                action: "Question Answered",
+                title: "Question Answered", 
+                message: `${req.user.name} replied to a student question` 
+            });
         } else {
-            // Send email to teacher if another student replied? User mentioned "other replies" too.
-            // But usually teacher wants to know.
+            // Notify teacher and admin that another student has replied
+            await NotificationModel.create({
+                 user: course.teacher,
+                 title: "New Question Reply",
+                 message: `Student ${req.user.name} replied to a question in ${course.name}`,
+                 role: 'teacher',
+                 path: `/course-access/${courseId}`
+            });
+            await NotificationModel.create({
+                 title: "New Question Reply",
+                 message: `Student ${req.user.name} replied to a question in ${course.name}`,
+                 role: 'admin',
+                 path: `/course-access/${courseId}`
+            });
+            io.to("teacher").to("admin").emit("newNotification", { 
+                action: "Question Answered",
+                title: "Student Replied to Question", 
+                message: `${req.user.name} replied in ${course.name}` 
+            });
         }
         res.status(200).json({ success: true, course });
     } catch (err) {
@@ -333,6 +408,7 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
             user: req.user,
             rating,
             comment: review,
+            createdAt: new Date(),
         };
         course.reviews.push(newReview);
 
@@ -344,9 +420,11 @@ export const addReview = catchAsyncErrors(async (req, res, next) => {
         await redis.set(courseId, JSON.stringify(course), "EX", 604800);
 
         await NotificationModel.create({
-            user: req.user._id,
+            user: course.teacher,
             title: "New Review",
             message: `${req.user.name} has given a review in ${course.name}`,
+            role: 'teacher',
+            path: `/course/${courseId}`
         });
         io.to("teacher").to("admin").emit("newNotification", { action: "New Review Received", title: "New Review", message: `${req.user.name} reviewed ${course.name}` });
 
@@ -366,7 +444,11 @@ export const addReplyToReview = catchAsyncErrors(async (req, res, next) => {
         const review = course.reviews.find((rev) => rev._id.equals(reviewId));
         if (!review) return next(new ErrorHandler(404, "Review not found"));
 
-        const replyData = { user: req.user, comment };
+        const replyData = { 
+            user: req.user, 
+            comment,
+            createdAt: new Date(),
+        };
         if (!review.commentReplies) review.commentReplies = [];
         review.commentReplies.push(replyData);
 
@@ -375,8 +457,9 @@ export const addReplyToReview = catchAsyncErrors(async (req, res, next) => {
             await NotificationModel.create({
                 user: review.user._id,
                 title: "New Review Reply",
-                message: `A teacher replied to your review in ${course.name}`,
-                role: 'student'
+                message: `Teacher ${req.user.name} replied to your review in ${course.name}`,
+                role: 'student',
+                path: `/course/${courseId}`
             });
             io.to(review.user._id.toString()).emit("newNotification", {
                 action: "Review Reply Received",
@@ -387,6 +470,21 @@ export const addReplyToReview = catchAsyncErrors(async (req, res, next) => {
 
         await course.save();
         await redis.set(courseId, JSON.stringify(course), "EX", 604800);
+
+        if (req.user.role === 'teacher' || req.user.role === 'admin') {
+             // Notify admin that a teacher has replied to a review
+             await NotificationModel.create({
+                 title: "Review Replied",
+                 message: `Teacher ${req.user.name} replied to a review in ${course.name}`,
+                 role: 'admin',
+                 path: `/course/${courseId}`
+             });
+             io.to("admin").emit("newNotification", { 
+                action: "Review Replied",
+                title: "Review Replied", 
+                message: `${req.user.name} replied to a review` 
+            });
+        }
 
         res.status(200).json({ success: true, course });
     } catch (err) {

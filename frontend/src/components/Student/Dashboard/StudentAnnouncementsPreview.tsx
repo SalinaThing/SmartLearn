@@ -25,7 +25,7 @@ const StudentAnnouncementsPreview: FC = () => {
                 <h2 className="text-xl font-bold text-gray-800 dark:text-white">
                     Latest Announcements
                 </h2>
-                <Link to="/student/announcements" className="text-[#3ccbae] text-sm font-semibold hover:underline">
+                <Link to="/student/announcements" className="text-[#39c1f3] text-sm font-semibold hover:underline">
                     View All
                 </Link>
             </div>

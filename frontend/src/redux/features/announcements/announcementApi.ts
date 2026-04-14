@@ -8,12 +8,14 @@ export const announcementApi = apiSlice.injectEndpoints({
                 method: "POST",
                 body: data,
             }),
+            invalidatesTags: ["Announcements"],
         }),
         getAnnouncementsByCourse: builder.query({
             query: (courseId) => ({
                 url: `get-announcements/${courseId}`,
                 method: "GET",
             }),
+            providesTags: ["Announcements"],
         }),
         updateAnnouncement: builder.mutation({
             query: ({ id, data }) => ({
@@ -21,12 +23,14 @@ export const announcementApi = apiSlice.injectEndpoints({
                 method: "PUT",
                 body: data,
             }),
+            invalidatesTags: ["Announcements"],
         }),
         deleteAnnouncement: builder.mutation({
             query: (id) => ({
                 url: `delete-announcement/${id}`,
                 method: "DELETE",
             }),
+            invalidatesTags: ["Announcements"],
         }),
     }),
 });

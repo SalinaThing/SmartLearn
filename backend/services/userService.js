@@ -30,6 +30,13 @@ export const updateUserRoleService = async (id, role, res) => {
         throw new Error("Invalid role. Allowed roles are: student, teacher, admin");
     }
 
+    if (role === "admin") {
+        const existingAdmin = await userModel.findOne({ role: "admin", _id: { $ne: id } });
+        if (existingAdmin) {
+            throw new Error("An admin already exists. Only one admin allowed in the system.");
+        }
+    }
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new Error("Invalid user id");
     }

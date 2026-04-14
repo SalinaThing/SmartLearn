@@ -220,7 +220,10 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                                 },
 
                                 "& .MuiTablePagination-root": {
-                                    color: theme === "dark" ? "#fff" : "#000",
+                                    color: "#fff !important",
+                                },
+                                "& .MuiTablePagination-selectIcon": {
+                                    color: "#fff !important",
                                 },
 
                                 "& .MuiDataGrid-cell": {
@@ -249,9 +252,9 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
                                 },
 
                                 "& .MuiDataGrid-footerContainer": {
-                                    backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#A4A9FC !important",
-                                    borderTop: "1px solid #ffffff30",
-                                    color: theme === "dark" ? "#fff !important" : "#000 !important",
+                                    background: "linear-gradient(to right, #39c1f3, #2a9fd8) !important",
+                                    borderTop: "none",
+                                    color: "#fff !important",
                                 },
 
                                 "& .MuiCheckbox-root": {

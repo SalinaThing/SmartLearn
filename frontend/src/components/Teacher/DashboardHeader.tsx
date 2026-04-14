@@ -123,7 +123,7 @@ const DashboardHeader: FC<Props> = ({ open: propOpen, setOpen: propSetOpen, hide
                                                 <p className="text-black dark:text-white font-medium">
                                                     {item.title}
                                                 </p>
-                                                <p className="text-blue-500 text-sm cursor-pointer hover:underline"
+                                                <p className="text-[#39c1f3] text-sm cursor-pointer hover:underline"
                                                     onClick={() => handleNotificationStatusChange(item._id)}
                                                 >
                                                     Mark read

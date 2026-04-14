@@ -9,6 +9,7 @@ export const quizApi = apiSlice.injectEndpoints({
                 body: data,
                 credentials: "include" as const,
             }),
+            invalidatesTags: ["Quizzes"],
         }),
         getQuizzesByCourse: builder.query({
             query: (courseId) => ({
@@ -16,6 +17,7 @@ export const quizApi = apiSlice.injectEndpoints({
                 method: "GET",
                 credentials: "include" as const,
             }),
+            providesTags: ["Quizzes"]
         }),
         updateQuiz: builder.mutation({
             query: ({ id, data }) => ({
@@ -24,6 +26,7 @@ export const quizApi = apiSlice.injectEndpoints({
                 body: data,
                 credentials: "include" as const,
             }),
+            invalidatesTags: ["Quizzes"],
         }),
         deleteQuiz: builder.mutation({
             query: (id) => ({
@@ -31,6 +34,7 @@ export const quizApi = apiSlice.injectEndpoints({
                 method: "DELETE",
                 credentials: "include" as const,
             }),
+            invalidatesTags: ["Quizzes"],
         }),
     }),
 });

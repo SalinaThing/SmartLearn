@@ -19,6 +19,7 @@ import {
     ExitToAppIcon,
     FeedbackIcon,
     NotificationsIcon,
+    AnnouncementIcon,
 } from "./Icon";
 import { useUser } from "@/hooks/useUser";
 import Image from "@/utils/Image";
@@ -95,6 +96,7 @@ const Sidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIsColla
         if (activeItem === 3) setSelected("Invoices");
         if (activeItem === 4) setSelected("Live Courses");
         if (activeItem === 14) setSelected("Quizzes");
+        if (activeItem === 15) setSelected("Announcements");
     }, [activeItem]);
 
     if (!mounted) return null;

@@ -248,7 +248,10 @@ const All_Invoices = ({ isDashboard }: Props) => {
                   },
                 },
                 "& .MuiTablePagination-root": {
-                  color: theme === "dark" ? "#fff" : "#000",
+                  color: "#fff !important",
+                },
+                "& .MuiTablePagination-selectIcon": {
+                  color: "#fff !important",
                 },
                 "& .MuiDataGrid-cell": {
                   borderBottom: "none!important",
@@ -280,9 +283,9 @@ const All_Invoices = ({ isDashboard }: Props) => {
                   backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#ffffff !important",
                 },
                 "& .MuiDataGrid-footerContainer": {
-                  color: theme === "dark" ? "#fff !important" : "#000 !important",
-                  borderTop: "1px solid #ffffff30",
-                  backgroundColor: theme === "dark" ? "#1F2A40 !important" : "#A4A9FC !important",
+                  background: "linear-gradient(to right, #39c1f3, #2a9fd8) !important",
+                  color: "#fff !important",
+                  borderTop: "none",
                   borderRadius: "0 0 12px 12px",
                 },
                 "& .MuiCheckbox-root": {

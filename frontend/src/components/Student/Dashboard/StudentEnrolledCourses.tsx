@@ -24,7 +24,7 @@ const StudentEnrolledCourses: FC = () => {
                     <p className="text-gray-500 dark:text-gray-400">
                         You are not enrolled in any courses yet.
                     </p>
-                    <button className="mt-4 px-6 py-2 bg-[#3ccbae] text-white rounded-lg hover:bg-[#2bb298] transition-colors">
+                    <button className="mt-4 px-6 py-2 bg-gradient-to-r from-[#39c1f3] to-[#2a9fd8] hover:from-[#2a9fd8] hover:to-[#1f8bc0] text-white rounded-lg transition-colors shadow-md">
                         Browse Courses
                     </button>
                 </div>

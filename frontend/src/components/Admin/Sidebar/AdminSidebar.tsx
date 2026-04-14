@@ -98,6 +98,8 @@ const AdminSidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIs
         if (activeItem === 8) setSelected("User Analytics");
         if (activeItem === 9) setSelected("Order Analytics");
         if (activeItem === 10) setSelected("Course Analytics");
+        if (activeItem === 11) setSelected("Feedback");
+        if (activeItem === 12) setSelected("Notifications");
     }, [activeItem]);
 
 
@@ -251,6 +253,7 @@ const AdminSidebar: FC<Props> = ({ activeItem, open, setOpen, isCollapsed, setIs
                                 </p>
                             )}
                             <Item title="Live Courses" to="/admin/courses" icon={<OndemandVideoIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
+                            <Item title="Feedback" to="/admin/feedback" icon={<FeedbackIcon />} selected={selected} setSelected={setSelected} setOpen={setOpen} isLightMode={isLightMode} />
                             
                             {!isCollapsed && (
                                 <p className="text-[15px] font-Poppins px-6 py-2 mt-4 font-[600]" style={{ color: isLightMode ? "#000" : "#9ca3af" }}>

@@ -164,6 +164,29 @@ const CourseContent = ({ id }: Props) => {
                                     )}
                                 </div>
                             )}
+
+                            {/* Preview Mode Banner */}
+                            {data?.isPreview && (
+                                <div className="w-full bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 p-4 sticky top-0 z-20 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-amber-100 dark:bg-amber-800 p-2 rounded-full">
+                                            <span className="text-xl">🔓</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-amber-800 dark:text-amber-400 font-bold font-Poppins">Free Preview Mode</h4>
+                                            <p className="text-amber-700 dark:text-amber-500 text-sm">
+                                                You are currently viewing the first 5 lessons of this premium course.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => navigate(`/course/${id}`)}
+                                        className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-md active:scale-95"
+                                    >
+                                        Unlock Full Course
+                                    </button>
+                                </div>
+                            )}
                             
                             <CourseContentMedia
                                 data={data?.content}

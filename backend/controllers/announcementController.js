@@ -11,52 +11,49 @@ const normalizeDate = (value, fallback = null) => {
 };
 
 // Create announcement (teacher only, enforced in route)
+// Create announcement (teacher only, enforced in route)
 export const createAnnouncement = catchAsyncErrors(async (req, res, next) => {
-  const { title, content, courseId, scheduledFor, validTill } = req.body;
+    const { title, content, courseId, scheduledFor, validTill } = req.body;
 
-  if (!title || !content || !courseId) {
-    return next(new ErrorHandler(400, "Title, content and courseId are required"));
-  }
+    if (!title || !content || !courseId) {
+        return next(new ErrorHandler(400, "Title, content and courseId are required"));
+    }
 
-  const scheduledDate = normalizeDate(scheduledFor, new Date());
-  const validTillDate = normalizeDate(validTill, null);
+    if (!req.user || !req.user._id) {
+        return next(new ErrorHandler(401, "User session not found, please login again"));
+    }
 
-  if (!scheduledDate) {
-    return next(new ErrorHandler(400, "Invalid scheduledFor date"));
-  }
-
-  if (validTillDate && validTillDate < scheduledDate) {
-    return next(new ErrorHandler(400, "validTill must be after scheduledFor"));
-  }
-
-  const announcement = await Announcement.create({
-    userId: req.user._id,
-    courseId,
-    title: title.trim(),
-    content: content.trim(),
-    scheduledFor: scheduledDate,
-    validTill: validTillDate,
-  });
-
-  try {
-    await NotificationModel.create({
-      title: "New Announcement",
-      message: `A new announcement has been posted: "${announcement.title}"`,
-      role: 'all' // Shows for students and admins
+    const announcement = await Announcement.create({
+        userId: req.user._id,
+        courseId: courseId.trim(),
+        title: title.trim(),
+        content: content.trim(),
+        scheduledFor: scheduledFor ? new Date(scheduledFor) : new Date(),
+        validTill: validTill ? new Date(validTill) : null,
     });
-    // Emit socket event to both
-    io.to("student").to("admin").emit("newNotification", {
-      title: "New Announcement",
-      message: `A new announcement has been posted: "${announcement.title}"`,
-    });
-  } catch (error) {
-    console.log("Announcement notification error:", error);
-  }
 
-  return res.status(201).json({
-    success: true,
-    announcement,
-  });
+    try {
+        await NotificationModel.create({
+            title: "New Announcement",
+            message: `New announcement: ${announcement.title}`,
+            role: 'student',
+            path: `/course-access/${courseId}`
+        });
+
+        if (io) {
+            io.emit("newNotification", {
+                title: "New Announcement",
+                message: `New announcement: ${announcement.title}`,
+            });
+        }
+    } catch (error) {
+        console.log("Notification error (non-fatal):", error.message);
+    }
+
+    res.status(201).json({
+        success: true,
+        announcement,
+    });
 });
 
 // Update announcement (teacher only, enforced in route)
@@ -101,10 +98,17 @@ export const updateAnnouncement = catchAsyncErrors(async (req, res, next) => {
     await NotificationModel.create({
       title: "Announcement Updated",
       message: `Announcement "${announcement.title}" has been updated.`,
-      role: 'student'
+      role: 'student',
+      path: `/course-access/${announcement.courseId}`
+    });
+    await NotificationModel.create({
+      title: "Announcement Updated",
+      message: `Teacher ${req.user.name} has updated an announcement: "${announcement.title}".`,
+      role: 'admin',
+      path: `/course-access/${announcement.courseId}`
     });
     // Emit socket event
-    io.to("student").emit("newNotification", {
+    io.to("student").to("admin").emit("newNotification", {
       title: "Announcement Updated",
       message: `Announcement "${announcement.title}" has been updated.`,
     });

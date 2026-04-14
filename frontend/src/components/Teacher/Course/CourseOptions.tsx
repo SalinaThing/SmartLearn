@@ -25,14 +25,14 @@ const CourseOptions: FC <Props> = ({active, setActive}) => {
                 >
                     <div
                         className={`w-[35px] h-[35px] rounded-full flex items-center justify-center ${
-                            active + 1 > index ? "bg-blue-500" :"bg-[#384766]"
+                            active + 1 > index ? "bg-[#39c1f3]" :"bg-[#384766]"
                         } relative`}
                     >
-                        <IoMdCheckmark className="text-[25px]"/>
+                        <IoMdCheckmark className="text-[25px] text-white"/>
                         {index != options.length - 1 && (
                             <div
                                 className={`absolute h-[30px] w-1 ${
-                                    active + 1 > index ? "bg-blue-500" :"bg-[#384766]"
+                                    active + 1 > index ? "bg-[#39c1f3]" :"bg-[#384766]"
                                 } bottom-[-100%]`}
                             />
                         )}
